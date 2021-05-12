@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QCoreApplication
-from .window import Window
+from .window import Editor, Window
 import sys
 
 class Application(QApplication):
@@ -51,8 +51,11 @@ class Application(QApplication):
         self.window.toolbar.add_action("Open", "Assets", "", "Opens the selected asset", testing("open asset"))
         self.window.toolbar.add_action("Delete", "Assets", "", "Deletes the selected asset", testing("del asset"))
         
-        
-        
+        self.editor = Editor(self.window)
+        self.editor.add_tab("Scene", 0, 0)
+        self.editor.add_tab("Game", 1, 0)
+        self.editor.add_tab("Inspector", 0, 1)
+
     def start(self):
         self.window.showMaximized()
         self.exec_()

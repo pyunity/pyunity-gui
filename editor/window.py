@@ -73,24 +73,40 @@ class ToolBar:
 class Editor(QWidget):
     def __init__(self, window):
         super(Editor, self).__init__(window)
-        self.window = window
         self.tabs = []
+        self.tab_widgets = []
+
+        self.grid_layout = QGridLayout(self)
+        self.grid_layout.setSpacing(0)
+        self.grid_layout.setContentsMargins(0, 0, 0, 0)
     
     def add_tab(self, name, row, column):
-        if len(self.tabs) >= column:
-            self.tabs.append([])
+        if len(self.tabs) <= column:
             column = len(self.tabs)
+            self.tabs.append([])
+            self.tab_widgets.append([])
+            span = int(len(self.tabs[column]) == 0) + 1
+            self.tab_widgets[column].append(tab_widget := QTabWidget(self))
+            self.grid_layout.addWidget(tab_widget, row, column, 1, span)
+        if len(self.tabs[column]) <= row:
+            row = len(self.tabs[column])
+            self.tabs[column].append([])
+            self.tab_widgets[column].append(tab_widget := QTabWidget(self))
+        else:
+            tab_widget = self.tab_widgets[column][row]
+        print(self.tabs, row, column)
+        tab = Tab(tab_widget, name, row, column)
+        self.tabs[column][row].append(tab)
 
 class Tab(QWidget):
-    def __init__(self, parent, name, row, column, span=False):
-        super(Tab, self).__init__(parent)
-        self.parent = parent
+    def __init__(self, tab_widget, name, row, column):
+        super(Tab, self).__init__()
+        self.tab_widget = tab_widget
         self.name = name
         self.row = row
         self.column = column
-        self.span = span
         
-        tabwidget = self.parent.tabs[row][column]
+        self.tab_widget.addTab(self, self.name)
 
 def start():
     return QApplication(sys.argv)
