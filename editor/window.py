@@ -88,13 +88,13 @@ class Editor(QWidget):
             self.tab_widgets.append([])
             span = int(len(self.tabs[column]) == 0) + 1
             self.tab_widgets[column].append(tab_widget := QTabWidget(self))
-            self.grid_layout.addWidget(tab_widget, row, column, 1, span)
+            self.grid_layout.addWidget(tab_widget, row, column, span, 1)
         if len(self.tabs[column]) <= row:
             row = len(self.tabs[column])
             self.tabs[column].append([])
             self.tab_widgets[column].append(tab_widget := QTabWidget(self))
             span = int(len(self.tabs[column]) == 0) + 1
-            self.grid_layout.addWidget(tab_widget, row, column, 1, span)
+            self.grid_layout.addWidget(tab_widget, row, column, span, 1)
         else:
             tab_widget = self.tab_widgets[column][row]
         print(self.tabs, row, column)
