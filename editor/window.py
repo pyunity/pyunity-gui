@@ -70,5 +70,27 @@ class ToolBar:
         if menu in self.menus and sub in self.sub_menus[menu]:
             self.sub_menus[menu][sub].addSeparator()
 
+class Editor(QWidget):
+    def __init__(self, window):
+        super(Editor, self).__init__(window)
+        self.window = window
+        self.tabs = []
+    
+    def add_tab(self, name, row, column):
+        if len(self.tabs) >= column:
+            self.tabs.append([])
+            column = len(self.tabs)
+
+class Tab(QWidget):
+    def __init__(self, parent, name, row, column, span=False):
+        super(Tab, self).__init__(parent)
+        self.parent = parent
+        self.name = name
+        self.row = row
+        self.column = column
+        self.span = span
+        
+        tabwidget = self.parent.tabs[row][column]
+
 def start():
     return QApplication(sys.argv)

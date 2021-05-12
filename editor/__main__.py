@@ -1,8 +1,5 @@
 from editor.app import Application
 
-def main():
+if __name__ == "__main__":
     app = Application()
     app.start()
-
-if __name__ == "__main__":
-    main()
