@@ -79,6 +79,7 @@ class Editor(QWidget):
         self.grid_layout = QGridLayout(self)
         self.grid_layout.setSpacing(0)
         self.grid_layout.setContentsMargins(0, 0, 0, 0)
+        window.setCentralWidget(self)
     
     def add_tab(self, name, row, column):
         if len(self.tabs) <= column:
@@ -92,6 +93,8 @@ class Editor(QWidget):
             row = len(self.tabs[column])
             self.tabs[column].append([])
             self.tab_widgets[column].append(tab_widget := QTabWidget(self))
+            span = int(len(self.tabs[column]) == 0) + 1
+            self.grid_layout.addWidget(tab_widget, row, column, 1, span)
         else:
             tab_widget = self.tab_widgets[column][row]
         print(self.tabs, row, column)
