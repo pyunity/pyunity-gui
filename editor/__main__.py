@@ -1,9 +1,8 @@
-from editor.core import Window, start
+from editor.app import Application
 
 def main():
-    app = start()
-    gui = Window()
-    app.exec_()
+    app = Application()
+    app.start()
 
 if __name__ == "__main__":
     main()
