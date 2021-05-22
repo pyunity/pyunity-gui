@@ -1,0 +1,6 @@
+pathvalidate
+PyQt5
+pytest
+glfw
+pygame
+pyopengl
