@@ -114,6 +114,7 @@ class Tab(QWidget):
     def __init__(self, tab_widget, name, row, column):
         super(Tab, self).__init__()
         self.tab_widget = tab_widget
+        self.vbox_layout = QVBoxLayout(self)
         self.name = name
         self.row = row
         self.column = column
