@@ -84,22 +84,18 @@ class Editor(QWidget):
     def add_tab(self, name, row, column):
         if len(self.tabs) <= column:
             column = len(self.tabs)
-            self.tabs.append([])
-            self.tab_widgets.append([])
-            span = int(len(self.tabs[column]) == 0) + 1
-            self.tab_widgets[column].append(tab_widget := QTabWidget(self))
-            self.grid_layout.addWidget(tab_widget, row, column, span, 1)
-        if len(self.tabs[column]) <= row:
+            self.tabs.append([[]])
+            tab_widget = QTabWidget(self)
+            self.tab_widgets.append([tab_widget])
+            self.grid_layout.addWidget(tab_widget, column, row, -1, 1)
+        elif len(self.tabs[column]) <= row:
             row = len(self.tabs[column])
             self.tabs[column].append([])
-            self.tab_widgets[column].append(tab_widget := QTabWidget(self))
-            span = int(len(self.tabs[column]) == 0) + 1
-            self.grid_layout.addWidget(tab_widget, row, column, span, 1)
-        else:
-            tab_widget = self.tab_widgets[column][row]
-        print(self.tabs, row, column)
-        tab = Tab(tab_widget, name, row, column)
-        self.tabs[column][row].append(tab)
+            tab_widget = QTabWidget(self)
+            self.tab_widgets[column].append(tab_widget)
+            self.grid_layout.addWidget(tab_widget, column, row, -1, 1)
+        tab_widget = self.tab_widgets[column][row]
+        self.tabs[column][row].append(Tab(tab_widget, name, row, column))
 
 class Tab(QWidget):
     def __init__(self, tab_widget, name, row, column):

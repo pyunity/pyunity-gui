@@ -53,9 +53,11 @@ class Application(QApplication):
         
         self.editor = Editor(self.window)
         self.editor.add_tab("Scene", 0, 0)
-        self.editor.add_tab("Game", 1, 0)
-        self.editor.add_tab("Inspector", 0, 1)
+        self.editor.add_tab("Game", 0, 1)
+        self.editor.add_tab("Console", 0, 1)
+        self.editor.add_tab("Hierarchy", 1, 0)
         self.editor.add_tab("Files", 1, 1)
+        self.editor.add_tab("Inspector", 2, 0)
 
     def start(self):
         self.window.showMaximized()
