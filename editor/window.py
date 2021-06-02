@@ -73,29 +73,42 @@ class ToolBar:
 class Editor(QWidget):
     def __init__(self, window):
         super(Editor, self).__init__(window)
-        self.tabs = []
-        self.tab_widgets = []
+        self.columnWidgets = []
 
-        self.grid_layout = QGridLayout(self)
-        self.grid_layout.setSpacing(0)
-        self.grid_layout.setContentsMargins(0, 0, 0, 0)
+        self.hbox_layout = QHBoxLayout(self)
+        self.hbox_layout.setSpacing(0)
+        self.hbox_layout.setContentsMargins(0, 0, 0, 0)
         window.setCentralWidget(self)
     
     def add_tab(self, name, row, column):
-        if len(self.tabs) <= column:
-            column = len(self.tabs)
-            self.tabs.append([[]])
+        if len(self.columnWidgets) <= column:
+            column = len(self.columnWidgets)
+            columnWidget = Column(column)
+            self.hbox_layout.addWidget(columnWidget)
+            self.columnWidgets.append(columnWidget)
+        columnWidget = self.columnWidgets[column]
+        columnWidget.add_tab(name, row)
+
+class Column(QWidget):
+    def __init__(self, column):
+        super(Column, self).__init__()
+        self.vbox_layout = QVBoxLayout(self)
+        self.vbox_layout.setSpacing(0)
+        self.vbox_layout.setContentsMargins(0, 0, 0, 0)
+        self.tab_widgets = []
+        self.tabs = []
+        self.column = column
+    
+    def add_tab(self, name, row):
+        if len(self.tabs) <= row:
+            row = len(self.tabs)
             tab_widget = QTabWidget(self)
-            self.tab_widgets.append([tab_widget])
-            self.grid_layout.addWidget(tab_widget, column, row, -1, 1)
-        elif len(self.tabs[column]) <= row:
-            row = len(self.tabs[column])
-            self.tabs[column].append([])
-            tab_widget = QTabWidget(self)
-            self.tab_widgets[column].append(tab_widget)
-            self.grid_layout.addWidget(tab_widget, column, row, -1, 1)
-        tab_widget = self.tab_widgets[column][row]
-        self.tabs[column][row].append(Tab(tab_widget, name, row, column))
+            self.vbox_layout.addWidget(tab_widget)
+            self.tab_widgets.append(tab_widget)
+            self.tabs.append([])
+        tab_widget = self.tab_widgets[row]
+        tab = Tab(tab_widget, name, row, self.column)
+        self.tabs[row].append(tab)
 
 class Tab(QWidget):
     def __init__(self, tab_widget, name, row, column):
