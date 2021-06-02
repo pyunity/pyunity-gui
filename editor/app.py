@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QCoreApplication
 from .window import Editor, Window
 import sys
-import qdarkstyle
+import os
 
 class Application(QApplication):
     def __init__(self):
@@ -11,7 +11,11 @@ class Application(QApplication):
                 print(string)
             return inner
         super(Application, self).__init__(sys.argv)
-        self.setStyleSheet(qdarkstyle.load_stylesheet(qt_api='pyqt5'))
+
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dark.qss")) as f:
+            style = f.read()
+        self.setStyleSheet(style)
+
         self.window = Window()
         
         self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
