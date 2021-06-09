@@ -88,6 +88,10 @@ class Editor(QWidget):
             self.columnWidgets.append(columnWidget)
         columnWidget = self.columnWidgets[column]
         columnWidget.add_tab(name, row)
+    
+    def set_stretch(self, stretch):
+        for i in range(len(stretch)):
+            self.hbox_layout.setStretch(i, stretch[i])
 
 class Column(QWidget):
     def __init__(self, column):

@@ -12,7 +12,8 @@ class Application(QApplication):
             return inner
         super(Application, self).__init__(sys.argv)
 
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dark.qss")) as f:
+        directory = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(directory, "theme", "dark.qss")) as f:
             style = f.read()
         self.setStyleSheet(style)
 
@@ -66,6 +67,7 @@ class Application(QApplication):
         self.editor.add_tab("Audio Mixer", 1, 1)
         self.editor.add_tab("Inspector", 0, 2)
         self.editor.add_tab("Navigation", 0, 2)
+        self.editor.set_stretch((3, 1, 1))
 
     def start(self):
         self.window.showMaximized()
