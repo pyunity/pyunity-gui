@@ -25,8 +25,9 @@ class Window(QMainWindow):
             self.theme = "dark"
         self.app.setStyleSheet(self.styles[self.theme])
     
-    def closeEvent(self, a0):
+    def closeEvent(self, event):
         self.app.quit_wrapper()
+        event.ignore()
 
 class ToolBar:
     def __init__(self, instance):

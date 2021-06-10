@@ -635,7 +635,7 @@ QPushButton
     border-width: 1px;
     border-color: #76797c;
     border-style: solid;
-    padding: 5px;
+    padding: 5px 20px;
     border-radius: 2px;
     outline: none;
 }
@@ -648,8 +648,8 @@ QPushButton:disabled
     border-style: solid;
     padding-top: 5px;
     padding-bottom: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
     border-radius: 2px;
     color: #454545;
 }
