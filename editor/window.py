@@ -83,25 +83,24 @@ class Editor(QWidget):
     def add_tab(self, name, row, column):
         if len(self.columnWidgets) <= column:
             column = len(self.columnWidgets)
-            columnWidget = Column(column)
+            columnWidget = Column()
             self.hbox_layout.addWidget(columnWidget)
             self.columnWidgets.append(columnWidget)
         columnWidget = self.columnWidgets[column]
-        columnWidget.add_tab(name, row)
+        return columnWidget.add_tab(name, row)
     
     def set_stretch(self, stretch):
         for i in range(len(stretch)):
             self.hbox_layout.setStretch(i, stretch[i])
 
 class Column(QWidget):
-    def __init__(self, column):
+    def __init__(self):
         super(Column, self).__init__()
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
         self.tab_widgets = []
         self.tabs = []
-        self.column = column
     
     def add_tab(self, name, row):
         if len(self.tabs) <= row:
@@ -111,19 +110,37 @@ class Column(QWidget):
             self.tab_widgets.append(tab_widget)
             self.tabs.append([])
         tab_widget = self.tab_widgets[row]
-        tab = Tab(tab_widget, name, row, self.column)
+        tab = Tab(tab_widget, name)
         self.tabs[row].append(tab)
+        return tab
 
 class Tab(QWidget):
-    def __init__(self, tab_widget, name, row, column):
+    def __init__(self, tab_widget, name):
         super(Tab, self).__init__()
         self.tab_widget = tab_widget
         self.vbox_layout = QVBoxLayout(self)
+        self.vbox_layout.addStretch()
+        self.vbox_layout.setSpacing(2)
         self.name = name
-        self.row = row
-        self.column = column
+        self.values = []
+        self.widgets = []
         
         self.tab_widget.addTab(self, self.name)
+    
+    def add_value(self, name, type):
+        self.values.append((name, type))
+        widget = QWidget()
+        layout = QHBoxLayout()
+
+        label = QLabel()
+        label.setText(name)
+        input_box = QLineEdit()
+
+        layout.addWidget(label)
+        layout.addWidget(input_box)
+        widget.setLayout(layout)
+        self.widgets.append(widget)
+        self.vbox_layout.insertWidget(len(self.widgets) - 1, widget)
 
 def start():
     return QApplication(sys.argv)

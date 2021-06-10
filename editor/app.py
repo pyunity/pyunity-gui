@@ -65,9 +65,12 @@ class Application(QApplication):
         self.editor.add_tab("Hierarchy", 0, 1)
         self.editor.add_tab("Files", 1, 1)
         self.editor.add_tab("Audio Mixer", 1, 1)
-        self.editor.add_tab("Inspector", 0, 2)
+        inspector = self.editor.add_tab("Inspector", 0, 2)
         self.editor.add_tab("Navigation", 0, 2)
         self.editor.set_stretch((3, 1, 1))
+
+        inspector.add_value("Name", str)
+        inspector.add_value("Name2", str)
 
     def start(self):
         self.window.showMaximized()
