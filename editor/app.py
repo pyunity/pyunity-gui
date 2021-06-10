@@ -1,5 +1,4 @@
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, Window
 import sys
 import os
@@ -23,7 +22,7 @@ class Application(QApplication):
         self.window.toolbar.add_action("Close Scene", "File", "Ctrl+W", "Closes the current Scene", testing("close"))
         self.window.toolbar.add_action("Close All", "File", "Ctrl+Shift+W", "Closes all opened Scene", testing("close all"))
         self.window.toolbar.add_separator("File")
-        self.window.toolbar.add_action("Quit", "File", "Ctrl+Q", "Close the Editor", QCoreApplication.instance().quit)
+        self.window.toolbar.add_action("Quit", "File", "Ctrl+Q", "Close the Editor", self.quit_wrapper)
         
         self.window.toolbar.add_action("Undo", "Edit", "Ctrl+Z", "Undo the last action", testing("undo"))
         self.window.toolbar.add_action("Redo", "Edit", "Ctrl+Shift+Z", "Redo the last action", testing("redo"))
@@ -72,3 +71,12 @@ class Application(QApplication):
     def start(self):
         self.window.showMaximized()
         self.exec_()
+    
+    def quit_wrapper(self):
+        message_box = QMessageBox(QMessageBox.Information, "Quit", "Are you sure you want to quit?")
+        message_box.setInformativeText("You may lose unsaved changes.")
+        message_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        message_box.setDefaultButton(QMessageBox.Cancel)
+        ret = message_box.exec()
+        if ret == QMessageBox.Ok:
+            self.quit()
