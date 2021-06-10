@@ -12,12 +12,7 @@ class Application(QApplication):
             return inner
         super(Application, self).__init__(sys.argv)
 
-        directory = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(directory, "theme", "dark.qss")) as f:
-            style = f.read()
-        self.setStyleSheet(style)
-
-        self.window = Window()
+        self.window = Window(self)
         
         self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
         self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", testing("open"))
@@ -58,6 +53,8 @@ class Application(QApplication):
         self.window.toolbar.add_action("Open", "Assets", "", "Opens the selected asset", testing("open asset"))
         self.window.toolbar.add_action("Delete", "Assets", "", "Deletes the selected asset", testing("del asset"))
         
+        self.window.toolbar.add_action("Toggle Theme", "Window", "Ctrl+L", "Toggle theme between light and dark", self.window.toggle_theme)
+
         self.editor = Editor(self.window)
         self.editor.add_tab("Scene", 0, 0)
         self.editor.add_tab("Game", 1, 0)

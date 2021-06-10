@@ -1,12 +1,29 @@
 from PyQt5.QtWidgets import *
 import sys
+import os
 
 class Window(QMainWindow):
-    def __init__(self):
+    def __init__(self, app):
         super(Window, self).__init__()
         self.setWindowTitle("PyUnity Editor")
-        
+        self.app = app
         self.toolbar = ToolBar(self)
+        
+        directory = os.path.dirname(os.path.abspath(__file__))
+        self.styles = {}
+        with open(os.path.join(directory, "theme", "dark.qss")) as f:
+            self.styles["dark"] = f.read()
+        with open(os.path.join(directory, "theme", "light.qss")) as f:
+            self.styles["light"] = f.read()
+        self.app.setStyleSheet(self.styles["dark"])
+        self.theme = "dark"
+    
+    def toggle_theme(self):
+        if self.theme == "dark":
+            self.theme = "light"
+        else:
+            self.theme = "dark"
+        self.app.setStyleSheet(self.styles[self.theme])
 
 class ToolBar:
     def __init__(self, instance):
