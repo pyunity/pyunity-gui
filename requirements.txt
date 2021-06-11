@@ -1,3 +1,2 @@
 pyunity
 pyqt5
-qdarkstyle
