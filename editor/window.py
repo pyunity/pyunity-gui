@@ -139,29 +139,29 @@ class Tab(QWidget):
     def __init__(self, tab_widget, name):
         super(Tab, self).__init__()
         self.tab_widget = tab_widget
+        self.name = name
+        
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.addStretch()
-        self.vbox_layout.setSpacing(2)
-        self.name = name
-        self.values = []
-        self.widgets = []
+        self.vbox_layout.setSpacing(4)
+        self.vbox_layout.setContentsMargins(4, 4, 4, 4)
+
+        self.grid_layout = QGridLayout()
+        self.grid_layout.setColumnStretch(1, 1)
+        self.vbox_layout.insertLayout(0, self.grid_layout)
+        self.fields = {}
         
         self.tab_widget.addTab(self, self.name)
     
     def add_value(self, name, type):
-        self.values.append((name, type))
-        widget = QWidget()
-        layout = QHBoxLayout()
-
         label = QLabel()
         label.setText(name)
+        label.setWordWrap(True)
         input_box = QLineEdit()
+        self.fields[name] = [type, input_box]
 
-        layout.addWidget(label)
-        layout.addWidget(input_box)
-        widget.setLayout(layout)
-        self.widgets.append(widget)
-        self.vbox_layout.insertWidget(len(self.widgets) - 1, widget)
+        self.grid_layout.addWidget(label, len(self.fields) - 1, 0)
+        self.grid_layout.addWidget(input_box, len(self.fields) - 1, 1)
 
 def start():
     return QApplication(sys.argv)
