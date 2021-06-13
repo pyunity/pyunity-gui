@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import *
 import sys
 import os
@@ -147,7 +148,8 @@ class Tab(QWidget):
         self.vbox_layout.setContentsMargins(4, 4, 4, 4)
 
         self.grid_layout = QGridLayout()
-        self.grid_layout.setColumnStretch(1, 1)
+        self.grid_layout.setColumnStretch(0, 1)
+        self.grid_layout.setColumnStretch(1, 2)
         self.vbox_layout.insertLayout(0, self.grid_layout)
         self.fields = {}
         
@@ -157,11 +159,29 @@ class Tab(QWidget):
         label = QLabel()
         label.setText(name)
         label.setWordWrap(True)
-        input_box = QLineEdit()
+
+        if type not in Tab.inputs:
+            raise ValueError("Cannot create input box of type \"" + type.__name__ + "\"")
+        input_box = Tab.inputs[type](self)
         self.fields[name] = [type, input_box]
 
         self.grid_layout.addWidget(label, len(self.fields) - 1, 0)
         self.grid_layout.addWidget(input_box, len(self.fields) - 1, 1)
+
+    def new_str(self):
+        return QLineEdit(self)
+    
+    def new_int(self):
+        line_edit = QLineEdit(self)
+        line_edit.setValidator(QIntValidator(self))
+        return line_edit
+    
+    def new_float(self):
+        line_edit = QLineEdit(self)
+        line_edit.setValidator(QDoubleValidator(self))
+        return line_edit
+    
+    inputs = {str: new_str, int: new_int, float: new_float}
 
 def start():
     return QApplication(sys.argv)
