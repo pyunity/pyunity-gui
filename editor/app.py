@@ -12,7 +12,7 @@ class Application(QApplication):
         super(Application, self).__init__(sys.argv)
 
         self.window = Window(self)
-        self.window.set_icon("../pyunity.png")
+        self.window.set_icon("../pyunity-logo.png")
         
         self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
         self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", testing("open"))
