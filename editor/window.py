@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 import sys
@@ -146,29 +147,48 @@ class Tab(QWidget):
     def __init__(self, tab_widget, name):
         super(Tab, self).__init__()
         self.tab_widget = tab_widget
+        self.name = name
+        
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.addStretch()
-        self.vbox_layout.setSpacing(0)
-        self.name = name
-        self.values = []
-        self.widgets = []
+        self.vbox_layout.setSpacing(4)
+        self.vbox_layout.setContentsMargins(4, 4, 4, 4)
+
+        self.grid_layout = QGridLayout()
+        self.grid_layout.setColumnStretch(0, 1)
+        self.grid_layout.setColumnStretch(1, 2)
+        self.vbox_layout.insertLayout(0, self.grid_layout)
+        self.fields = {}
         
         self.tab_widget.addTab(self, self.name)
     
     def add_value(self, name, type):
-        self.values.append((name, type))
-        widget = QWidget()
-        layout = QHBoxLayout()
-
         label = QLabel()
         label.setText(name)
-        input_box = QLineEdit()
+        label.setWordWrap(True)
 
-        layout.addWidget(label)
-        layout.addWidget(input_box)
-        widget.setLayout(layout)
-        self.widgets.append(widget)
-        self.vbox_layout.insertWidget(len(self.widgets) - 1, widget)
+        if type not in Tab.inputs:
+            raise ValueError("Cannot create input box of type \"" + type.__name__ + "\"")
+        input_box = Tab.inputs[type](self)
+        self.fields[name] = [type, input_box]
+
+        self.grid_layout.addWidget(label, len(self.fields) - 1, 0)
+        self.grid_layout.addWidget(input_box, len(self.fields) - 1, 1)
+
+    def new_str(self):
+        return QLineEdit(self)
+    
+    def new_int(self):
+        line_edit = QLineEdit(self)
+        line_edit.setValidator(QIntValidator(self))
+        return line_edit
+    
+    def new_float(self):
+        line_edit = QLineEdit(self)
+        line_edit.setValidator(QDoubleValidator(self))
+        return line_edit
+    
+    inputs = {str: new_str, int: new_int, float: new_float}
 
 def start():
     return QApplication(sys.argv)

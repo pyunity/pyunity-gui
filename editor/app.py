@@ -64,10 +64,11 @@ class Application(QApplication):
         self.editor.add_tab("Audio Mixer", 1, 1)
         inspector = self.editor.add_tab("Inspector", 0, 2)
         self.editor.add_tab("Navigation", 0, 2)
-        self.editor.set_stretch((3, 1, 1))
+        self.editor.set_stretch((4, 1, 1))
 
         inspector.add_value("Name", str)
-        inspector.add_value("Name2", str)
+        inspector.add_value("Value", int)
+        inspector.add_value("Price", float)
 
     def start(self):
         self.window.showMaximized()
