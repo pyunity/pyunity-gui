@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
 import sys
 import os
 
@@ -28,6 +29,9 @@ class Window(QMainWindow):
     def closeEvent(self, event):
         self.app.quit_wrapper()
         event.ignore()
+    
+    def set_icon(self, path):
+        self.setWindowIcon(QIcon(path))
 
 class ToolBar:
     def __init__(self, instance):
@@ -111,6 +115,9 @@ class Editor(QWidget):
         return columnWidget.add_tab(name, row)
     
     def set_stretch(self, stretch):
+        if len(stretch) != len(self.columnWidgets):
+            raise ValueError("Argument 1: expected %d length, got %d length" % \
+                (len(stretch), len(self.columnWidgets)))
         for i in range(len(stretch)):
             self.hbox_layout.setStretch(i, stretch[i])
 
@@ -141,7 +148,7 @@ class Tab(QWidget):
         self.tab_widget = tab_widget
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.addStretch()
-        self.vbox_layout.setSpacing(2)
+        self.vbox_layout.setSpacing(0)
         self.name = name
         self.values = []
         self.widgets = []

@@ -1,17 +1,18 @@
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, Window
 import sys
-import os
+
+def testing(string):
+    def inner():
+        print(string)
+    return inner
 
 class Application(QApplication):
     def __init__(self):
-        def testing(string):
-            def inner():
-                print(string)
-            return inner
         super(Application, self).__init__(sys.argv)
 
         self.window = Window(self)
+        self.window.set_icon("../pyunity.png")
         
         self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
         self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", testing("open"))
