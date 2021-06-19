@@ -1,0 +1,1 @@
+An editor to aid in creating PyUnity projects (see https://github.com/pyunity/pyunity).
