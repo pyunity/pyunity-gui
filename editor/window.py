@@ -153,23 +153,35 @@ class Tab(QWidget):
         self.vbox_layout.addStretch()
         self.vbox_layout.setSpacing(4)
         self.vbox_layout.setContentsMargins(4, 4, 4, 4)
+        
+        self.tab_widget.addTab(self, self.name)
+    
+    def set_window_type(self, window_type):
+        self.content = window_type()
+        self.vbox_layout.insertWidget(0, self.content)
+        return self.content
 
+def start():
+    return QApplication(sys.argv)
+
+class Values(QWidget):
+    def __init__(self):
+        super(Values, self).__init__()
         self.grid_layout = QGridLayout()
         self.grid_layout.setColumnStretch(0, 1)
         self.grid_layout.setColumnStretch(1, 2)
-        self.vbox_layout.insertLayout(0, self.grid_layout)
+        self.grid_layout.setContentsMargins(4, 4, 4, 4)
+        self.setLayout(self.grid_layout)
         self.fields = {}
-        
-        self.tab_widget.addTab(self, self.name)
     
     def add_value(self, name, type):
         label = QLabel()
         label.setText(name)
         label.setWordWrap(True)
 
-        if type not in Tab.inputs:
+        if type not in self.__class__.inputs:
             raise ValueError("Cannot create input box of type \"" + type.__name__ + "\"")
-        input_box = Tab.inputs[type](self)
+        input_box = self.__class__.inputs[type](self)
         self.fields[name] = [type, input_box]
 
         self.grid_layout.addWidget(label, len(self.fields) - 1, 0)
@@ -189,6 +201,3 @@ class Tab(QWidget):
         return line_edit
     
     inputs = {str: new_str, int: new_int, float: new_float}
-
-def start():
-    return QApplication(sys.argv)

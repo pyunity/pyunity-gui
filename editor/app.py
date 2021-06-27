@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from .window import Editor, Window
+from .window import Editor, Window, Values
+from .render import OpenGLFrame
 import sys
 
 def testing(string):
@@ -56,19 +57,24 @@ class Application(QApplication):
         self.window.toolbar.add_action("Toggle Theme", "Window", "Ctrl+L", "Toggle theme between light and dark", self.window.toggle_theme)
 
         self.editor = Editor(self.window)
-        self.editor.add_tab("Scene", 0, 0)
-        self.editor.add_tab("Game", 1, 0)
-        self.editor.add_tab("Console", 1, 0)
-        self.editor.add_tab("Hierarchy", 0, 1)
-        self.editor.add_tab("Files", 1, 1)
-        self.editor.add_tab("Audio Mixer", 1, 1)
-        inspector = self.editor.add_tab("Inspector", 0, 2)
-        self.editor.add_tab("Navigation", 0, 2)
+        self.scene = self.editor.add_tab("Scene", 0, 0)
+        self.game = self.editor.add_tab("Game", 1, 0)
+        self.console = self.editor.add_tab("Console", 1, 0)
+        self.hierarchy = self.editor.add_tab("Hierarchy", 0, 1)
+        self.files = self.editor.add_tab("Files", 1, 1)
+        self.mixer = self.editor.add_tab("Audio Mixer", 1, 1)
+        self.inspector = self.editor.add_tab("Inspector", 0, 2)
+        self.navigation = self.editor.add_tab("Navigation", 0, 2)
+        
         self.editor.set_stretch((4, 1, 1))
 
-        inspector.add_value("Name", str)
-        inspector.add_value("Value", int)
-        inspector.add_value("Price", float)
+        inspector_content = self.inspector.set_window_type(Values)
+        inspector_content.add_value("Name", str)
+        inspector_content.add_value("Value", int)
+        inspector_content.add_value("Price", float)
+
+        game_content = self.game.set_window_type(OpenGLFrame)
+        game_content.scene = None
 
     def start(self):
         self.window.showMaximized()
