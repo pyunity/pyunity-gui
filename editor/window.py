@@ -151,8 +151,8 @@ class Tab(QWidget):
         
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.addStretch()
-        self.vbox_layout.setSpacing(4)
-        self.vbox_layout.setContentsMargins(4, 4, 4, 4)
+        self.vbox_layout.setSpacing(0)
+        self.vbox_layout.setContentsMargins(0, 0, 0, 0)
         
         self.tab_widget.addTab(self, self.name)
     
@@ -160,9 +160,6 @@ class Tab(QWidget):
         self.content = window_type()
         self.vbox_layout.insertWidget(0, self.content)
         return self.content
-
-def start():
-    return QApplication(sys.argv)
 
 class Values(QWidget):
     def __init__(self):
@@ -201,3 +198,18 @@ class Values(QWidget):
         return line_edit
     
     inputs = {str: new_str, int: new_int, float: new_float}
+
+class Hierarchy(QTreeWidget):
+    def __init__(self):
+        super(Hierarchy, self).__init__()
+        self.items = []
+        self.header().setVisible(False)
+        self.setIndentation(10)
+
+        self.add_item("GameObject")
+        self.add_item("GameObject")
+    
+    def add_item(self, name):
+        item = QTreeWidgetItem(self)
+        item.setText(0, name)
+        self.items.append((name, item))

@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from .window import Editor, Window, Values
+from .window import Editor, Window, Values, Hierarchy
 from .render import OpenGLFrame
 import sys
 
@@ -75,6 +75,9 @@ class Application(QApplication):
 
         game_content = self.game.set_window_type(OpenGLFrame)
         game_content.scene = None
+
+        hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
+        hierarchy_content.scene = None
 
     def start(self):
         self.window.showMaximized()
