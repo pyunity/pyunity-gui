@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from pyunity import config, Clock, KeyCode
 
 class OpenGLFrame(QOpenGLWidget):
+    SPACER = None
     def __init__(self):
         super(OpenGLFrame, self).__init__()
     

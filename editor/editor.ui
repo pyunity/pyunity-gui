@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>573</width>
-    <height>325</height>
+    <width>610</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1688,6 +1688,9 @@ QDoubleSpinBox::down-arrow:off
     </property>
     <item row="0" column="1" rowspan="2">
      <widget class="QTabWidget" name="tabWidget_2">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>Tab 1</string>
@@ -1768,20 +1771,35 @@ QDoubleSpinBox::down-arrow:off
        <attribute name="title">
         <string>Tab 2</string>
        </attribute>
-      </widget>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QTabWidget" name="tabWidget_3">
-      <widget class="QWidget" name="tab_5">
-       <attribute name="title">
-        <string>Tab 1</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_6">
-       <attribute name="title">
-        <string>Tab 2</string>
-       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_3"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -1802,6 +1820,21 @@ QDoubleSpinBox::down-arrow:off
       </widget>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QTabWidget" name="tabWidget_3">
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Tab 1</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2"/>
+      </widget>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1809,8 +1842,8 @@ QDoubleSpinBox::down-arrow:off
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>573</width>
-     <height>21</height>
+     <width>610</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>

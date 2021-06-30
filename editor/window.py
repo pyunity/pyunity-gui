@@ -150,15 +150,20 @@ class Tab(QWidget):
         self.name = name
         
         self.vbox_layout = QVBoxLayout(self)
-        self.vbox_layout.addStretch()
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.spacer = QSpacerItem(20, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.vbox_layout.addSpacerItem(self.spacer)
         
         self.tab_widget.addTab(self, self.name)
     
     def set_window_type(self, window_type):
         self.content = window_type()
         self.vbox_layout.insertWidget(0, self.content)
+        if hasattr(window_type, "SPACER"):
+            self.vbox_layout.removeItem(self.spacer)
+            del self.spacer
         return self.content
 
 class Values(QWidget):
@@ -200,6 +205,7 @@ class Values(QWidget):
     inputs = {str: new_str, int: new_int, float: new_float}
 
 class Hierarchy(QTreeWidget):
+    SPACER = None
     def __init__(self):
         super(Hierarchy, self).__init__()
         self.items = []
