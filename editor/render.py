@@ -12,21 +12,33 @@ class OpenGLFrame(QOpenGLWidget):
     SPACER = None
     def __init__(self):
         super(OpenGLFrame, self).__init__()
-        self.scene = SceneManager.AddScene("Scene")
+        self.default = SceneManager.AddScene("Scene")
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update)
     
     def initializeGL(self):
         global frame
         frame = self
-        SceneManager.LoadSceneByIndex(0)
+        self.default.Start()
     
     def paintGL(self):
         if window is not None:
             window.update_func()
+        else:
+            self.default.update()
     
     def resizeGL(self, width, height):
         if window is not None:
             window.resize(width, height)
-            self.update()
+        else:
+            self.default.mainCamera.Resize(width, height)
+        self.update()
+    
+    def stop(self):
+        window.timer.stop()
+    
+    def start_scene(self, scene):
+        SceneManager.LoadScene(scene)
 
 class Window:
     def __init__(self, name, resize):
@@ -35,11 +47,10 @@ class Window:
         self.resize = resize
 
     def quit(self):
-        pass
+        global window
+        del window
 
     def start(self, update_func):
         frame.makeCurrent()
         self.update_func = update_func
-        self.timer = QTimer(frame)
-        self.timer.timeout.connect(frame.update)
-        self.timer.start(config.fps)
+        frame.timer.start(1000 / config.fps)
