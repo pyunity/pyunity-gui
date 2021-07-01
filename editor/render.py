@@ -22,6 +22,11 @@ class OpenGLFrame(QOpenGLWidget):
     def paintGL(self):
         if window is not None:
             window.update_func()
+    
+    def resizeGL(self, width, height):
+        if window is not None:
+            window.resize(width, height)
+            self.update()
 
 class Window:
     def __init__(self, name, resize):
