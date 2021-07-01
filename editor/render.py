@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 from pyunity import SceneManager, config, Clock
 import sys
 import threading
@@ -16,8 +17,7 @@ class OpenGLFrame(QOpenGLWidget):
     def initializeGL(self):
         global frame
         frame = self
-        t = threading.Timer(5, lambda: SceneManager.LoadSceneByIndex(0))
-        t.start()
+        SceneManager.LoadSceneByIndex(0)
     
     def paintGL(self):
         if window is not None:
@@ -33,12 +33,8 @@ class Window:
         pass
 
     def start(self, update_func):
+        frame.makeCurrent()
         self.update_func = update_func
-        clock = Clock()
-        clock.Start(config.fps)
-        self.done = False
-        while not self.done:
-            frame.update()
-            clock.Maintain()
-
-        self.quit()
+        self.timer = QTimer(frame)
+        self.timer.timeout.connect(frame.update)
+        self.timer.start(config.fps)
