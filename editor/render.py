@@ -10,14 +10,15 @@ class OpenGLFrame(QOpenGLWidget):
         super(OpenGLFrame, self).__init__()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
+        self.timer.start(1000 / config.fps)
         self.scene = None
         
-        # class Rotator(pyu.Behaviour):
-        #     def Update(self, dt):
-        #         self.transform.eulerAngles += pyu.Vector3(0, 90, 0) * dt
+        class Rotator(pyu.Behaviour):
+            def Update(self, dt):
+                self.transform.eulerAngles += pyu.Vector3(0, 45, 0) * dt
 
         self.default = Scene("Default Scene")
-        # self.default.mainCamera.AddComponent(Rotator)
+        self.default.mainCamera.AddComponent(Rotator)
     
     def initializeGL(self):
         self.default.Start()
