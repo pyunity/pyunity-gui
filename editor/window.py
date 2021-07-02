@@ -45,21 +45,24 @@ class SceneButtons(QWidget):
     def __init__(self, window):
         super(SceneButtons, self).__init__(window)
         self.buttons = []
+
         self.hbox_layout = QHBoxLayout(self)
         self.hbox_layout.setSpacing(0)
         self.hbox_layout.setContentsMargins(0, 0, 0, 0)
+
         spacer1 = QSpacerItem(0, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         spacer2 = QSpacerItem(0, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.hbox_layout.addSpacerItem(spacer1)
         self.hbox_layout.addSpacerItem(spacer2)
         self.spacers = [spacer1, spacer2]
-        print(self.hbox_layout.children())
+
+        self.directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "buttons")
     
-    def add_button(self):
+    def add_button(self, icon):
         button = QToolButton(self)
-        button.setCheckable(True)
+        button.setIcon(QIcon(os.path.join(self.directory, icon)))
         self.buttons.append(button)
-        self.hbox_layout.insertWidget(1, button)
+        self.hbox_layout.insertWidget(len(self.buttons), button)
 
 class ToolBar:
     def __init__(self, instance):
