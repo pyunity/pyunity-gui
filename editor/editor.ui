@@ -1712,12 +1712,20 @@ QDoubleSpinBox::down-arrow:off
         <property name="text">
          <string>...</string>
         </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/buttons/play.png</normaloff>icons/buttons/play.png</iconset>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="toolButton_2">
         <property name="text">
          <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/buttons/pause.png</normaloff>icons/buttons/pause.png</iconset>
         </property>
        </widget>
       </item>

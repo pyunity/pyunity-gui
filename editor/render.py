@@ -2,15 +2,22 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from pyunity import config
 from pyunity.scenes import Scene
+import pyunity as pyu
 
 class OpenGLFrame(QOpenGLWidget):
     SPACER = None
     def __init__(self):
         super(OpenGLFrame, self).__init__()
-        self.default = Scene("Default Scene")
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.scene = None
+        
+        # class Rotator(pyu.Behaviour):
+        #     def Update(self, dt):
+        #         self.transform.eulerAngles += pyu.Vector3(0, 90, 0) * dt
+
+        self.default = Scene("Default Scene")
+        # self.default.mainCamera.AddComponent(Rotator)
     
     def initializeGL(self):
         self.default.Start()
