@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from .window import Editor, Window, Values, Hierarchy
+from .window import Editor, SceneButtons, Window, Values, Hierarchy
 from .render import OpenGLFrame
 import sys
 
@@ -55,6 +55,12 @@ class Application(QApplication):
         self.window.toolbar.add_action("Delete", "Assets", "", "Deletes the selected asset", testing("del asset"))
         
         self.window.toolbar.add_action("Toggle Theme", "Window", "Ctrl+L", "Toggle theme between light and dark", self.window.toggle_theme)
+
+        self.buttons = SceneButtons(self.window)
+        self.buttons.add_button()
+        self.buttons.add_button()
+        self.buttons.add_button()
+        self.window.vbox_layout.addWidget(self.buttons)
 
         self.editor = Editor(self.window)
         self.scene = self.editor.add_tab("Scene", 0, 0)

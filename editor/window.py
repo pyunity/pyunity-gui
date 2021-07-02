@@ -1,7 +1,6 @@
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
-import sys
 import os
 
 class Window(QMainWindow):
@@ -10,6 +9,14 @@ class Window(QMainWindow):
         self.setWindowTitle("PyUnity Editor")
         self.app = app
         self.toolbar = ToolBar(self)
+        self.vbox_layout = QVBoxLayout()
+        self.vbox_layout.setStretch(0, 0)
+        self.vbox_layout.setStretch(1, 1)
+        self.vbox_layout.setSpacing(0)
+        self.vbox_layout.setContentsMargins(2, 2, 2, 2)
+        widget = QWidget()
+        widget.setLayout(self.vbox_layout)
+        self.setCentralWidget(widget)
         
         directory = os.path.dirname(os.path.abspath(__file__))
         self.styles = {}
@@ -33,6 +40,26 @@ class Window(QMainWindow):
     
     def set_icon(self, path):
         self.setWindowIcon(QIcon(path))
+
+class SceneButtons(QWidget):
+    def __init__(self, window):
+        super(SceneButtons, self).__init__(window)
+        self.buttons = []
+        self.hbox_layout = QHBoxLayout(self)
+        self.hbox_layout.setSpacing(0)
+        self.hbox_layout.setContentsMargins(0, 0, 0, 0)
+        spacer1 = QSpacerItem(0, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        spacer2 = QSpacerItem(0, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.hbox_layout.addSpacerItem(spacer1)
+        self.hbox_layout.addSpacerItem(spacer2)
+        self.spacers = [spacer1, spacer2]
+        print(self.hbox_layout.children())
+    
+    def add_button(self):
+        button = QToolButton(self)
+        button.setCheckable(True)
+        self.buttons.append(button)
+        self.hbox_layout.insertWidget(1, button)
 
 class ToolBar:
     def __init__(self, instance):
@@ -99,12 +126,12 @@ class ToolBar:
 class Editor(QWidget):
     def __init__(self, window):
         super(Editor, self).__init__(window)
+        window.vbox_layout.addWidget(self)
         self.columnWidgets = []
 
         self.hbox_layout = QHBoxLayout(self)
         self.hbox_layout.setSpacing(0)
         self.hbox_layout.setContentsMargins(0, 0, 0, 0)
-        window.setCentralWidget(self)
     
     def add_tab(self, name, row, column):
         if len(self.columnWidgets) <= column:
