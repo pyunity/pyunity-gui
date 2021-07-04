@@ -4,6 +4,7 @@ from .window import Editor, SceneButtons, Window, Values, Hierarchy
 from .render import OpenGLFrame
 from pyunity import Loader, SceneManager
 import sys
+import subprocess
 
 def testing(string):
     def inner():
@@ -11,14 +12,15 @@ def testing(string):
     return inner
 
 class Application(QApplication):
-    def __init__(self):
+    def __init__(self, path):
         super(Application, self).__init__(sys.argv)
+        self.project = Loader.LoadProject(path)
 
         self.window = Window(self)
         self.window.set_icon("../pyunity-logo.png")
         
         self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
-        self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", testing("open"))
+        self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", self.open)
         self.window.toolbar.add_action("Save", "File", "Ctrl+S", "Save the current Scene", testing("save"))
         self.window.toolbar.add_action("Save As", "File", "Ctrl+Shift+S", "Save the current Scene as new file", testing("save as"))
         self.window.toolbar.add_action("Save a Copy As", "File", "Ctrl+Alt+S", "Save a copy of the current Scene", testing("save copy as"))
@@ -82,7 +84,6 @@ class Application(QApplication):
         inspector_content.add_value("Price", float)
 
         game_content = self.game.set_window_type(OpenGLFrame)
-        self.project = Loader.LoadProject("Test")
         game_content.original = SceneManager.GetSceneByIndex(self.project.firstScene)
         game_content.set_buttons(self.buttons)
 
@@ -95,6 +96,12 @@ class Application(QApplication):
     def start(self):
         self.window.showMaximized()
         self.exec_()
+    
+    def open(self):
+        print("Choosing folder...")
+        # Get opened project
+        subprocess.Popen(["py", "cli.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.quit()
     
     def quit_wrapper(self):
         message_box = QMessageBox(QMessageBox.Information, "Quit", "Are you sure you want to quit?")
