@@ -4,7 +4,7 @@ import sys
 import distutils.util
 
 plat = distutils.util.get_platform()
-num = int(plat == "win_amd64")
+num = int(plat == "win-amd64")
 if plat.startswith("win"):
     job = 0
 elif plat.startswith("linux"):
