@@ -1,3 +1,4 @@
+from editor.files import FileTracker
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window, Values, Hierarchy
 from .render import OpenGLFrame
@@ -84,6 +85,9 @@ class Application(QApplication):
 
         hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
         hierarchy_content.scene = None
+
+        self.file_tracker = FileTracker("Test")
+        self.file_tracker.start(5)
 
     def start(self):
         self.window.showMaximized()
