@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from pyunity import config
 from pyunity.scenes import Scene
 import pyunity as pyu
+import copy
 
 class OpenGLFrame(QOpenGLWidget):
     SPACER = None
@@ -10,24 +11,24 @@ class OpenGLFrame(QOpenGLWidget):
         super(OpenGLFrame, self).__init__()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
-        self.timer.start(1000 / config.fps)
         self.scene = None
-        
-        class Rotator(pyu.Behaviour):
-            def Update(self, dt):
-                self.transform.eulerAngles += pyu.Vector3(0, 45, 0) * dt
 
         self.default = Scene("Default Scene")
-        self.default.mainCamera.AddComponent(Rotator)
+    
+    def set_buttons(self, buttons):
+        buttons.buttons[0].clicked.connect(
+            lambda: self.start_scene(pyu.SceneManager.GetSceneByIndex(0)))
+        buttons.buttons[2].clicked.connect(self.stop)
     
     def initializeGL(self):
         self.default.Start()
+        self.timer.start(1000 / config.fps)
     
     def paintGL(self):
         if self.scene is not None:
             self.scene.update()
         else:
-            self.default.update()
+            self.default.mainCamera.Render(self.default.gameObjects)
     
     def resizeGL(self, width, height):
         if self.scene is not None:
@@ -37,10 +38,11 @@ class OpenGLFrame(QOpenGLWidget):
         self.update()
     
     def stop(self):
-        self.timer.stop()
-        self.scene = False
+        self.scene = None
     
     def start_scene(self, scene):
-        self.scene = scene
-        scene.Start()
+        self.makeCurrent()
+        self.default = scene
+        self.scene = copy.deepcopy(scene)
+        self.scene.Start()
         self.timer.start(1000 / config.fps)

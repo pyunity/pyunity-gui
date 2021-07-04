@@ -2,3 +2,5 @@ Project
     name: Test
     firstScene: 0
 Files
+    30f18935-a722-4e11-8813-f17801cdabb2: Scenes\Main Scene.scene
+    bd5c191a-53d7-49d4-a67e-a467a9a3b807: Scripts\Rotator.py

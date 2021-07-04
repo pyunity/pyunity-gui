@@ -1,39 +1,41 @@
-Scene : cbbf72e9-2a91-4006-afaf-05e4b4079903
+Scene : 569e7be4-3739-4923-b23d-29c1fb214f7c
     name: "Main Scene"
-GameObject : 1cc35207-e98b-4021-aa9b-22998a404eb4
+GameObject : 647c80cf-05a2-4458-a5db-43e430e7cac9
     name: "Main Camera"
     tag: 0
-    transform: 6af09712-befe-401c-acf3-39fa5334db5b
-GameObject : fe1aa336-d810-44af-a20c-b60817c79a4b
+    transform: fbc23256-ac7a-4e04-8add-8b78b2f9de55
+GameObject : f67497a4-3cfa-4cb6-a2af-805c7ff7cb04
     name: "Light"
     tag: 0
-    transform: 7e9a2e24-b500-4017-8c18-521fed259235
-Transform(Component) : 6af09712-befe-401c-acf3-39fa5334db5b
-    gameObject: 1cc35207-e98b-4021-aa9b-22998a404eb4
+    transform: 6fc82aaa-5ff1-4c01-97b7-ad0be19c0b13
+Transform(Component) : fbc23256-ac7a-4e04-8add-8b78b2f9de55
+    gameObject: 647c80cf-05a2-4458-a5db-43e430e7cac9
     enabled: True
     localPosition: Vector3(0, 0, 0)
     localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: None
-Camera(Component) : 0e9b0ed6-e682-4873-ac8c-3136ed8dbc43
-    gameObject: 1cc35207-e98b-4021-aa9b-22998a404eb4
+Camera(Component) : dbad443c-8b67-4fd0-97c5-8e141a909ca1
+    gameObject: 647c80cf-05a2-4458-a5db-43e430e7cac9
     enabled: True
     near: 0.05
     far: 200
     fov: 90
     clearColor: (0, 0, 0, 1)
-    shader: <pyunity.render.Shader object at 0x0454AA90>
-AudioListener(Component) : 1ef20a89-08cb-4e46-a743-316bbf24fed7
-    gameObject: 1cc35207-e98b-4021-aa9b-22998a404eb4
+    shader: <pyunity.render.Shader object at 0x049817A8>
+AudioListener(Component) : 3170bfa4-56ae-4e50-a828-acaeb637856e
+    gameObject: 647c80cf-05a2-4458-a5db-43e430e7cac9
     enabled: True
-Transform(Component) : 7e9a2e24-b500-4017-8c18-521fed259235
-    gameObject: fe1aa336-d810-44af-a20c-b60817c79a4b
+Rotator(Behaviour) : bd5c191a-53d7-49d4-a67e-a467a9a3b807
+    gameObject: 647c80cf-05a2-4458-a5db-43e430e7cac9
+Transform(Component) : 6fc82aaa-5ff1-4c01-97b7-ad0be19c0b13
+    gameObject: f67497a4-3cfa-4cb6-a2af-805c7ff7cb04
     enabled: True
     localPosition: Vector3(10, 10, -10)
     localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: None
-Light(Component) : 62b3f70a-350e-42c6-b1b7-2dba5deff698
-    gameObject: fe1aa336-d810-44af-a20c-b60817c79a4b
+Light(Component) : a3b87f03-877e-48e5-bc30-e5a83a4d7a1d
+    gameObject: f67497a4-3cfa-4cb6-a2af-805c7ff7cb04
     enabled: True
     intensity: 100

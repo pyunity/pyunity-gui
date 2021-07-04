@@ -2,6 +2,7 @@ from editor.files import FileTracker
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window, Values, Hierarchy
 from .render import OpenGLFrame
+from pyunity import Loader, SceneManager
 import sys
 
 def testing(string):
@@ -81,7 +82,8 @@ class Application(QApplication):
         inspector_content.add_value("Price", float)
 
         game_content = self.game.set_window_type(OpenGLFrame)
-        game_content.scene = None
+        self.project = Loader.LoadProject("Test")
+        game_content.set_buttons(self.buttons)
 
         hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
         hierarchy_content.scene = None
