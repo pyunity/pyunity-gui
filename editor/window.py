@@ -58,11 +58,11 @@ class SceneButtons(QWidget):
 
         self.directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "buttons")
     
-    def add_button(self, icon, tip="", toggle=False, on=False):
+    def add_button(self, icon, tip="", on=False):
         button = QToolButton(self)
         button.setIcon(QIcon(os.path.join(self.directory, icon)))
         button.setStatusTip(tip)
-        button.setCheckable(toggle)
+        button.setCheckable(True)
         button.setChecked(on)
         self.buttons.append(button)
         self.hbox_layout.insertWidget(len(self.buttons), button)
