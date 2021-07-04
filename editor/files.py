@@ -1,4 +1,5 @@
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtWidgets import QMessageBox
 import os
 import glob
 import enum
@@ -32,6 +33,15 @@ class FileTracker:
             self.changed.append((file, FileState.CREATED))
             self.times[file] = os.stat(file)[8]
         self.files = files2
+
+        for file in self.changed:
+            message = QMessageBox()
+            message.setText(str(file))
+            message.setStandardButtons(QMessageBox.StandardButton.NoButton)
+            message.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+            QTimer.singleShot(2000, lambda: message.done(0))
+            message.exec()
+        self.changed = []
     
     def start(self, delay):
         self.timer.start(delay * 1000)

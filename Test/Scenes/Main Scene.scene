@@ -1,0 +1,39 @@
+Scene : 94e9ca2e-34c0-447a-b5ce-f9cb2038fd6f
+    name: "Main Scene"
+GameObject : 8cdfdb66-baac-45ab-a477-2df911a3c939
+    name: "Main Camera"
+    tag: 0
+    transform: 9528ae98-55f0-4df5-972b-2f71343386a2
+GameObject : 2eb816b0-834c-4219-9184-b75c981b1f4f
+    name: "Light"
+    tag: 0
+    transform: 05628dfe-af7b-43a4-982c-fc706a25adcc
+Transform(Component) : 9528ae98-55f0-4df5-972b-2f71343386a2
+    gameObject: 8cdfdb66-baac-45ab-a477-2df911a3c939
+    enabled: True
+    localPosition: Vector3(0, 0, 0)
+    localRotation: Quaternion(1, 0, 0, 0)
+    localScale: Vector3(1, 1, 1)
+    parent: None
+Camera(Component) : 6b52851c-d07a-43a2-993d-02785c756eab
+    gameObject: 8cdfdb66-baac-45ab-a477-2df911a3c939
+    enabled: True
+    near: 0.05
+    far: 200
+    fov: 90
+    clearColor: (0, 0, 0, 1)
+    shader: <pyunity.render.Shader object at 0x0486AA90>
+AudioListener(Component) : ab0e325f-99a2-41c9-98a9-fa4ee482ed6d
+    gameObject: 8cdfdb66-baac-45ab-a477-2df911a3c939
+    enabled: True
+Transform(Component) : 05628dfe-af7b-43a4-982c-fc706a25adcc
+    gameObject: 2eb816b0-834c-4219-9184-b75c981b1f4f
+    enabled: True
+    localPosition: Vector3(10, 10, -10)
+    localRotation: Quaternion(1, 0, 0, 0)
+    localScale: Vector3(1, 1, 1)
+    parent: None
+Light(Component) : 26b804a2-3b5e-4044-95ee-d5d616700b62
+    gameObject: 2eb816b0-834c-4219-9184-b75c981b1f4f
+    enabled: True
+    intensity: 100
