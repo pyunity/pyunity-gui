@@ -59,9 +59,9 @@ class Application(QApplication):
         self.window.toolbar.add_action("Toggle Theme", "Window", "Ctrl+L", "Toggle theme between light and dark", self.window.toggle_theme)
 
         self.buttons = SceneButtons(self.window)
-        self.buttons.add_button("play.png", "Run the scene")
+        self.buttons.add_button("play.png", "Run the scene", True)
         self.buttons.add_button("pause.png", "Pause the scene", True)
-        self.buttons.add_button("stop.png", "Stop the current running scene")
+        self.buttons.add_button("stop.png", "Stop the current running scene", True, True)
         self.window.vbox_layout.addWidget(self.buttons)
 
         self.editor = Editor(self.window)
@@ -83,6 +83,7 @@ class Application(QApplication):
 
         game_content = self.game.set_window_type(OpenGLFrame)
         self.project = Loader.LoadProject("Test")
+        game_content.original = SceneManager.GetSceneByIndex(self.project.firstScene)
         game_content.set_buttons(self.buttons)
 
         hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
