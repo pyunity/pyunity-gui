@@ -1,39 +1,39 @@
-Scene : 94e9ca2e-34c0-447a-b5ce-f9cb2038fd6f
+Scene : cbbf72e9-2a91-4006-afaf-05e4b4079903
     name: "Main Scene"
-GameObject : 8cdfdb66-baac-45ab-a477-2df911a3c939
+GameObject : 1cc35207-e98b-4021-aa9b-22998a404eb4
     name: "Main Camera"
     tag: 0
-    transform: 9528ae98-55f0-4df5-972b-2f71343386a2
-GameObject : 2eb816b0-834c-4219-9184-b75c981b1f4f
+    transform: 6af09712-befe-401c-acf3-39fa5334db5b
+GameObject : fe1aa336-d810-44af-a20c-b60817c79a4b
     name: "Light"
     tag: 0
-    transform: 05628dfe-af7b-43a4-982c-fc706a25adcc
-Transform(Component) : 9528ae98-55f0-4df5-972b-2f71343386a2
-    gameObject: 8cdfdb66-baac-45ab-a477-2df911a3c939
+    transform: 7e9a2e24-b500-4017-8c18-521fed259235
+Transform(Component) : 6af09712-befe-401c-acf3-39fa5334db5b
+    gameObject: 1cc35207-e98b-4021-aa9b-22998a404eb4
     enabled: True
     localPosition: Vector3(0, 0, 0)
     localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: None
-Camera(Component) : 6b52851c-d07a-43a2-993d-02785c756eab
-    gameObject: 8cdfdb66-baac-45ab-a477-2df911a3c939
+Camera(Component) : 0e9b0ed6-e682-4873-ac8c-3136ed8dbc43
+    gameObject: 1cc35207-e98b-4021-aa9b-22998a404eb4
     enabled: True
     near: 0.05
     far: 200
     fov: 90
     clearColor: (0, 0, 0, 1)
-    shader: <pyunity.render.Shader object at 0x0486AA90>
-AudioListener(Component) : ab0e325f-99a2-41c9-98a9-fa4ee482ed6d
-    gameObject: 8cdfdb66-baac-45ab-a477-2df911a3c939
+    shader: <pyunity.render.Shader object at 0x0454AA90>
+AudioListener(Component) : 1ef20a89-08cb-4e46-a743-316bbf24fed7
+    gameObject: 1cc35207-e98b-4021-aa9b-22998a404eb4
     enabled: True
-Transform(Component) : 05628dfe-af7b-43a4-982c-fc706a25adcc
-    gameObject: 2eb816b0-834c-4219-9184-b75c981b1f4f
+Transform(Component) : 7e9a2e24-b500-4017-8c18-521fed259235
+    gameObject: fe1aa336-d810-44af-a20c-b60817c79a4b
     enabled: True
     localPosition: Vector3(10, 10, -10)
     localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: None
-Light(Component) : 26b804a2-3b5e-4044-95ee-d5d616700b62
-    gameObject: 2eb816b0-834c-4219-9184-b75c981b1f4f
+Light(Component) : 62b3f70a-350e-42c6-b1b7-2dba5deff698
+    gameObject: fe1aa336-d810-44af-a20c-b60817c79a4b
     enabled: True
     intensity: 100

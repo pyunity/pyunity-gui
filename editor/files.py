@@ -36,7 +36,10 @@ class FileTracker:
 
         for file in self.changed:
             message = QMessageBox()
-            message.setText(str(file))
+            message.setText(
+                file[1].name.lower().capitalize().replace("ed", "ing") + \
+                    " " + file[0])
+            message.setWindowTitle("Importing files...")
             message.setStandardButtons(QMessageBox.StandardButton.NoButton)
             message.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint)
             QTimer.singleShot(2000, lambda: message.done(0))
