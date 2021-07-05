@@ -88,7 +88,7 @@ class Application(QApplication):
         game_content.set_buttons(self.buttons)
 
         hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
-        hierarchy_content.scene = None
+        hierarchy_content.load_scene(game_content.original)
 
         self.file_tracker = FileTracker("Test")
         self.file_tracker.start(5)

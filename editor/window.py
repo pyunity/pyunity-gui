@@ -237,6 +237,17 @@ class Values(QWidget):
     
     inputs = {str: new_str, int: new_int, float: new_float}
 
+class HierarchyItem(QTreeWidgetItem):
+    def __init__(self, name):
+        super(HierarchyItem, self).__init__()
+        self.setText(name)
+        self.name = name
+        self.children = []
+    
+    def add_child(self, child):
+        self.children.append(child)
+        self.addChild(child)
+
 class Hierarchy(QTreeWidget):
     SPACER = None
     def __init__(self):
@@ -245,10 +256,16 @@ class Hierarchy(QTreeWidget):
         self.header().setVisible(False)
         self.setIndentation(10)
 
-        self.add_item("GameObject")
-        self.add_item("GameObject")
+        self.add_item("Main Camera")
+        self.add_item("Light")
     
-    def add_item(self, name):
-        item = QTreeWidgetItem(self)
-        item.setText(0, name)
-        self.items.append((name, item))
+    def add_item(self, name, parent=None):
+        item = HierarchyItem(name)
+        if parent is None:
+            self.items.append(item)
+            self.addTopLevelItem(item)
+        else:
+            parent.add_child(item)
+    
+    def load_scene(self, scene):
+        pass
