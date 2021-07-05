@@ -240,7 +240,7 @@ class Values(QWidget):
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, name):
         super(HierarchyItem, self).__init__()
-        self.setText(name)
+        self.setText(0, name)
         self.name = name
         self.children = []
     
@@ -255,9 +255,6 @@ class Hierarchy(QTreeWidget):
         self.items = []
         self.header().setVisible(False)
         self.setIndentation(10)
-
-        self.add_item("Main Camera")
-        self.add_item("Light")
     
     def add_item(self, name, parent=None):
         item = HierarchyItem(name)
@@ -276,3 +273,13 @@ class Hierarchy(QTreeWidget):
             parent = parent.children[num]
         parent.add_child(item)
         return item
+
+    def load_scene(self, scene):
+        items = {}
+        for gameObject in scene.rootGameObjects:
+            items[gameObject] = self.add_item(gameObject.name)
+        for gameObject in scene.gameObjects:
+            if gameObject in scene.gameObjects:
+                continue
+            self.add_item(gameObject.name,
+                items[gameObject.transform.parent.gameObject])
