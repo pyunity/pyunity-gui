@@ -70,6 +70,7 @@ class OpenGLFrame(QOpenGLWidget):
             self.makeCurrent()
             self.scene = copy.deepcopy(self.original)
             self.scene.Start()
+            self.scene.mainCamera.Resize(self.width(), self.height())
             self.buttons[2].setChecked(False)
             if self.paused:
                 self.pause()
