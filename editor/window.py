@@ -266,6 +266,13 @@ class Hierarchy(QTreeWidget):
             self.addTopLevelItem(item)
         else:
             parent.add_child(item)
+        return item
     
-    def load_scene(self, scene):
-        pass
+    def add_item_pos(self, name, *args):
+        item = HierarchyItem(name)
+        parent = self.items[args[0]]
+        pos = args[1:]
+        for num in pos:
+            parent = parent.children[num]
+        parent.add_child(item)
+        return item
