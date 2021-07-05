@@ -39,3 +39,14 @@ Light(Component) : a3b87f03-877e-48e5-bc30-e5a83a4d7a1d
     gameObject: f67497a4-3cfa-4cb6-a2af-805c7ff7cb04
     enabled: True
     intensity: 100
+GameObject : 06d7119c-8e7a-4b1e-a124-545960dbe7dc
+    name: "Child"
+    tag: 0
+    transform: a96d9a58-fd45-4bd8-84e4-d5f9560d229e
+Transform(Component) : a96d9a58-fd45-4bd8-84e4-d5f9560d229e
+    gameObject: 06d7119c-8e7a-4b1e-a124-545960dbe7dc
+    enabled: True
+    localPosition: Vector3(0, 0, 0)
+    localRotation: Quaternion(1, 0, 0, 0)
+    localScale: Vector3(1, 1, 1)
+    parent: fbc23256-ac7a-4e04-8add-8b78b2f9de55

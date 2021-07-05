@@ -2,6 +2,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 import os
+from . import resources
 
 class Window(QMainWindow):
     def __init__(self, app):
@@ -279,7 +280,8 @@ class Hierarchy(QTreeWidget):
         for gameObject in scene.rootGameObjects:
             items[gameObject] = self.add_item(gameObject.name)
         for gameObject in scene.gameObjects:
-            if gameObject in scene.gameObjects:
+            print(gameObject.transform.parent)
+            if gameObject.transform.parent is None:
                 continue
             self.add_item(gameObject.name,
                 items[gameObject.transform.parent.gameObject])
