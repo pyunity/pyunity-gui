@@ -93,8 +93,10 @@ class Application(QApplication):
         self.file_tracker = FileTracker(path)
         self.file_tracker.start(5)
 
-    def start(self):
+    def start(self, loaded=None):
         self.window.showMaximized()
+        if loaded is not None:
+            loaded.append(True)
         self.exec_()
     
     def open(self):

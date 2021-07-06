@@ -59,7 +59,7 @@ class OpenGLFrame(QOpenGLWidget):
             self.timer.stop()
             self.paused = True
         else:
-            self.scene.lastFrame = time.time()
+            self.scene.lastFrame = time.time() - 1 / config.fps
             self.timer.start(1000 / config.fps)
             self.paused = False
     
