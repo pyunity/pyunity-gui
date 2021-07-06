@@ -1,3 +1,4 @@
+import os
 from editor.files import FileTracker
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window, Values, Hierarchy
@@ -93,10 +94,9 @@ class Application(QApplication):
         self.file_tracker = FileTracker(path)
         self.file_tracker.start(5)
 
-    def start(self, loaded=None):
+    def start(self):
         self.window.showMaximized()
-        if loaded is not None:
-            loaded.append(True)
+        os.environ["PYUNITY_EDITOR_LOADED"] = "1"
         self.exec_()
     
     def open(self):

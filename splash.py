@@ -1,23 +1,25 @@
-loaded = []
+import os
+import tkinter
+import time
+import threading
 
 def main():
-    global loaded
     from editor.app import Application
     app = Application("Test")
-    app.start(loaded)
+    app.start()
 
 def splash():
-    import tkinter, time
     a = tkinter.Tk()
     while True:
-        if len(loaded):
+        if os.getenv("PYUNITY_EDITOR_LOADED") == "1":
             break
         a.update()
-        time.sleep(0.1)
+        time.sleep(0.2)
     a.destroy()
 
-import threading
-t = threading.Thread(target=splash)
-t.start()
+def start(func, args=[], kwargs={}):
+    t = threading.Thread(target=splash)
+    t.start()
+    func(*args, **kwargs)
 
-main()
+start(main)
