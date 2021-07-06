@@ -2,7 +2,22 @@ import os
 import tkinter
 import time
 import threading
+import builtins
+import sys
 from PIL import ImageTk, Image
+
+_print = builtins.print
+sys._stderr = sys.stderr
+
+def disable_print():
+    def wrapper(*args, **kwargs):
+        pass
+    builtins.print = wrapper
+    sys.stderr = os.devnull
+
+def enable_print():
+    builtins.print = _print
+    sys.stderr = sys._stderr
 
 def splash():
     root = tkinter.Tk()
