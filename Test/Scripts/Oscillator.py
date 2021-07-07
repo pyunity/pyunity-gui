@@ -1,4 +1,5 @@
 from pyunity import *
+import math
 
 class Oscillator(Behaviour):
     a = 0

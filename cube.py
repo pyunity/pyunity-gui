@@ -1,4 +1,5 @@
 from pyunity import *
+import math
 
 class Oscillator(Behaviour):
     a = 0
@@ -22,6 +23,13 @@ class Oscillator(Behaviour):
             color = Vector3(255, 0, x)
         self.renderer.mat.color = Color(*color)
 
+class Oscillator2(Behaviour):
+    a = 0
+    speed = ShowInInspector(int, 10)
+    def Update(self, dt):
+        self.a += dt * self.speed / 10
+        self.transform.localScale = Vector3.one() * (0.75 + math.sin(self.a) / 4)
+
 class Rotator(Behaviour):
     def Update(self, dt):
         self.transform.eulerAngles += Vector3(0, 90, 135) * dt
@@ -31,6 +39,7 @@ scene.mainCamera.transform.position = Vector3(0, 0, -10)
 
 root = GameObject("Root")
 root.AddComponent(Rotator)
+root.AddComponent(Oscillator2)
 scene.Add(root)
 
 i = 0
@@ -56,3 +65,4 @@ for direction in [Vector3.up(), Vector3.right(), Vector3.forward()]:
         scene.Add(go)
 
 SceneManager.LoadScene(scene)
+Loader.SaveSceneToProject(scene)

@@ -19,6 +19,5 @@ project = requests.get(f"{apiUrl}/projects/rayzchen/pyunity")
 jobId = project.json()["build"]["jobs"][4 * job + 9 - ver]["jobId"]
 artifacts = requests.get(f"{apiUrl}/buildjobs/{jobId}/artifacts")
 file = f"{apiUrl}/buildjobs/{jobId}/artifacts/{artifacts.json()[num]['fileName']}"
+os.system("pip3 uninstall -y pyunity")
 os.system("pip3 install -U pyunity@" + file)
-
-
