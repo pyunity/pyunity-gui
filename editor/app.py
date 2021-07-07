@@ -2,10 +2,11 @@ import os
 from editor.files import FileTracker
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window, Values, Hierarchy
-from .render import OpenGLFrame
-from pyunity import Loader, SceneManager
+from .render import OpenGLFrame, Console
+from pyunity import Loader, SceneManager, Logger
 import sys
 import subprocess
+import time
 
 def testing(string):
     def inner():
@@ -90,6 +91,10 @@ class Application(QApplication):
 
         hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
         hierarchy_content.load_scene(game_content.original)
+        
+        console_content = self.console.set_window_type(Console)
+        for i in range(10):
+            console_content.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), Logger.OUTPUT, "Test")
 
         self.file_tracker = FileTracker(path)
         self.file_tracker.start(5)

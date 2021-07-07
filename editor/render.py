@@ -74,3 +74,31 @@ class OpenGLFrame(QOpenGLWidget):
             self.buttons[2].setChecked(False)
             if self.paused:
                 self.pause()
+
+class Console(QWidget):
+    SPACER = None
+    def __init__(self):
+        super(Console, self).__init__()
+        self.entries = []
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.vbox_layout = QVBoxLayout(self)
+        self.setLayout(self.vbox_layout)
+    
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scroll_area.setWidget(self)
+    
+    def add_entry(self, timestamp, level, text):
+        entry = ConsoleEntry(timestamp, level, text)
+        self.entries.append(entry)
+        self.vbox_layout.addWidget(entry)
+
+class ConsoleEntry(QWidget):
+    def __init__(self, timestamp, level, text):
+        super(ConsoleEntry, self).__init__()
+        self.hbox_layout = QHBoxLayout(self)
+        self.setLayout(self.hbox_layout)
+        self.label = QLabel()
+        self.label.setText(timestamp + " |" + level.abbr + "| " + text)
+        self.hbox_layout.addWidget(self.label)
