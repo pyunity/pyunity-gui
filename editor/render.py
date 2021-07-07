@@ -93,6 +93,12 @@ class Console(QWidget):
         entry = ConsoleEntry(timestamp, level, text)
         self.entries.append(entry)
         self.vbox_layout.addWidget(entry)
+    
+    def showEvent(self, event):
+        super(Console, self).showEvent(event)
+        self.setMaximumHeight(self.height())
+        for i in range(10):
+            self.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), pyu.Logger.OUTPUT, "Test")
 
 class ConsoleEntry(QWidget):
     def __init__(self, timestamp, level, text):

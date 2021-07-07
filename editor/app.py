@@ -93,8 +93,7 @@ class Application(QApplication):
         hierarchy_content.load_scene(game_content.original)
         
         console_content = self.console.set_window_type(Console)
-        for i in range(10):
-            console_content.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), Logger.OUTPUT, "Test")
+        console_content.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), Logger.OUTPUT, "Test")
 
         self.file_tracker = FileTracker(path)
         self.file_tracker.start(5)
