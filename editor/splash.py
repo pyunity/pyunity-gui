@@ -44,5 +44,6 @@ def splash():
 
 def start(func, args=[], kwargs={}):
     t = threading.Thread(target=splash)
+    t.daemon = True
     t.start()
     func(*args, **kwargs)
