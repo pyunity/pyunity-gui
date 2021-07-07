@@ -7,7 +7,7 @@ import glob
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-data_files = [file for file in glob.glob("editor/**/*", recursive=True) if ".py" not in file]
+data_files = [file for file in glob.glob("editor/**/*", recursive=True) if ".py" not in file and not file.endswith(".svg")]
 
 setup(
     name="pyunity-editor",

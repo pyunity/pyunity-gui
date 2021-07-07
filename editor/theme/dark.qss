@@ -1249,7 +1249,7 @@ QTableView::item,
 QListView::item,
 QTreeView::item
 {
-    padding: 3px;
+    padding: 3px 0;
 }
 
 QTableView::item:!selected:hover,
@@ -1259,7 +1259,6 @@ QTreeView::item:!selected:hover
     background-color: rgba(61, 173, 232, 0.2);
     outline: 0;
     color: #eff0f1;
-    padding: 3px;
 }
 
 
