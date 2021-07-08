@@ -92,4 +92,4 @@ class ConsoleEntry(QListWidgetItem):
     def __init__(self, timestamp, level, text):
         super(ConsoleEntry, self).__init__(QIcon(),
             "|" + level.abbr + "| " + text + "\n" + timestamp)
-        self.setFont(QFont("Arial", 16))
+        self.setFont(QFont("Segoe UI", 14))

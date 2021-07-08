@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 import os
 from . import resources
 
@@ -16,6 +16,7 @@ class Window(QMainWindow):
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)
         widget = QWidget()
+        widget.setFont(QFont("Segoe UI"))
         widget.setLayout(self.vbox_layout)
         self.setCentralWidget(widget)
         
