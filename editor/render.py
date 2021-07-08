@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtGui import QFont, QIcon
 from pyunity import config
 from pyunity.scenes import Scene
 import pyunity as pyu
@@ -75,36 +76,20 @@ class OpenGLFrame(QOpenGLWidget):
             if self.paused:
                 self.pause()
 
-class Console(QWidget):
+class Console(QListWidget):
     SPACER = None
     def __init__(self):
         super(Console, self).__init__()
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.entries = []
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.vbox_layout = QVBoxLayout(self)
-        self.setLayout(self.vbox_layout)
-    
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.scroll_area.setWidget(self)
     
     def add_entry(self, timestamp, level, text):
         entry = ConsoleEntry(timestamp, level, text)
         self.entries.append(entry)
-        self.vbox_layout.addWidget(entry)
-    
-    def showEvent(self, event):
-        super(Console, self).showEvent(event)
-        self.setMaximumHeight(self.height())
-        for i in range(10):
-            self.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), pyu.Logger.OUTPUT, "Test")
+        self.addItem(entry)
 
-class ConsoleEntry(QWidget):
+class ConsoleEntry(QListWidgetItem):
     def __init__(self, timestamp, level, text):
-        super(ConsoleEntry, self).__init__()
-        self.hbox_layout = QHBoxLayout(self)
-        self.setLayout(self.hbox_layout)
-        self.label = QLabel()
-        self.label.setText(timestamp + " |" + level.abbr + "| " + text)
-        self.hbox_layout.addWidget(self.label)
+        super(ConsoleEntry, self).__init__(QIcon(),
+            "|" + level.abbr + "| " + text + "\n" + timestamp)
+        self.setFont(QFont("Arial", 16))
