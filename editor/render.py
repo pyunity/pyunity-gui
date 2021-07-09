@@ -13,6 +13,7 @@ class OpenGLFrame(QOpenGLWidget):
         super(OpenGLFrame, self).__init__()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
+        self.console = None
         self.scene = None
         self.original = None
         self.paused = False
@@ -75,6 +76,7 @@ class OpenGLFrame(QOpenGLWidget):
             self.buttons[2].setChecked(False)
             if self.paused:
                 self.pause()
+            self.console.clear()
 
 class Console(QListWidget):
     SPACER = None
@@ -82,11 +84,23 @@ class Console(QListWidget):
         super(Console, self).__init__()
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.entries = []
+        self.clear_on_run = True
     
     def add_entry(self, timestamp, level, text):
         entry = ConsoleEntry(timestamp, level, text)
         self.entries.append(entry)
         self.addItem(entry)
+    
+    def clear(self):
+        if self.clear_on_run:
+            num = len(self.entries)
+            self.entries = []
+            for i in range(num):
+                entry = self.takeItem(0)
+                del entry
+    
+    def listen(self):
+        pass
 
 class ConsoleEntry(QListWidgetItem):
     def __init__(self, timestamp, level, text):
