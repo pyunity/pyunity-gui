@@ -2,24 +2,24 @@ Project
     name: Scene
     firstScene: 0
 Files
-    f3c6b87a-ad53-4902-8e33-8bd6a977e769: Materials\Side.mat
-    a67291fe-9eb3-4679-9f58-d1474c27230f: Materials\Side.mat
-    0b45d790-848d-4595-87d1-7f77a60404d0: Materials\Side.mat
-    a6f80220-f302-4d75-8907-137aef690d55: Materials\Side.mat
-    69af8652-dc97-4381-b8b0-14d5de4e61e8: Materials\Side.mat
-    24817de6-ef05-4eb2-a298-c7b97c343f45: Materials\Side.mat
-    71643149-c30b-4cb3-8d5e-e6599bb950b2: Meshes\Side.mesh
-    d877f69c-4840-42c4-bd0e-4837c228d269: Meshes\Side.mesh
-    24cdfa31-c2b6-4233-8342-223a9b7d5dbe: Meshes\Side.mesh
-    64592c0f-c897-495b-8686-bace9fed3b39: Meshes\Side.mesh
-    310d5dee-001d-44a8-be34-664183589c6d: Meshes\Side.mesh
-    d1c72e03-bd78-4ea4-af78-27c8c0502b34: Meshes\Side.mesh
-    95fc9425-87da-4838-a7d1-7025af87fa01: Scenes\Scene.scene
-    ca6b8f45-56b5-4c1e-b4ca-30c935d1acca: Scripts\Oscillator.py
-    d75f65d7-a367-4bf5-a7a6-c82c0cad56ef: Scripts\Oscillator.py
-    2b18b130-9237-4528-82d7-7132588018b4: Scripts\Oscillator.py
-    459a64f3-180c-4762-bc20-193b2f11e437: Scripts\Oscillator.py
-    80621027-8e1c-4b57-9548-444c3743ce70: Scripts\Oscillator.py
-    ca563772-e9f1-4c4f-810f-48dc74922e5d: Scripts\Oscillator.py
-    eb06305a-2ad2-4516-a1ab-4dee391da34a: Scripts\Oscillator2.py
-    f862fef9-eaab-436e-a496-188bce952914: Scripts\Rotator.py
+    f3c6b87a-ad53-4902-8e33-8bd6a977e769: Materials/Side.mat
+    a67291fe-9eb3-4679-9f58-d1474c27230f: Materials/Side.mat
+    0b45d790-848d-4595-87d1-7f77a60404d0: Materials/Side.mat
+    a6f80220-f302-4d75-8907-137aef690d55: Materials/Side.mat
+    69af8652-dc97-4381-b8b0-14d5de4e61e8: Materials/Side.mat
+    24817de6-ef05-4eb2-a298-c7b97c343f45: Materials/Side.mat
+    71643149-c30b-4cb3-8d5e-e6599bb950b2: Meshes/Side.mesh
+    d877f69c-4840-42c4-bd0e-4837c228d269: Meshes/Side.mesh
+    24cdfa31-c2b6-4233-8342-223a9b7d5dbe: Meshes/Side.mesh
+    64592c0f-c897-495b-8686-bace9fed3b39: Meshes/Side.mesh
+    310d5dee-001d-44a8-be34-664183589c6d: Meshes/Side.mesh
+    d1c72e03-bd78-4ea4-af78-27c8c0502b34: Meshes/Side.mesh
+    95fc9425-87da-4838-a7d1-7025af87fa01: Scenes/Scene.scene
+    ca6b8f45-56b5-4c1e-b4ca-30c935d1acca: Scripts/Oscillator.py
+    d75f65d7-a367-4bf5-a7a6-c82c0cad56ef: Scripts/Oscillator.py
+    2b18b130-9237-4528-82d7-7132588018b4: Scripts/Oscillator.py
+    459a64f3-180c-4762-bc20-193b2f11e437: Scripts/Oscillator.py
+    80621027-8e1c-4b57-9548-444c3743ce70: Scripts/Oscillator.py
+    ca563772-e9f1-4c4f-810f-48dc74922e5d: Scripts/Oscillator.py
+    eb06305a-2ad2-4516-a1ab-4dee391da34a: Scripts/Oscillator2.py
+    f862fef9-eaab-436e-a496-188bce952914: Scripts/Rotator.py
