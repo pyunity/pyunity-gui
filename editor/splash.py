@@ -26,14 +26,16 @@ def splash():
 
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
-    x = int((screen_width / 2) - (256 / 2))
-    y = int((screen_height / 2) - (256 / 2))
-    root.geometry("256x256+" + str(x) + "+" + str(y))
+    size = int(screen_height // 2)
+    x = int((screen_width / 2) - (size / 2))
+    y = int((screen_height / 2) - (size / 2))
+    root.geometry(str(size) + "x" + str(size) + "+" + str(x) + "+" + str(y))
 
-    canvas = tkinter.Canvas(root, width=256, height=256,
+    canvas = tkinter.Canvas(root, width=size, height=size,
         bd=0, highlightthickness=0, relief='ridge')
     canvas.pack()
-    img = ImageTk.PhotoImage(Image.open("../pyunity.png").resize((256, 256)))
+    splash_img = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "splash.png")
+    img = ImageTk.PhotoImage(Image.open(splash_img).resize((size, size)))
     canvas.create_image(0, 0, anchor=tkinter.NW, image=img)
     while True:
         if os.getenv("PYUNITY_EDITOR_LOADED") == "1":
