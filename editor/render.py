@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QFont, QIcon
 from pyunity import config
-from pyunity.scenes import Scene
 import pyunity as pyu
 import copy
 import time
@@ -85,6 +84,7 @@ class Console(QListWidget):
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.entries = []
         self.clear_on_run = True
+        pyu.Logger.LogLine = self.modded_log(pyu.Logger.LogLine)
     
     def add_entry(self, timestamp, level, text):
         entry = ConsoleEntry(timestamp, level, text)
@@ -99,8 +99,11 @@ class Console(QListWidget):
                 entry = self.takeItem(0)
                 del entry
     
-    def listen(self):
-        pass
+    def modded_log(self, func):
+        def inner(*args, **kwargs):
+            timestamp, msg = func(*args, **kwargs)
+            self.add_entry(timestamp, args[0], msg)
+        return inner
 
 class ConsoleEntry(QListWidgetItem):
     def __init__(self, timestamp, level, text):

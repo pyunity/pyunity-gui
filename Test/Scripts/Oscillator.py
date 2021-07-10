@@ -22,3 +22,4 @@ class Oscillator(Behaviour):
         elif period == 5:
             color = Vector3(255, 0, x)
         self.renderer.mat.color = Color(*color)
+        Logger.Log(self.renderer.mat.color)
