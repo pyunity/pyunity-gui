@@ -15,7 +15,7 @@ ver = sys.version_info.minor
 
 
 apiUrl = "https://ci.appveyor.com/api"
-project = requests.get(f"{apiUrl}/projects/rayzchen/pyunity")
+project = requests.get(f"{apiUrl}/projects/pyunity/pyunity")
 jobId = project.json()["build"]["jobs"][4 * job + 9 - ver]["jobId"]
 artifacts = requests.get(f"{apiUrl}/buildjobs/{jobId}/artifacts")
 file = f"{apiUrl}/buildjobs/{jobId}/artifacts/{artifacts.json()[num]['fileName']}"
