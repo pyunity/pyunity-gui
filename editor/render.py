@@ -101,7 +101,7 @@ class Console(QListWidget):
     
     def modded_log(self, func):
         def inner(*args, **kwargs):
-            timestamp, msg = func(*args, **kwargs)
+            timestamp, msg = func(*args, **kwargs, silent=True)
             self.add_entry(timestamp, args[0], msg)
         return inner
 
