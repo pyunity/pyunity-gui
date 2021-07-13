@@ -169,7 +169,7 @@ class Column(QWidget):
     def add_tab(self, name, row):
         if len(self.tabs) <= row:
             row = len(self.tabs)
-            tab_widget = QTabWidget(self)
+            tab_widget = TabGroup(self)
             self.vbox_layout.addWidget(tab_widget)
             self.tab_widgets.append(tab_widget)
             self.tabs.append([])
@@ -177,6 +177,13 @@ class Column(QWidget):
         tab = Tab(tab_widget, name)
         self.tabs[row].append(tab)
         return tab
+
+class TabGroup(QTabWidget):
+    def currentChanged(self, index):
+        widget = self.currentWidget()
+        if widget.content is not None:
+            if hasattr(widget.content, "on_switch"):
+                widget.content.on_switch()
 
 class Tab(QWidget):
     def __init__(self, tab_widget, name):
@@ -192,6 +199,7 @@ class Tab(QWidget):
         self.vbox_layout.addSpacerItem(self.spacer)
         
         self.tab_widget.addTab(self, self.name)
+        self.content = None
     
     def set_window_type(self, window_type):
         self.content = window_type()
