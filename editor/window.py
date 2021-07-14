@@ -179,9 +179,13 @@ class Column(QWidget):
         return tab
 
 class TabGroup(QTabWidget):
-    def currentChanged(self, index):
+    def __init__(self, parent):
+        super(TabGroup, self).__init__(parent)
+        self.currentChanged.connect(self.tab_change)
+
+    def tab_change(self, index):
         widget = self.currentWidget()
-        if widget.content is not None:
+        if hasattr(widget, "content") and widget.content is not None:
             if hasattr(widget.content, "on_switch"):
                 widget.content.on_switch()
 

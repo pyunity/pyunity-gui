@@ -83,6 +83,7 @@ class Console(QListWidget):
         super(Console, self).__init__()
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.entries = []
+        self.pending_entries = []
         self.clear_on_run = True
         pyu.Logger.LogLine = self.modded_log(pyu.Logger.LogLine)
     
@@ -102,8 +103,13 @@ class Console(QListWidget):
     def modded_log(self, func):
         def inner(*args, **kwargs):
             timestamp, msg = func(*args, **kwargs, silent=True)
-            self.add_entry(timestamp, args[0], msg)
+            self.pending_entries.append([timestamp, args[0], msg])
         return inner
+    
+    def on_switch(self):
+        for entry in self.pending_entries:
+            self.add_entry(*entry)
+        self.pending_entries = []
 
 class ConsoleEntry(QListWidgetItem):
     def __init__(self, timestamp, level, text):
