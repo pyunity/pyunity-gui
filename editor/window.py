@@ -41,7 +41,8 @@ class Window(QMainWindow):
         event.ignore()
     
     def set_icon(self, path):
-        self.setWindowIcon(QIcon(path))
+        directory = os.path.dirname(os.path.abspath(__file__))
+        self.setWindowIcon(QIcon(os.path.join(directory, path)))
 
 class SceneButtons(QWidget):
     def __init__(self, window):
