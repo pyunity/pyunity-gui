@@ -5,6 +5,10 @@ class Oscillator(Behaviour):
     a = 0
     speed = ShowInInspector(int, 5)
     renderer = ShowInInspector(MeshRenderer)
+
+    # def Start(self):
+    #     raise Exception
+
     def Update(self, dt):
         self.a += dt * self.speed / 10
         x = 255 * (1 - abs((self.a % 3 * 2) % 2 - 1))

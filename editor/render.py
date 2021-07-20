@@ -20,13 +20,13 @@ class OpenGLFrame(QOpenGLWidget):
     
     def set_buttons(self, buttons):
         self.buttons = buttons.buttons
-        self.buttons[0].clicked.connect(self.start_scene)
+        self.buttons[0].clicked.connect(self.start)
         self.buttons[1].clicked.connect(self.pause)
         self.buttons[2].clicked.connect(self.stop)
     
     def initializeGL(self):
-        self.original.Start()
-        self.timer.start(1000 / config.fps)
+        for renderer in self.original.FindComponentsByType(pyu.MeshRenderer):
+            renderer.mesh.recompile()
     
     def paintGL(self):
         if self.scene is not None:
@@ -41,31 +41,7 @@ class OpenGLFrame(QOpenGLWidget):
             self.original.mainCamera.Resize(width, height)
         self.update()
     
-    def stop(self):
-        if self.scene is not None:
-            self.scene = None
-            self.buttons[0].setChecked(False)
-            self.buttons[1].setChecked(False)
-            self.buttons[2].setChecked(True)
-            self.paused = False
-            if not self.timer.isActive():
-                self.timer.start(1000 / config.fps)
-        else:
-            self.buttons[2].setChecked(True)
-    
-    def pause(self):
-        if self.scene is None:
-            self.paused = not self.paused
-            return
-        if self.timer.isActive():
-            self.timer.stop()
-            self.paused = True
-        else:
-            self.scene.lastFrame = time.time() - 1 / config.fps
-            self.timer.start(1000 / config.fps)
-            self.paused = False
-    
-    def start_scene(self):
+    def start(self):
         if self.scene is not None:
             self.stop()
         else:
@@ -74,9 +50,35 @@ class OpenGLFrame(QOpenGLWidget):
             self.scene.Start()
             self.scene.mainCamera.Resize(self.width(), self.height())
             self.buttons[2].setChecked(False)
+            print(self.paused)
+            if self.console.clear_on_run:
+                self.console.clear()
+            if not self.paused:
+                self.timer.start(1000 / config.fps)
+    
+    def stop(self):
+        if self.scene is not None:
+            self.scene = None
+            self.buttons[0].setChecked(False)
+            self.buttons[1].setChecked(False)
+            self.buttons[2].setChecked(True)
+            self.paused = False
+            self.update()
+            self.timer.stop()
+        else:
+            self.buttons[2].setChecked(True)
+    
+    def pause(self):
+        self.paused = not self.paused
+        if self.scene is not None:
             if self.paused:
-                self.pause()
-            self.console.clear()
+                self.timer.stop()
+            else:
+                self.scene.lastFrame = time.time() - 1 / config.fps
+                self.timer.start(1000 // config.fps)
+    
+    def on_switch(self):
+        self.console.timer.stop()
 
 class Console(QListWidget):
     SPACER = None
@@ -87,6 +89,9 @@ class Console(QListWidget):
         self.entries = []
         self.pending_entries = []
         self.clear_on_run = True
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.on_switch)
         pyu.Logger.LogLine = self.modded_log(pyu.Logger.LogLine)
     
     def add_entry(self, timestamp, level, text):
@@ -95,12 +100,11 @@ class Console(QListWidget):
         self.addItem(entry)
     
     def clear(self):
-        if self.clear_on_run:
-            num = len(self.entries)
-            self.entries = []
-            for i in range(num):
-                entry = self.takeItem(0)
-                del entry
+        num = len(self.entries)
+        self.entries = []
+        for i in range(num):
+            entry = self.takeItem(0)
+            del entry
     
     def modded_log(self, func):
         def inner(*args, **kwargs):
@@ -111,9 +115,11 @@ class Console(QListWidget):
         return inner
     
     def on_switch(self):
+        self.pending_entries = self.pending_entries[-100:]
         for entry in self.pending_entries:
             self.add_entry(*entry)
         self.pending_entries = []
+        self.timer.start(250)
 
 class ConsoleEntry(QListWidgetItem):
     icon_map = {
