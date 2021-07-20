@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import QFont, QIcon
 from pyunity import config
 import pyunity as pyu
+import os
 import copy
 import time
 
@@ -82,6 +83,7 @@ class Console(QListWidget):
     def __init__(self):
         super(Console, self).__init__()
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setIconSize(QSize(100, 100))
         self.entries = []
         self.pending_entries = []
         self.clear_on_run = True
@@ -103,7 +105,9 @@ class Console(QListWidget):
     def modded_log(self, func):
         def inner(*args, **kwargs):
             timestamp, msg = func(*args, **kwargs, silent=True)
-            self.pending_entries.append([timestamp, args[0], msg])
+            if args[0] != pyu.Logger.DEBUG:
+                self.pending_entries.append([timestamp, args[0], msg])
+            return timestamp, msg
         return inner
     
     def on_switch(self):
@@ -112,7 +116,16 @@ class Console(QListWidget):
         self.pending_entries = []
 
 class ConsoleEntry(QListWidgetItem):
+    icon_map = {
+        pyu.Logger.ERROR: "error.png",
+        pyu.Logger.INFO: "info.png",
+        pyu.Logger.OUTPUT: "output.png",
+        pyu.Logger.WARN: "warning.png"
+    }
     def __init__(self, timestamp, level, text):
         super(ConsoleEntry, self).__init__(QIcon(),
             "|" + level.abbr + "| " + text + "\n" + timestamp)
         self.setFont(QFont("Segoe UI", 14))
+        directory = os.path.dirname(os.path.abspath(__file__))
+        self.setIcon(QIcon(os.path.join(directory,
+            "icons", "console", ConsoleEntry.icon_map[level])))
