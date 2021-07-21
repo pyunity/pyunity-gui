@@ -1,7 +1,7 @@
 import os
 from editor.files import FileTracker
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from .window import Editor, SceneButtons, Window, Values, Hierarchy
+from .window import Editor, SceneButtons, Window, Inspector, Hierarchy
 from .render import OpenGLFrame, Console
 from pyunity import Loader, SceneManager, Logger
 import sys
@@ -80,10 +80,11 @@ class Application(QApplication):
         
         self.editor.set_stretch((4, 1, 1))
 
-        inspector_content = self.inspector.set_window_type(Values)
-        inspector_content.add_value("Name", str)
-        inspector_content.add_value("Value", int)
-        inspector_content.add_value("Price", float)
+        inspector_content = self.inspector.set_window_type(Inspector)
+        section = inspector_content.add_section("Testing")
+        section.add_value("Name", str)
+        section.add_value("Value", int)
+        section.add_value("Price", float)
 
         game_content = self.game.set_window_type(OpenGLFrame)
         game_content.original = SceneManager.GetSceneByIndex(self.project.firstScene)
@@ -91,6 +92,7 @@ class Application(QApplication):
 
         hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
         hierarchy_content.load_scene(game_content.original)
+        hierarchy_content.inspector = inspector_content
         
         console_content = self.console.set_window_type(Console)
         for i in range(10):
