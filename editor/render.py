@@ -7,6 +7,15 @@ import os
 import copy
 import time
 
+
+def patch(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            pyu.Logger.LogException(e)
+    return inner
+
 class OpenGLFrame(QOpenGLWidget):
     SPACER = None
     def __init__(self):
@@ -41,7 +50,8 @@ class OpenGLFrame(QOpenGLWidget):
             self.original.mainCamera.Resize(width, height)
         self.update()
     
-    def start(self):
+    @patch
+    def start(self, on):
         if self.scene is not None:
             self.stop()
         else:
@@ -56,7 +66,8 @@ class OpenGLFrame(QOpenGLWidget):
             if not self.paused:
                 self.timer.start(1000 / config.fps)
     
-    def stop(self):
+    @patch
+    def stop(self, on):
         if self.scene is not None:
             self.scene = None
             self.buttons[0].setChecked(False)
@@ -68,7 +79,7 @@ class OpenGLFrame(QOpenGLWidget):
         else:
             self.buttons[2].setChecked(True)
     
-    def pause(self):
+    def pause(self, on):
         self.paused = not self.paused
         if self.scene is not None:
             if self.paused:

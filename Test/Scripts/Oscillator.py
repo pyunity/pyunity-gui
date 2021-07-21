@@ -6,8 +6,8 @@ class Oscillator(Behaviour):
     speed = ShowInInspector(int, 5)
     renderer = ShowInInspector(MeshRenderer)
 
-    # def Start(self):
-    #     raise Exception
+    def Start(self):
+        raise Exception
 
     def Update(self, dt):
         self.a += dt * self.speed / 10
