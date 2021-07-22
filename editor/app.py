@@ -1,7 +1,8 @@
 import os
 from editor.files import FileTracker
 from PyQt5.QtWidgets import QApplication, QMessageBox
-from .window import Editor, SceneButtons, Window, Inspector, Hierarchy
+from .window import Editor, SceneButtons, Window
+from .views import Inspector, Hierarchy
 from .render import OpenGLFrame, Console
 from pyunity import Loader, SceneManager, Logger
 import sys

@@ -8,6 +8,8 @@
 
 from PyQt5 import QtCore
 
+__all__ = []
+
 qt_resource_data = b"\
 \x00\x00\x13\xe0\
 \x00\
