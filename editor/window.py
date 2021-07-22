@@ -9,6 +9,7 @@ class Window(QMainWindow):
         super(Window, self).__init__()
         self.setWindowTitle("PyUnity Editor")
         self.app = app
+        self.app.setFont(QFont("Segoe UI", 10))
         self.toolbar = ToolBar(self)
         widget = QWidget(self)
         self.vbox_layout = QVBoxLayout(widget)
@@ -16,7 +17,6 @@ class Window(QMainWindow):
         self.vbox_layout.setStretch(1, 1)
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)
-        widget.setFont(QFont("Segoe UI"))
         widget.setLayout(self.vbox_layout)
         self.setCentralWidget(widget)
         

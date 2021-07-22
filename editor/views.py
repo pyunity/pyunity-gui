@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QDoubleValidator, QIntValidator
+from PyQt5.QtGui import QDoubleValidator, QFont, QIntValidator
 import gc
 
 class Inspector(QWidget):
@@ -39,6 +39,7 @@ class Inspector(QWidget):
                     section.add_value(attr, str)
 
 class InspectorSection(QWidget):
+    large_font = QFont("Segoe UI", 12)
     def __init__(self, name, parent):
         super(InspectorSection, self).__init__(parent)
         self.grid_layout = QGridLayout(self)
@@ -47,12 +48,14 @@ class InspectorSection(QWidget):
         self.grid_layout.setContentsMargins(4, 4, 4, 4)
 
         self.name = name
-        self.grid_layout.addWidget(QLabel(self.name, self))
+        self.header = QLabel(self.name, self)
+        self.header.setFont(self.__class__.large_font)
+        self.grid_layout.addWidget(self.header)
         self.grid_layout.addWidget(QWidget(self))
+        self.setLayout(self.grid_layout)
         self.fields = {None: None}
     
     def add_value(self, name, type):
-        self.setLayout(self.grid_layout)
         label = QLabel(name, self)
         label.setWordWrap(True)
 
