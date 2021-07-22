@@ -21,14 +21,9 @@ class Inspector(QWidget):
         self.sections = []
         for i in range(num):
             item = self.vbox_layout.takeAt(0)
-            item.widget().delete()
+            widget = item.widget()
             self.vbox_layout.removeItem(item)
-            del item
-            gc.collect()
-        # for i in range(num):
-        #     child = self.findChild(InspectorSection)
-        #     child.delete()
-        #     del child
+            widget.deleteLater()
         if gameObject is None:
             return
         main_section = self.add_section("GameObject")
@@ -36,15 +31,12 @@ class Inspector(QWidget):
         main_section.add_value("Tag", int)
         for component in gameObject.components:
             section = self.add_section(component.__class__.__name__)
-        #     # if hasattr(component, "shown"):
-        #     #     for attr in component.shown:
-        #     #         section.add_value(attr, str)
-        #     # else:
-        #     for attr in component.attrs:
-        #         print(attr)
-        #         section.add_value(attr, str)
-        #     self.dumpObjectTree()
-        #     return
+            if hasattr(component, "shown"):
+                for attr in component.shown:
+                    section.add_value(attr, str)
+            else:
+                for attr in component.attrs:
+                    section.add_value(attr, str)
 
 class InspectorSection(QWidget):
     def __init__(self, name, parent):
@@ -86,12 +78,6 @@ class InspectorSection(QWidget):
         return line_edit
     
     inputs = {str: new_str, int: new_int, float: new_float}
-
-    def delete(self):
-        while self.grid_layout.count():
-            item = self.grid_layout.takeAt(0)
-            self.grid_layout.removeItem(item)
-            del item
 
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
