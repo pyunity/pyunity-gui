@@ -114,7 +114,7 @@ class Application(QApplication):
         self.quit()
     
     def quit_wrapper(self):
-        message_box = QMessageBox(QMessageBox.Information, "Quit", "Are you sure you want to quit?")
+        message_box = QMessageBox(QMessageBox.Information, "Quit", "Are you sure you want to quit?", parent=self.window)
         message_box.setInformativeText("You may lose unsaved changes.")
         message_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         message_box.setDefaultButton(QMessageBox.Cancel)

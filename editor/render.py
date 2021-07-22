@@ -18,8 +18,8 @@ def patch(func):
 
 class OpenGLFrame(QOpenGLWidget):
     SPACER = None
-    def __init__(self):
-        super(OpenGLFrame, self).__init__()
+    def __init__(self, parent):
+        super(OpenGLFrame, self).__init__(parent)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.console = None
@@ -93,8 +93,8 @@ class OpenGLFrame(QOpenGLWidget):
 
 class Console(QListWidget):
     SPACER = None
-    def __init__(self):
-        super(Console, self).__init__()
+    def __init__(self, parent):
+        super(Console, self).__init__(parent)
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.setIconSize(QSize(100, 100))
         self.entries = []
@@ -140,7 +140,7 @@ class ConsoleEntry(QListWidgetItem):
         pyu.Logger.WARN: "warning.png"
     }
     def __init__(self, timestamp, level, text):
-        super(ConsoleEntry, self).__init__(QIcon(),
+        super(ConsoleEntry, self).__init__(
             "|" + level.abbr + "| " + text + "\n" + timestamp)
         self.setFont(QFont("Segoe UI", 14))
         directory = os.path.dirname(os.path.abspath(__file__))

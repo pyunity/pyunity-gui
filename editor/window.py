@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
 import os
 from . import resources
+import gc
 
 class Window(QMainWindow):
     def __init__(self, app):
@@ -10,12 +11,12 @@ class Window(QMainWindow):
         self.setWindowTitle("PyUnity Editor")
         self.app = app
         self.toolbar = ToolBar(self)
-        self.vbox_layout = QVBoxLayout()
+        widget = QWidget(self)
+        self.vbox_layout = QVBoxLayout(widget)
         self.vbox_layout.setStretch(0, 0)
         self.vbox_layout.setStretch(1, 1)
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)
-        widget = QWidget()
         widget.setFont(QFont("Segoe UI"))
         widget.setLayout(self.vbox_layout)
         self.setCentralWidget(widget)
@@ -141,11 +142,12 @@ class Editor(QWidget):
         self.hbox_layout = QHBoxLayout(self)
         self.hbox_layout.setSpacing(0)
         self.hbox_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.hbox_layout)
     
     def add_tab(self, name, row, column):
         if len(self.columnWidgets) <= column:
             column = len(self.columnWidgets)
-            columnWidget = Column()
+            columnWidget = Column(self)
             self.hbox_layout.addWidget(columnWidget)
             self.columnWidgets.append(columnWidget)
         columnWidget = self.columnWidgets[column]
@@ -159,11 +161,12 @@ class Editor(QWidget):
             self.hbox_layout.setStretch(i, stretch[i])
 
 class Column(QWidget):
-    def __init__(self):
-        super(Column, self).__init__()
+    def __init__(self, parent):
+        super(Column, self).__init__(parent)
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.vbox_layout)
         self.tab_widgets = []
         self.tabs = []
     
@@ -192,7 +195,7 @@ class TabGroup(QTabWidget):
 
 class Tab(QWidget):
     def __init__(self, tab_widget, name):
-        super(Tab, self).__init__()
+        super(Tab, self).__init__(tab_widget)
         self.tab_widget = tab_widget
         self.name = name
         
@@ -207,7 +210,7 @@ class Tab(QWidget):
         self.content = None
     
     def set_window_type(self, window_type):
-        self.content = window_type()
+        self.content = window_type(self)
         self.vbox_layout.insertWidget(0, self.content)
         if hasattr(window_type, "SPACER"):
             self.vbox_layout.removeItem(self.spacer)
@@ -215,26 +218,31 @@ class Tab(QWidget):
         return self.content
 
 class Inspector(QWidget):
-    def __init__(self):
-        super(Inspector, self).__init__()
-        self.vbox_layout = QVBoxLayout()
+    def __init__(self, parent):
+        super(Inspector, self).__init__(parent)
+        self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.vbox_layout)
         self.sections = []
     
     def add_section(self, name):
-        section = InspectorSection(name)
+        section = InspectorSection(name, self)
         self.sections.append(section)
         self.vbox_layout.addWidget(section)
         return section
 
     def load(self, gameObject=None):
+        num = len(self.sections)
         self.sections = []
-        while self.vbox_layout.count():
+        for i in range(num):
             item = self.vbox_layout.takeAt(0)
             item.widget().delete()
             self.vbox_layout.removeItem(item)
             del item
+        for i in range(num):
+            child = self.findChild(InspectorSection)
+            child.delete()
+            del child
         if gameObject is None:
             return
         main_section = self.add_section("GameObject")
@@ -242,32 +250,32 @@ class Inspector(QWidget):
         main_section.add_value("Tag", int)
         for component in gameObject.components:
             section = self.add_section(component.__class__.__name__)
-            # if hasattr(component, "shown"):
-            #     for attr in component.shown:
-            #         section.add_value(attr, str)
-            # else:
-            for attr in component.attrs:
-                print(attr)
-                section.add_value(attr, str)
-            return
+        #     # if hasattr(component, "shown"):
+        #     #     for attr in component.shown:
+        #     #         section.add_value(attr, str)
+        #     # else:
+        #     for attr in component.attrs:
+        #         print(attr)
+        #         section.add_value(attr, str)
+        #     self.dumpObjectTree()
+        #     return
 
 class InspectorSection(QWidget):
-    def __init__(self, name):
-        super(InspectorSection, self).__init__()
-        self.grid_layout = QGridLayout()
+    def __init__(self, name, parent):
+        super(InspectorSection, self).__init__(parent)
+        self.grid_layout = QGridLayout(self)
         self.grid_layout.setColumnStretch(0, 1)
         self.grid_layout.setColumnStretch(1, 2)
         self.grid_layout.setContentsMargins(4, 4, 4, 4)
 
         self.name = name
-        self.grid_layout.addWidget(QLabel(self.name))
-        self.grid_layout.addWidget(QWidget())
+        self.grid_layout.addWidget(QLabel(self.name, self))
+        self.grid_layout.addWidget(QWidget(self))
         self.fields = {None: None}
     
     def add_value(self, name, type):
         self.setLayout(self.grid_layout)
-        label = QLabel()
-        label.setText(name)
+        label = QLabel(name, self)
         label.setWordWrap(True)
 
         if type not in self.__class__.inputs:
@@ -313,8 +321,8 @@ class HierarchyItem(QTreeWidgetItem):
 
 class Hierarchy(QTreeWidget):
     SPACER = None
-    def __init__(self):
-        super(Hierarchy, self).__init__()
+    def __init__(self, parent):
+        super(Hierarchy, self).__init__(parent)
         self.items = []
         self.header().setVisible(False)
         self.setIndentation(10)
