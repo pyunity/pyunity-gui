@@ -13,6 +13,13 @@ def capitalize(string):
 # test string clearBoxColor5_3withoutLines
 # turns into Clear Box Color 5 3 Without Lines
 
+def isfloat(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
 class Inspector(QWidget):
     def __init__(self, parent):
         super(Inspector, self).__init__(parent)
@@ -115,28 +122,61 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
         self.type = type
     
     def on_edit(self, text):
+        if not isfloat(text):
+            self.setText("0")
+            return
         self.modified = True
         font = self.label.font()
         font.setBold(self.modified)
         self.label.setFont(font)
+    
+    def get(self):
+        return self.type(self.text())
 
 class InspectorVector3Edit(InspectorInput):
     def __init__(self, parent):
         super(InspectorVector3Edit, self).__init__(parent)
         self.labels = [QLabel("X", self), QLabel("Y", self), QLabel("Z", self)]
         self.inputs = [QLineEdit(self), QLineEdit(self), QLineEdit(self)]
+        for i in range(len(self.inputs)):
+            self.inputs[i].setValidator(QDoubleValidator(self.inputs[i]))
+            self.inputs[i].textEdited.connect(self.on_edit(i))
+        
         self.hbox_layout = QHBoxLayout(self)
         self.hbox_layout.setSpacing(2)
         self.hbox_layout.setContentsMargins(0, 0, 0, 0)
         for i in range(3):
             self.hbox_layout.addWidget(self.labels[i])
             self.hbox_layout.addWidget(self.inputs[i])
+        
+        self.modified = False
     
     def setText(self, vec):
         x, y, z = vec[8: -1].split(", ")
         self.inputs[0].setText(x)
         self.inputs[1].setText(y)
         self.inputs[2].setText(z)
+    
+    def get(self):
+        x = float(self.inputs[0].text())
+        y = float(self.inputs[0].text())
+        z = float(self.inputs[0].text())
+        return pyu.Vector3(x, y, z)
+    
+    def on_edit(self, input):
+        def inner(text):
+            if not isfloat(text):
+                self.inputs[input].setText("0")
+                return
+            self.modified = True
+            font = self.labels[input].font()
+            font.setBold(self.modified)
+            self.labels[input].setFont(font)
+            
+            font = self.label.font()
+            font.setBold(self.modified)
+            self.label.setFont(font)
+        return inner
 
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
