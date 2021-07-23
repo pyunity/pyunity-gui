@@ -1,182 +1,156 @@
-Scene : c226fb1b-eebf-40e9-950e-84296769bc2c
+Scene : 13d71713-de31-4286-94a3-9620bc59ae9f
     name: "Scene"
-GameObject : 866115f4-5c7c-480d-8cf5-a21d52117a24
+GameObject : 60926cd4-b9f8-4d43-85c2-2056963ade67
     name: "Main Camera"
     tag: 0
-    transform: a943babe-d751-4187-b3b9-be9292ee429b
-GameObject : e6fd21eb-c785-47ff-8911-a35024f2fe14
+    transform: 04f997ff-ba76-4e3c-ae54-4fae5b42a139
+GameObject : 9e1f2499-5509-479f-af3e-ef70fe41a790
     name: "Light"
     tag: 0
-    transform: 68287aab-1274-4583-bcbd-4593fa994424
-GameObject : c360b3be-4911-43d2-bab7-e3f1bf8fe502
+    transform: 4e5c85e6-6869-4105-8d81-51a532de7026
+GameObject : c6595f37-eccf-4d09-b754-d2e7d6dec66d
     name: "Root"
     tag: 0
-    transform: 055f2ccd-94fb-4b3e-9aca-4618fc6c6a53
-GameObject : 2128f6de-2c65-4ce7-808b-428d4c9c4edf
+    transform: ec8538c8-33ca-436a-a1e0-e3b9eff6debe
+GameObject : d2c980f3-4139-47c3-8daf-4afba0e43b6d
     name: "Side"
     tag: 0
-    transform: 539f545c-c3f6-4dcf-b3c7-04eace7a0700
-GameObject : a2869469-c133-40ae-b48f-528ecea6ff3e
+    transform: 7de694c8-d9d6-4989-84c4-f7348f103e03
+GameObject : 3ed066d5-e208-4c7a-9596-48b1673aca16
     name: "Side"
     tag: 0
-    transform: 1f5c1640-28b0-4507-97ce-9d0754ff1dd8
-GameObject : 89da7b62-ba15-4e5e-ad2d-e0947684e66f
+    transform: aa54f10c-36f2-45af-9bbc-be4460a0d842
+GameObject : 92d77600-2f5a-4322-8dd0-374e7be88773
     name: "Side"
     tag: 0
-    transform: 257341aa-64be-49ad-9afd-94579fbaf7b5
-GameObject : 370b1421-2faf-4a1e-99f3-d108c33c1176
+    transform: 4c35f54d-711b-4bba-bac9-e94145395204
+GameObject : 4ab61553-789c-4cc6-809f-cacdeb69dd0a
     name: "Side"
     tag: 0
-    transform: 747a3b23-3754-4ae9-8dcc-e66769df1671
-GameObject : b075a760-85b9-43da-aaaa-b3ae72400b1b
+    transform: 3f90246c-e8c0-4559-b37e-44d455c91518
+GameObject : d89a6fa5-aa58-40f9-8f15-67143262a186
     name: "Side"
     tag: 0
-    transform: c79dfae4-fe29-4a7c-ae79-53531f596671
-GameObject : 16776044-80a2-4567-b0a4-a915a44cc26c
+    transform: 0e583637-2101-4cbd-8af5-456150413165
+GameObject : 81a700c5-9513-4b25-a07b-03faeea09a23
     name: "Side"
     tag: 0
-    transform: 4b8b13c1-9042-4fed-b887-a015bad5755d
-Transform(Component) : a943babe-d751-4187-b3b9-be9292ee429b
-    gameObject: 866115f4-5c7c-480d-8cf5-a21d52117a24
-    enabled: True
+    transform: d750f36b-4486-46b2-aa98-b52ee326cd61
+Transform(Component) : 04f997ff-ba76-4e3c-ae54-4fae5b42a139
+    gameObject: 60926cd4-b9f8-4d43-85c2-2056963ade67
     localPosition: Vector3(0, 0, -10)
     localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: None
-Camera(Component) : 06a5abfc-f63c-43f6-9504-9b7909d4edfb
-    gameObject: 866115f4-5c7c-480d-8cf5-a21d52117a24
-    enabled: True
-    near: 0.05
+Camera(Component) : 2da5b7b1-b8f3-4b6b-96b3-6522f97f360b
+    gameObject: 60926cd4-b9f8-4d43-85c2-2056963ade67
+    clearColor: Color(0, 0, 0)
     far: 200
+    near: 0.05
     fov: 90
-    clearColor: (0, 0, 0, 1)
-    shader: <pyunity.render.Shader object at 0x046A36E8>
-AudioListener(Component) : 48695c3a-f92e-4acf-91c2-5ab00d12f2f4
-    gameObject: 866115f4-5c7c-480d-8cf5-a21d52117a24
-    enabled: True
-Transform(Component) : 68287aab-1274-4583-bcbd-4593fa994424
-    gameObject: e6fd21eb-c785-47ff-8911-a35024f2fe14
-    enabled: True
+AudioListener(Component) : 72aebc67-9550-43db-81c5-d99961ca7b73
+    gameObject: 60926cd4-b9f8-4d43-85c2-2056963ade67
+Transform(Component) : 4e5c85e6-6869-4105-8d81-51a532de7026
+    gameObject: 9e1f2499-5509-479f-af3e-ef70fe41a790
     localPosition: Vector3(10, 10, -10)
     localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: None
-Light(Component) : dae75fb9-0e68-40ff-ad95-d4e2351139f3
-    gameObject: e6fd21eb-c785-47ff-8911-a35024f2fe14
-    enabled: True
+Light(Component) : 9a3988b2-cf63-4629-b401-49efd1ac4153
+    gameObject: 9e1f2499-5509-479f-af3e-ef70fe41a790
     intensity: 100
-Transform(Component) : 055f2ccd-94fb-4b3e-9aca-4618fc6c6a53
-    gameObject: c360b3be-4911-43d2-bab7-e3f1bf8fe502
-    enabled: True
+Transform(Component) : ec8538c8-33ca-436a-a1e0-e3b9eff6debe
+    gameObject: c6595f37-eccf-4d09-b754-d2e7d6dec66d
     localPosition: Vector3(0, 0, 0)
     localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: None
-Rotator(Behaviour) : f862fef9-eaab-436e-a496-188bce952914
-    gameObject: c360b3be-4911-43d2-bab7-e3f1bf8fe502
-Oscillator2(Behaviour) : eb06305a-2ad2-4516-a1ab-4dee391da34a
-    gameObject: c360b3be-4911-43d2-bab7-e3f1bf8fe502
-    a: 0
+Rotator(Behaviour) : feab424f-5aee-408d-9105-e7485c56b90a
+    gameObject: c6595f37-eccf-4d09-b754-d2e7d6dec66d
+Oscillator2(Behaviour) : 67362314-5e6e-48f4-b83f-383a84e6c925
+    gameObject: c6595f37-eccf-4d09-b754-d2e7d6dec66d
     speed: 10
-Transform(Component) : 539f545c-c3f6-4dcf-b3c7-04eace7a0700
-    gameObject: 2128f6de-2c65-4ce7-808b-428d4c9c4edf
-    enabled: True
+Transform(Component) : 7de694c8-d9d6-4989-84c4-f7348f103e03
+    gameObject: d2c980f3-4139-47c3-8daf-4afba0e43b6d
     localPosition: Vector3(0, -1, 0)
     localRotation: Quaternion(0.7071067811865476, 0.7071067811865475, 0.0, 0.0)
     localScale: Vector3(1, 1, 1)
-    parent: 055f2ccd-94fb-4b3e-9aca-4618fc6c6a53
-MeshRenderer(Component) : d5bbd47b-9d39-4058-b234-1916e0007c94
-    gameObject: 2128f6de-2c65-4ce7-808b-428d4c9c4edf
-    enabled: True
-    mesh: 71643149-c30b-4cb3-8d5e-e6599bb950b2
-    mat: f3c6b87a-ad53-4902-8e33-8bd6a977e769
-Oscillator(Behaviour) : ca6b8f45-56b5-4c1e-b4ca-30c935d1acca
-    gameObject: 2128f6de-2c65-4ce7-808b-428d4c9c4edf
-    a: 0
-    renderer: d5bbd47b-9d39-4058-b234-1916e0007c94
+    parent: ec8538c8-33ca-436a-a1e0-e3b9eff6debe
+MeshRenderer(Component) : 64c8c1d2-5f31-4d12-a447-d9d4edcb2d24
+    gameObject: d2c980f3-4139-47c3-8daf-4afba0e43b6d
+    mat: b4ec1153-dd16-4a85-9e8b-1ed34a55830f
+    mesh: 14ed8c65-e315-4873-88d8-5335139259a3
+Oscillator(Behaviour) : 6d1e5892-e4e9-4e10-a667-9908fa50aab4
+    gameObject: d2c980f3-4139-47c3-8daf-4afba0e43b6d
+    renderer: 64c8c1d2-5f31-4d12-a447-d9d4edcb2d24
     speed: 1
-Transform(Component) : 1f5c1640-28b0-4507-97ce-9d0754ff1dd8
-    gameObject: a2869469-c133-40ae-b48f-528ecea6ff3e
-    enabled: True
+Transform(Component) : aa54f10c-36f2-45af-9bbc-be4460a0d842
+    gameObject: 3ed066d5-e208-4c7a-9596-48b1673aca16
     localPosition: Vector3(0, 1, 0)
     localRotation: Quaternion(0.7071067811865476, -0.7071067811865475, 0.0, 0.0)
     localScale: Vector3(1, 1, 1)
-    parent: 055f2ccd-94fb-4b3e-9aca-4618fc6c6a53
-MeshRenderer(Component) : 3a9173fe-4c0b-437f-9475-3993e6b69ebb
-    gameObject: a2869469-c133-40ae-b48f-528ecea6ff3e
-    enabled: True
-    mesh: d877f69c-4840-42c4-bd0e-4837c228d269
-    mat: a67291fe-9eb3-4679-9f58-d1474c27230f
-Oscillator(Behaviour) : d75f65d7-a367-4bf5-a7a6-c82c0cad56ef
-    gameObject: a2869469-c133-40ae-b48f-528ecea6ff3e
-    a: 0
-    renderer: 3a9173fe-4c0b-437f-9475-3993e6b69ebb
+    parent: ec8538c8-33ca-436a-a1e0-e3b9eff6debe
+MeshRenderer(Component) : 8dd63795-41e9-4d8e-a76a-a3e17d802137
+    gameObject: 3ed066d5-e208-4c7a-9596-48b1673aca16
+    mat: d5b6c835-780a-45d2-8b57-c07c6cdd9a15
+    mesh: 759e7338-006d-401a-b8f7-a4a2814ee48d
+Oscillator(Behaviour) : 076fe728-d657-45fa-892f-72271f0ddd39
+    gameObject: 3ed066d5-e208-4c7a-9596-48b1673aca16
+    renderer: 8dd63795-41e9-4d8e-a76a-a3e17d802137
     speed: 2
-Transform(Component) : 257341aa-64be-49ad-9afd-94579fbaf7b5
-    gameObject: 89da7b62-ba15-4e5e-ad2d-e0947684e66f
-    enabled: True
+Transform(Component) : 4c35f54d-711b-4bba-bac9-e94145395204
+    gameObject: 92d77600-2f5a-4322-8dd0-374e7be88773
     localPosition: Vector3(-1, 0, 0)
     localRotation: Quaternion(0.7071067811865476, 0.0, -0.7071067811865475, 0.0)
     localScale: Vector3(1, 1, 1)
-    parent: 055f2ccd-94fb-4b3e-9aca-4618fc6c6a53
-MeshRenderer(Component) : 48b43aed-173e-4861-8bb8-376bc8cf2991
-    gameObject: 89da7b62-ba15-4e5e-ad2d-e0947684e66f
-    enabled: True
-    mesh: 24cdfa31-c2b6-4233-8342-223a9b7d5dbe
-    mat: 0b45d790-848d-4595-87d1-7f77a60404d0
-Oscillator(Behaviour) : 2b18b130-9237-4528-82d7-7132588018b4
-    gameObject: 89da7b62-ba15-4e5e-ad2d-e0947684e66f
-    a: 0
-    renderer: 48b43aed-173e-4861-8bb8-376bc8cf2991
+    parent: ec8538c8-33ca-436a-a1e0-e3b9eff6debe
+MeshRenderer(Component) : 7afea465-0a7f-4d6e-b7ff-d9ad75a8e382
+    gameObject: 92d77600-2f5a-4322-8dd0-374e7be88773
+    mat: ea68dd6f-29e1-47f6-b5fb-d17857357243
+    mesh: 4f0910da-7bd3-4441-8291-6819e47284fe
+Oscillator(Behaviour) : 23eb7785-67a1-4b68-b5d7-8be740023488
+    gameObject: 92d77600-2f5a-4322-8dd0-374e7be88773
+    renderer: 7afea465-0a7f-4d6e-b7ff-d9ad75a8e382
     speed: 3
-Transform(Component) : 747a3b23-3754-4ae9-8dcc-e66769df1671
-    gameObject: 370b1421-2faf-4a1e-99f3-d108c33c1176
-    enabled: True
+Transform(Component) : 3f90246c-e8c0-4559-b37e-44d455c91518
+    gameObject: 4ab61553-789c-4cc6-809f-cacdeb69dd0a
     localPosition: Vector3(1, 0, 0)
     localRotation: Quaternion(0.7071067811865476, 0.0, 0.7071067811865475, 0.0)
     localScale: Vector3(1, 1, 1)
-    parent: 055f2ccd-94fb-4b3e-9aca-4618fc6c6a53
-MeshRenderer(Component) : 5eb1a5ce-f95b-4990-b565-a3d96830b317
-    gameObject: 370b1421-2faf-4a1e-99f3-d108c33c1176
-    enabled: True
-    mesh: 64592c0f-c897-495b-8686-bace9fed3b39
-    mat: a6f80220-f302-4d75-8907-137aef690d55
-Oscillator(Behaviour) : 459a64f3-180c-4762-bc20-193b2f11e437
-    gameObject: 370b1421-2faf-4a1e-99f3-d108c33c1176
-    a: 0
-    renderer: 5eb1a5ce-f95b-4990-b565-a3d96830b317
+    parent: ec8538c8-33ca-436a-a1e0-e3b9eff6debe
+MeshRenderer(Component) : 7063f80d-da77-4d72-a850-c42190d36c0e
+    gameObject: 4ab61553-789c-4cc6-809f-cacdeb69dd0a
+    mat: 5920050a-7f98-4437-b464-911986d03800
+    mesh: d9f2a49c-d5bf-4473-826c-3745404b8ea0
+Oscillator(Behaviour) : 5eb27a7b-9d9d-4b4f-815a-459833e3720a
+    gameObject: 4ab61553-789c-4cc6-809f-cacdeb69dd0a
+    renderer: 7063f80d-da77-4d72-a850-c42190d36c0e
     speed: 4
-Transform(Component) : c79dfae4-fe29-4a7c-ae79-53531f596671
-    gameObject: b075a760-85b9-43da-aaaa-b3ae72400b1b
-    enabled: True
+Transform(Component) : 0e583637-2101-4cbd-8af5-456150413165
+    gameObject: d89a6fa5-aa58-40f9-8f15-67143262a186
     localPosition: Vector3(0, 0, -1)
     localRotation: Quaternion(1.0, 0.0, 0.0, 0.0)
     localScale: Vector3(1, 1, 1)
-    parent: 055f2ccd-94fb-4b3e-9aca-4618fc6c6a53
-MeshRenderer(Component) : 98aee4dd-5196-476c-accc-dd5a5f53c4e6
-    gameObject: b075a760-85b9-43da-aaaa-b3ae72400b1b
-    enabled: True
-    mesh: 310d5dee-001d-44a8-be34-664183589c6d
-    mat: 69af8652-dc97-4381-b8b0-14d5de4e61e8
-Oscillator(Behaviour) : 80621027-8e1c-4b57-9548-444c3743ce70
-    gameObject: b075a760-85b9-43da-aaaa-b3ae72400b1b
-    a: 0
-    renderer: 98aee4dd-5196-476c-accc-dd5a5f53c4e6
+    parent: ec8538c8-33ca-436a-a1e0-e3b9eff6debe
+MeshRenderer(Component) : 4a05e4f0-a3f0-4e2f-a7ae-34a12da78a9a
+    gameObject: d89a6fa5-aa58-40f9-8f15-67143262a186
+    mat: 51adc6e3-9848-4025-a0a8-e2ced2706538
+    mesh: 6cb5fe4b-0d27-419a-9248-d2f7c70064e0
+Oscillator(Behaviour) : 9dba9ce2-8560-43bc-a6e5-e10677a1afe5
+    gameObject: d89a6fa5-aa58-40f9-8f15-67143262a186
+    renderer: 4a05e4f0-a3f0-4e2f-a7ae-34a12da78a9a
     speed: 5
-Transform(Component) : 4b8b13c1-9042-4fed-b887-a015bad5755d
-    gameObject: 16776044-80a2-4567-b0a4-a915a44cc26c
-    enabled: True
+Transform(Component) : d750f36b-4486-46b2-aa98-b52ee326cd61
+    gameObject: 81a700c5-9513-4b25-a07b-03faeea09a23
     localPosition: Vector3(0, 0, 1)
     localRotation: Quaternion(1.0, 0.0, 0.0, 0.0)
     localScale: Vector3(1, 1, 1)
-    parent: 055f2ccd-94fb-4b3e-9aca-4618fc6c6a53
-MeshRenderer(Component) : 723758bb-8b26-41d1-a007-ad827313b413
-    gameObject: 16776044-80a2-4567-b0a4-a915a44cc26c
-    enabled: True
-    mesh: d1c72e03-bd78-4ea4-af78-27c8c0502b34
-    mat: 24817de6-ef05-4eb2-a298-c7b97c343f45
-Oscillator(Behaviour) : ca563772-e9f1-4c4f-810f-48dc74922e5d
-    gameObject: 16776044-80a2-4567-b0a4-a915a44cc26c
-    a: 0
-    renderer: 723758bb-8b26-41d1-a007-ad827313b413
+    parent: ec8538c8-33ca-436a-a1e0-e3b9eff6debe
+MeshRenderer(Component) : 262fd6e2-69a8-4fdd-8d7c-ddf19d1fc5fb
+    gameObject: 81a700c5-9513-4b25-a07b-03faeea09a23
+    mat: cb30708c-3a74-4238-bd18-2bfe4393f79d
+    mesh: 0bfeeb97-9dda-4359-a689-6f7bb312304a
+Oscillator(Behaviour) : 98d769c1-f4f2-4b2f-b4cd-46622cc3b19f
+    gameObject: 81a700c5-9513-4b25-a07b-03faeea09a23
+    renderer: 262fd6e2-69a8-4fdd-8d7c-ddf19d1fc5fb
     speed: 6

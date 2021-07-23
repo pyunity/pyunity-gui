@@ -111,11 +111,8 @@ class Console(QListWidget):
         self.addItem(entry)
     
     def clear(self):
-        num = len(self.entries)
         self.entries = []
-        for i in range(num):
-            entry = self.takeItem(0)
-            entry.deleteLater()
+        super(Console, self).clear()
     
     def modded_log(self, func):
         def inner(*args, **kwargs):

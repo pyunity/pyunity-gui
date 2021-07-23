@@ -5,10 +5,6 @@ class Oscillator(Behaviour):
     a = 0
     speed = ShowInInspector(int, 5)
     renderer = ShowInInspector(MeshRenderer)
-
-    def Start(self):
-        raise Exception
-
     def Update(self, dt):
         self.a += dt * self.speed / 10
         x = 255 * (1 - abs((self.a % 3 * 2) % 2 - 1))
@@ -26,4 +22,3 @@ class Oscillator(Behaviour):
         elif period == 5:
             color = Vector3(255, 0, x)
         self.renderer.mat.color = Color(*color)
-        Logger.Log(self.renderer.mat.color)
