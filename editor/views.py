@@ -1,6 +1,16 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QDoubleValidator, QFont, QIntValidator
-import gc
+import re
+
+regex = re.compile("(?<![A-Z])[A-Z][a-z]*|(?<![a-z])[a-z]+|\\d*")
+def capitalize(string):
+    match = re.findall(regex, string)
+    while "" in match:
+        match.remove("")
+    return " ".join(map(lambda a: a.capitalize(), match))
+
+# test string clearBoxColor5_3withoutLines
+# turns into Clear Box Color 5 3 Without Lines
 
 class Inspector(QWidget):
     def __init__(self, parent):
@@ -55,7 +65,7 @@ class InspectorSection(QWidget):
         self.fields = {None: None}
     
     def add_value(self, name, type):
-        label = QLabel(name, self)
+        label = QLabel(capitalize(name), self)
         label.setWordWrap(True)
 
         if type not in self.__class__.inputs:
