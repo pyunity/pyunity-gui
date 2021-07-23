@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QDoubleValidator, QFont, QIntValidator
 import re
+import pyunity as pyu
 
 regex = re.compile("(?<![A-Z])[A-Z][a-z]*|(?<![a-z])[a-z]+|\\d*")
 def capitalize(string):
@@ -43,7 +44,7 @@ class Inspector(QWidget):
             section = self.add_section(component.__class__.__name__)
             for name, val in component.shown.items():
                 if val.type in InspectorSection.inputs:
-                    section.add_value(name, val.type)
+                    section.add_value(name, val.type, getattr(component, name))
                 else:
                     section.add_value(name, None)
 
@@ -64,28 +65,32 @@ class InspectorSection(QWidget):
         self.setLayout(self.grid_layout)
         self.fields = {None: None}
     
-    def add_value(self, name, type):
+    def add_value(self, name, type, value=None):
         label = QLabel(capitalize(name), self)
         label.setWordWrap(True)
 
         if type not in self.__class__.inputs:
             raise ValueError("Cannot create input box of type \"" + type.__name__ + "\"")
         input_box = self.__class__.inputs[type](self)
+        if isinstance(input_box, HierarchyInput):
+            input_box.label = label
+            if value is not None:
+                input_box.setText(str(value))
         self.fields[name] = [type, input_box]
 
         self.grid_layout.addWidget(label)
         self.grid_layout.addWidget(input_box)
 
     def new_str(self):
-        return QLineEdit(self)
+        return HierarchyTextEdit(self)
     
     def new_int(self):
-        line_edit = QLineEdit(self)
+        line_edit = HierarchyTextEdit(self)
         line_edit.setValidator(QIntValidator(self))
         return line_edit
     
     def new_float(self):
-        line_edit = QLineEdit(self)
+        line_edit = HierarchyTextEdit(self)
         line_edit.setValidator(QDoubleValidator(self))
         return line_edit
     
@@ -94,6 +99,21 @@ class InspectorSection(QWidget):
         return blank
     
     inputs = {str: new_str, int: new_int, float: new_float, None: new_misc}
+
+class HierarchyInput(QWidget):
+    pass
+
+class HierarchyTextEdit(QLineEdit, HierarchyInput):
+    def __init__(self, parent):
+        super(HierarchyTextEdit, self).__init__(parent)
+        self.textEdited.connect(self.on_edit)
+        self.modified = False
+    
+    def on_edit(self, text):
+        self.modified = True
+        font = self.label.font()
+        font.setBold(self.modified)
+        self.label.setFont(font)
 
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
