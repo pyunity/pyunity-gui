@@ -72,7 +72,7 @@ class InspectorSection(QWidget):
         if type not in self.__class__.inputs:
             raise ValueError("Cannot create input box of type \"" + type.__name__ + "\"")
         input_box = self.__class__.inputs[type](self)
-        if isinstance(input_box, HierarchyInput):
+        if isinstance(input_box, InspectorInput):
             input_box.label = label
             if value is not None:
                 input_box.setText(str(value))
@@ -82,15 +82,15 @@ class InspectorSection(QWidget):
         self.grid_layout.addWidget(input_box)
 
     def new_str(self):
-        return HierarchyTextEdit(self)
+        return InspectorTextEdit(self, str)
     
     def new_int(self):
-        line_edit = HierarchyTextEdit(self)
+        line_edit = InspectorTextEdit(self, int)
         line_edit.setValidator(QIntValidator(self))
         return line_edit
     
     def new_float(self):
-        line_edit = HierarchyTextEdit(self)
+        line_edit = InspectorTextEdit(self, float)
         line_edit.setValidator(QDoubleValidator(self))
         return line_edit
     
@@ -98,22 +98,45 @@ class InspectorSection(QWidget):
         blank = QWidget(self)
         return blank
     
-    inputs = {str: new_str, int: new_int, float: new_float, None: new_misc}
+    def new_vector3(self):
+        input = InspectorVector3Edit(self)
+        return input
+    
+    inputs = {str: new_str, int: new_int, float: new_float, pyu.Vector3: new_vector3, None: new_misc}
 
-class HierarchyInput(QWidget):
+class InspectorInput(QWidget):
     pass
 
-class HierarchyTextEdit(QLineEdit, HierarchyInput):
-    def __init__(self, parent):
-        super(HierarchyTextEdit, self).__init__(parent)
+class InspectorTextEdit(QLineEdit, InspectorInput):
+    def __init__(self, parent, type):
+        super(InspectorTextEdit, self).__init__(parent)
         self.textEdited.connect(self.on_edit)
         self.modified = False
+        self.type = type
     
     def on_edit(self, text):
         self.modified = True
         font = self.label.font()
         font.setBold(self.modified)
         self.label.setFont(font)
+
+class InspectorVector3Edit(InspectorInput):
+    def __init__(self, parent):
+        super(InspectorVector3Edit, self).__init__(parent)
+        self.labels = [QLabel("X", self), QLabel("Y", self), QLabel("Z", self)]
+        self.inputs = [QLineEdit(self), QLineEdit(self), QLineEdit(self)]
+        self.hbox_layout = QHBoxLayout(self)
+        self.hbox_layout.setSpacing(2)
+        self.hbox_layout.setContentsMargins(0, 0, 0, 0)
+        for i in range(3):
+            self.hbox_layout.addWidget(self.labels[i])
+            self.hbox_layout.addWidget(self.inputs[i])
+    
+    def setText(self, vec):
+        x, y, z = vec[8: -1].split(", ")
+        self.inputs[0].setText(x)
+        self.inputs[1].setText(y)
+        self.inputs[2].setText(z)
 
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
