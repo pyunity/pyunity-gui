@@ -31,12 +31,11 @@ class Inspector(QWidget):
         main_section.add_value("Tag", int)
         for component in gameObject.components:
             section = self.add_section(component.__class__.__name__)
-            if hasattr(component, "shown"):
-                for attr in component.shown:
-                    section.add_value(attr, str)
-            else:
-                for attr in component.attrs:
-                    section.add_value(attr, str)
+            for name, val in component.shown.items():
+                if val.type in InspectorSection.inputs:
+                    section.add_value(name, val.type)
+                else:
+                    section.add_value(name, None)
 
 class InspectorSection(QWidget):
     large_font = QFont("Segoe UI", 12)
@@ -80,7 +79,11 @@ class InspectorSection(QWidget):
         line_edit.setValidator(QDoubleValidator(self))
         return line_edit
     
-    inputs = {str: new_str, int: new_int, float: new_float}
+    def new_misc(self):
+        blank = QWidget(self)
+        return blank
+    
+    inputs = {str: new_str, int: new_int, float: new_float, None: new_misc}
 
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
