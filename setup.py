@@ -7,7 +7,8 @@ import glob
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-data_files = [file for file in glob.glob("editor/**/*", recursive=True) if ".py" not in file and not file.endswith(".svg")]
+data_files = glob.glob("editor/**/*.qss", recursive=True) + \
+    glob.glob("editor/**/*.png", recursive=True)
 
 setup(
     name="pyunity-editor",
@@ -37,7 +38,7 @@ setup(
     package_data={"editor": [file[7:] for file in data_files]},
     entry_points={
         "console_scripts": [
-            "pyunity-editor=editor.__main__:start_splash"
+            "pyunity-editor=editor.cli:run"
         ]
     }
 )
