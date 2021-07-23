@@ -140,7 +140,7 @@ class InspectorVector3Edit(InspectorInput):
         self.inputs = [QLineEdit(self), QLineEdit(self), QLineEdit(self)]
         for i in range(len(self.inputs)):
             self.inputs[i].setValidator(QDoubleValidator(self.inputs[i]))
-            self.inputs[i].textEdited.connect(self.on_edit(i))
+            self.inputs[i].editingFinished.connect(self.on_edit(i))
         
         self.hbox_layout = QHBoxLayout(self)
         self.hbox_layout.setSpacing(2)
@@ -164,10 +164,12 @@ class InspectorVector3Edit(InspectorInput):
         return pyu.Vector3(x, y, z)
     
     def on_edit(self, input):
-        def inner(text):
+        def inner():
+            text = self.inputs[input].text()
             if not isfloat(text):
                 self.inputs[input].setText("0")
                 return
+            self.inputs[input].setText(str(float(text)))
             self.modified = True
             font = self.labels[input].font()
             font.setBold(self.modified)
