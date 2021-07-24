@@ -3,7 +3,8 @@ os.environ["PYUNITY_DEBUG_MODE"] = "1"
 from editor.files import FileTracker
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window
-from .views import Inspector, Hierarchy
+from .views import Hierarchy
+from .inspector import Inspector
 from .render import OpenGLFrame, Console
 from pyunity import Loader, SceneManager, Logger
 import sys
