@@ -89,16 +89,14 @@ class InspectorSection(QWidget):
         self.grid_layout.addWidget(input_box)
 
     def new_str(self):
-        return InspectorTextEdit(self, str)
+        return InspectorTextEdit(self)
     
     def new_int(self):
-        line_edit = InspectorTextEdit(self, int)
-        line_edit.setValidator(QIntValidator(self))
+        line_edit = InspectorIntEdit(self)
         return line_edit
     
     def new_float(self):
-        line_edit = InspectorTextEdit(self, float)
-        line_edit.setValidator(QDoubleValidator(self))
+        line_edit = InspectorFloatEdit(self)
         return line_edit
     
     def new_misc(self):
@@ -115,24 +113,49 @@ class InspectorInput(QWidget):
     pass
 
 class InspectorTextEdit(QLineEdit, InspectorInput):
-    def __init__(self, parent, type):
+    def __init__(self, parent):
         super(InspectorTextEdit, self).__init__(parent)
         self.editingFinished.connect(self.on_edit)
         self.modified = False
-        self.type = type
+        self.value = ""
     
     def on_edit(self, text):
-        if self.type in [int, float]:
-            if not isfloat(text):
-                self.setText("0")
-                return
-        self.modified = True
-        font = self.label.font()
-        font.setBold(self.modified)
-        self.label.setFont(font)
+        if text != self.value:
+            self.modified = True
+            font = self.label.font()
+            font.setBold(self.modified)
+            self.label.setFont(font)
+        self.value = text
+        self.setText(str(self.value))
     
     def get(self):
-        return self.type(self.text())
+        return self.value
+
+class InspectorIntEdit(InspectorTextEdit):
+    def __init__(self, parent):
+        super(InspectorIntEdit, self).__init__(parent)
+        self.value = 0
+        self.setText("0")
+        self.setValidator(QIntValidator(self))
+    
+    def on_edit(self):
+        super(InspectorIntEdit, self).on_edit(int(self.text()))
+
+class InspectorFloatEdit(InspectorTextEdit):
+    def __init__(self, parent):
+        super(InspectorFloatEdit, self).__init__(parent)
+        self.value = 0
+        self.setText("0.0")
+        self.setValidator(FloatValidator(self))
+    
+    def on_edit(self):
+        super(InspectorFloatEdit, self).on_edit(float(self.text()))
+
+class FloatValidator(QValidator):
+    def validate(self, input, pos):
+        if not isfloat(input):
+            return QValidator.Invalid, input, pos
+        return QValidator.Acceptable, input, pos
 
 class InspectorVector3Edit(InspectorInput):
     def __init__(self, parent):
