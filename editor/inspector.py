@@ -152,10 +152,32 @@ class InspectorFloatEdit(InspectorTextEdit):
         super(InspectorFloatEdit, self).on_edit(float(self.text()))
 
 class FloatValidator(QValidator):
+    regex = re.compile("[-+]?((?:[0-9]*[.])?[0-9]+)([eE][-+]?\\d+)?")
+    regexes = [
+        (re.compile("[-+]?"), "0.0"),
+        (re.compile("[-+]?[.]"), "0.0"),
+        (re.compile("([-+]?((?:[0-9]*[.])?[0-9]+))[eE]"), "\\1"),
+        (re.compile("([-+]?((?:[0-9]*[.])?[0-9]+))[eE][-+]"), "\\1")
+    ]
     def validate(self, input, pos):
         if not isfloat(input):
+            if self.check(input) is not None:
+                return QValidator.Intermediate, input, pos
             return QValidator.Invalid, input, pos
         return QValidator.Acceptable, input, pos
+    
+    def fixup(self, input):
+        print(input)
+        new = self.check(input)
+        if new is not None:
+            return new
+        return input
+    
+    def check(self, string):
+        for regex, replace in self.__class__.regexes:
+            match = re.match(regex, string)
+            if match is not None and match.group(0) == string:
+                return re.sub(regex, replace, string, 1)
 
 class InspectorVector3Edit(InspectorInput):
     def __init__(self, parent):
