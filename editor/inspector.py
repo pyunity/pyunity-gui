@@ -167,7 +167,6 @@ class FloatValidator(QValidator):
         return QValidator.Acceptable, input, pos
     
     def fixup(self, input):
-        print(input)
         new = self.check(input)
         if new is not None:
             return new
@@ -185,7 +184,10 @@ class InspectorVector3Edit(InspectorInput):
         self.labels = [QLabel("X", self), QLabel("Y", self), QLabel("Z", self)]
         self.inputs = [QLineEdit(self), QLineEdit(self), QLineEdit(self)]
         for i in range(len(self.inputs)):
-            self.inputs[i].setValidator(QDoubleValidator(self.inputs[i]))
+            self.inputs[i].modified = False
+            self.inputs[i].value = 0
+            self.inputs[i].label = self.labels[i]
+            self.inputs[i].setValidator(FloatValidator(self.inputs[i]))
             self.inputs[i].editingFinished.connect(self.on_edit(i))
         
         self.hbox_layout = QHBoxLayout(self)
@@ -196,12 +198,13 @@ class InspectorVector3Edit(InspectorInput):
             self.hbox_layout.addWidget(self.inputs[i])
         
         self.modified = False
+        self.value = pyu.Vector3.zero()
     
     def setText(self, vec):
         x, y, z = vec[8: -1].split(", ")
-        self.inputs[0].setText(x)
-        self.inputs[1].setText(y)
-        self.inputs[2].setText(z)
+        self.inputs[0].setText(str(float(x)))
+        self.inputs[1].setText(str(float(y)))
+        self.inputs[2].setText(str(float(z)))
     
     def get(self):
         x = float(self.inputs[0].text())
@@ -211,17 +214,20 @@ class InspectorVector3Edit(InspectorInput):
     
     def on_edit(self, input):
         def inner():
-            text = self.inputs[input].text()
-            if not isfloat(text):
-                self.inputs[input].setText("0")
-                return
-            self.inputs[input].setText(str(float(text)))
-            self.modified = True
-            font = self.labels[input].font()
-            font.setBold(self.modified)
-            self.labels[input].setFont(font)
-            
-            font = self.label.font()
-            font.setBold(self.modified)
-            self.label.setFont(font)
+            text = float(self.inputs[input].text())
+            print(text, self.value)
+            if text != self.value[input]:
+                self.modified = True
+                font = self.label.font()
+                font.setBold(self.modified)
+                self.label.setFont(font)
+                
+                self.inputs[input].modified = True
+                font = self.inputs[input].label.font()
+                font.setBold(self.inputs[input].modified)
+                self.inputs[input].label.setFont(font)
+            vec = list(self.value)
+            vec[input] = text
+            self.value = pyu.Vector3(vec)
+            self.setText(str(self.value))
         return inner
