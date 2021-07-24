@@ -45,8 +45,8 @@ class Inspector(QWidget):
         if gameObject is None:
             return
         main_section = self.add_section("GameObject")
-        main_section.add_value("Name", str)
-        main_section.add_value("Tag", int)
+        main_section.add_value("Name", str, gameObject.name)
+        main_section.add_value("Tag", int, gameObject.tag.tag)
         for component in gameObject.components:
             section = self.add_section(component.__class__.__name__)
             for name, val in component.shown.items():
@@ -117,14 +117,15 @@ class InspectorInput(QWidget):
 class InspectorTextEdit(QLineEdit, InspectorInput):
     def __init__(self, parent, type):
         super(InspectorTextEdit, self).__init__(parent)
-        self.textEdited.connect(self.on_edit)
+        self.editingFinished.connect(self.on_edit)
         self.modified = False
         self.type = type
     
     def on_edit(self, text):
-        if not isfloat(text):
-            self.setText("0")
-            return
+        if self.type in [int, float]:
+            if not isfloat(text):
+                self.setText("0")
+                return
         self.modified = True
         font = self.label.font()
         font.setBold(self.modified)
