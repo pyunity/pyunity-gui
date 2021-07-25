@@ -1,3 +1,4 @@
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import pyunity as pyu
@@ -21,6 +22,7 @@ def isfloat(string):
         return False
 
 class Inspector(QWidget):
+    props = [pyu.ShowInInspector(str, "", "name"), pyu.ShowInInspector(int, "", "tag")]
     def __init__(self, parent):
         super(Inspector, self).__init__(parent)
         self.vbox_layout = QVBoxLayout(self)
@@ -28,13 +30,16 @@ class Inspector(QWidget):
         self.setLayout(self.vbox_layout)
         self.sections = []
     
-    def add_section(self, name):
-        section = InspectorSection(name, self)
+    def add_section(self, component):
+        section = InspectorSection(component.__class__.__name__, self)
+        section.component = component
+        section.edited.connect(self.on_edit)
         self.sections.append(section)
         self.vbox_layout.addWidget(section)
         return section
 
     def load(self, gameObject=None):
+        self.gameObject = gameObject
         num = len(self.sections)
         self.sections = []
         for i in range(num):
@@ -44,77 +49,31 @@ class Inspector(QWidget):
             widget.deleteLater()
         if gameObject is None:
             return
-        main_section = self.add_section("GameObject")
-        main_section.add_value("Name", str, gameObject.name)
-        main_section.add_value("Tag", int, gameObject.tag.tag)
+        main_section = self.add_section(gameObject)
+        main_section.component = gameObject
+        main_section.add_value("name", self.props[0], gameObject.name)
+        main_section.add_value("tag", self.props[1], gameObject.tag.tag)
         for component in gameObject.components:
-            section = self.add_section(component.__class__.__name__)
+            section = self.add_section(component)
             for name, val in component.shown.items():
-                if val.type in InspectorSection.inputs:
-                    section.add_value(val.name, val.type, getattr(component, name))
-                else:
-                    section.add_value(val.name, None)
-
-class InspectorSection(QWidget):
-    large_font = QFont("Segoe UI", 12)
-    def __init__(self, name, parent):
-        super(InspectorSection, self).__init__(parent)
-        self.grid_layout = QGridLayout(self)
-        self.grid_layout.setColumnStretch(0, 1)
-        self.grid_layout.setColumnStretch(1, 2)
-        self.grid_layout.setContentsMargins(4, 4, 4, 4)
-
-        self.name = name
-        self.header = QLabel(self.name, self)
-        self.header.setFont(self.__class__.large_font)
-        self.grid_layout.addWidget(self.header)
-        self.grid_layout.addWidget(QWidget(self))
-        self.setLayout(self.grid_layout)
-        self.fields = {None: None}
+                section.add_value(name, val, getattr(component, name))
     
-    def add_value(self, name, type, value=None):
-        label = QLabel(capitalize(name), self)
-        label.setWordWrap(True)
-
-        if type not in self.__class__.inputs:
-            raise ValueError("Cannot create input box of type \"" + type.__name__ + "\"")
-        input_box = self.__class__.inputs[type](self)
-        if isinstance(input_box, InspectorInput):
-            input_box.label = label
-            if value is not None:
-                input_box.setText(str(value))
-        self.fields[name] = [type, input_box]
-
-        self.grid_layout.addWidget(label)
-        self.grid_layout.addWidget(input_box)
-
-    def new_str(self):
-        return InspectorTextEdit(self)
-    
-    def new_int(self):
-        line_edit = InspectorIntEdit(self)
-        return line_edit
-    
-    def new_float(self):
-        line_edit = InspectorFloatEdit(self)
-        return line_edit
-    
-    def new_misc(self):
-        blank = QWidget(self)
-        return blank
-    
-    def new_vector3(self):
-        input = InspectorVector3Edit(self)
-        return input
-    
-    inputs = {str: new_str, int: new_int, float: new_float, pyu.Vector3: new_vector3, None: new_misc}
+    def on_edit(self, section, value, attr):
+        if self.gameObject is None:
+            return
+        if section.component is None:
+            return
+        print(section.component, getattr(section.component, attr), value)
 
 class InspectorInput(QWidget):
     pass
 
 class InspectorTextEdit(QLineEdit, InspectorInput):
-    def __init__(self, parent):
+    edited = pyqtSignal(object)
+    def __init__(self, parent, prop, orig):
         super(InspectorTextEdit, self).__init__(parent)
+        self.prop = prop
+        self.orig = orig
         self.editingFinished.connect(self.on_edit)
         self.modified = False
         self.value = ""
@@ -127,13 +86,15 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
             self.label.setFont(font)
         self.value = text
         self.setText(str(self.value))
+        self.edited.emit(self)
     
     def get(self):
         return self.value
 
 class InspectorIntEdit(InspectorTextEdit):
-    def __init__(self, parent):
-        super(InspectorIntEdit, self).__init__(parent)
+    edited = pyqtSignal(object)
+    def __init__(self, parent, prop, orig):
+        super(InspectorIntEdit, self).__init__(parent, prop, orig)
         self.value = 0
         self.setText("0")
         self.setValidator(QIntValidator(self))
@@ -142,8 +103,9 @@ class InspectorIntEdit(InspectorTextEdit):
         super(InspectorIntEdit, self).on_edit(int(self.text()))
 
 class InspectorFloatEdit(InspectorTextEdit):
-    def __init__(self, parent):
-        super(InspectorFloatEdit, self).__init__(parent)
+    edited = pyqtSignal(object)
+    def __init__(self, parent, prop, orig):
+        super(InspectorFloatEdit, self).__init__(parent, prop, orig)
         self.value = 0
         self.setText("0.0")
         self.setValidator(FloatValidator(self))
@@ -179,8 +141,11 @@ class FloatValidator(QValidator):
                 return re.sub(regex, replace, string, 1)
 
 class InspectorVector3Edit(InspectorInput):
-    def __init__(self, parent):
+    edited = pyqtSignal(object)
+    def __init__(self, parent, prop, orig):
         super(InspectorVector3Edit, self).__init__(parent)
+        self.prop = prop
+        self.orig = orig
         self.labels = [QLabel("X", self), QLabel("Y", self), QLabel("Z", self)]
         self.inputs = [QLineEdit(self), QLineEdit(self), QLineEdit(self)]
         for i in range(len(self.inputs)):
@@ -208,14 +173,13 @@ class InspectorVector3Edit(InspectorInput):
     
     def get(self):
         x = float(self.inputs[0].text())
-        y = float(self.inputs[0].text())
-        z = float(self.inputs[0].text())
+        y = float(self.inputs[1].text())
+        z = float(self.inputs[2].text())
         return pyu.Vector3(x, y, z)
     
     def on_edit(self, input):
         def inner():
             text = float(self.inputs[input].text())
-            print(text, self.value)
             if text != self.value[input]:
                 self.modified = True
                 font = self.label.font()
@@ -226,8 +190,58 @@ class InspectorVector3Edit(InspectorInput):
                 font = self.inputs[input].label.font()
                 font.setBold(self.inputs[input].modified)
                 self.inputs[input].label.setFont(font)
-            vec = list(self.value)
+            vec = list(self.get())
             vec[input] = text
             self.value = pyu.Vector3(vec)
             self.setText(str(self.value))
+            self.edited.emit(self)
         return inner
+
+class InspectorSection(QWidget):
+    large_font = QFont("Segoe UI", 12)
+    edited = pyqtSignal(object, object, str)
+    def __init__(self, name, parent):
+        super(InspectorSection, self).__init__(parent)
+        self.grid_layout = QGridLayout(self)
+        self.grid_layout.setColumnStretch(0, 1)
+        self.grid_layout.setColumnStretch(1, 2)
+        self.grid_layout.setContentsMargins(4, 4, 4, 4)
+
+        self.name = name
+        self.component = None
+        self.header = QLabel(self.name, self)
+        self.header.setFont(self.__class__.large_font)
+        self.grid_layout.addWidget(self.header)
+        self.grid_layout.addWidget(QWidget(self))
+        self.setLayout(self.grid_layout)
+        self.fields = {}
+    
+    def add_value(self, orig, prop, value=None):
+        label = QLabel(capitalize(prop.name), self)
+        label.setWordWrap(True)
+
+        if prop.type not in self.__class__.inputs:
+            input_box = QWidget(self)
+        else:
+            input_box = self.__class__.inputs[prop.type](self, prop, orig)
+        if isinstance(input_box, InspectorInput):
+            input_box.label = label
+            if value is not None:
+                input_box.setText(str(value))
+            input_box.edited.connect(self.on_edit)
+        self.fields[input_box] = [prop.name, prop.type]
+
+        self.grid_layout.addWidget(label)
+        self.grid_layout.addWidget(input_box)
+
+    inputs = {
+        str: InspectorTextEdit,
+        int: InspectorIntEdit,
+        float: InspectorFloatEdit,
+        pyu.Vector3: InspectorVector3Edit,
+    }
+
+    def on_edit(self, input):
+        value = input.get()
+        attr = self.fields[input][0]
+        self.edited.emit(self, value, attr)

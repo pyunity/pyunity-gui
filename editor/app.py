@@ -84,10 +84,6 @@ class Application(QApplication):
         self.editor.set_stretch((7, 2, 2))
 
         inspector_content = self.inspector.set_window_type(Inspector)
-        section = inspector_content.add_section("Testing")
-        section.add_value("Name", str)
-        section.add_value("Value", int)
-        section.add_value("Price", float)
 
         game_content = self.game.set_window_type(OpenGLFrame)
         game_content.original = SceneManager.GetSceneByIndex(self.project.firstScene)
