@@ -60,7 +60,6 @@ class OpenGLFrame(QOpenGLWidget):
             self.scene.Start()
             self.scene.mainCamera.Resize(self.width(), self.height())
             self.buttons[2].setChecked(False)
-            print(self.paused)
             if self.console.clear_on_run:
                 self.console.clear()
             if not self.paused:
@@ -75,7 +74,6 @@ class OpenGLFrame(QOpenGLWidget):
             self.buttons[2].setChecked(True)
             self.paused = False
             self.update()
-            self.timer.stop()
         else:
             self.buttons[2].setChecked(True)
     
@@ -90,6 +88,9 @@ class OpenGLFrame(QOpenGLWidget):
     
     def on_switch(self):
         self.console.timer.stop()
+
+class SceneEditor:
+    pass
 
 class Console(QListWidget):
     SPACER = None

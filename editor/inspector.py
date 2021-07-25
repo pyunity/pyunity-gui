@@ -4,15 +4,15 @@ from PyQt5.QtGui import *
 import pyunity as pyu
 import re
 
+# test string "clearBoxColor5_3withoutLines"
+# turns into "Clear Box Color 5 3 Without Lines"
+
 regex = re.compile("(?<![A-Z])[A-Z][a-z]*|(?<![a-z])[a-z]+|\\d*")
 def capitalize(string):
     match = re.findall(regex, string)
     while "" in match:
         match.remove("")
     return " ".join(map(lambda a: a.capitalize(), match))
-
-# test string clearBoxColor5_3withoutLines
-# turns into Clear Box Color 5 3 Without Lines
 
 def isfloat(string):
     try:
@@ -38,8 +38,10 @@ class Inspector(QWidget):
         self.vbox_layout.addWidget(section)
         return section
 
-    def load(self, gameObject=None):
-        self.gameObject = gameObject
+    def load(self, hieararchyItem):
+        self.gameObject = hieararchyItem.gameObject
+        if len(self.sections):
+            list(self.sections[0].fields.keys()[0]).edited.disconnect()
         num = len(self.sections)
         self.sections = []
         for i in range(num):
@@ -47,23 +49,23 @@ class Inspector(QWidget):
             widget = item.widget()
             self.vbox_layout.removeItem(item)
             widget.deleteLater()
-        if gameObject is None:
+        if hieararchyItem.gameObject is None:
             return
-        main_section = self.add_section(gameObject)
-        main_section.component = gameObject
-        main_section.add_value("name", self.props[0], gameObject.name)
-        main_section.add_value("tag", self.props[1], gameObject.tag.tag)
-        for component in gameObject.components:
+        main_section = self.add_section(hieararchyItem.gameObject)
+        main_section.component = hieararchyItem.gameObject
+        name_input = main_section.add_value("name", self.props[0], hieararchyItem.gameObject.name)
+        name_input.edited.connect(hieararchyItem.rename)
+        tag_input = main_section.add_value("tag", self.props[1], hieararchyItem.gameObject.tag.tag)
+        tag_input.prevent_modify = True # temporarily until i implement tag dropdowns
+        for component in hieararchyItem.gameObject.components:
             section = self.add_section(component)
             for name, val in component.shown.items():
                 section.add_value(name, val, getattr(component, name))
     
     def on_edit(self, section, value, attr):
-        if self.gameObject is None:
+        if section.prevent_modify or section.component is None:
             return
-        if section.component is None:
-            return
-        print(section.component, getattr(section.component, attr), value)
+        setattr(section.component, attr, value)
 
 class InspectorInput(QWidget):
     pass
@@ -74,10 +76,13 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
         super(InspectorTextEdit, self).__init__(parent)
         self.prop = prop
         self.orig = orig
-        self.editingFinished.connect(self.on_edit)
+        self.editingFinished.connect(self.edit)
         self.modified = False
         self.value = ""
     
+    def edit(self):
+        self.on_edit(self.text())
+
     def on_edit(self, text):
         if text != self.value:
             self.modified = True
@@ -116,10 +121,10 @@ class InspectorFloatEdit(InspectorTextEdit):
 class FloatValidator(QValidator):
     regex = re.compile("[-+]?((?:[0-9]*[.])?[0-9]+)([eE][-+]?\\d+)?")
     regexes = [
-        (re.compile("[-+]?"), "0.0"),
-        (re.compile("[-+]?[.]"), "0.0"),
-        (re.compile("([-+]?((?:[0-9]*[.])?[0-9]+))[eE]"), "\\1"),
-        (re.compile("([-+]?((?:[0-9]*[.])?[0-9]+))[eE][-+]"), "\\1")
+        (re.compile("[-+]?"), "0.0"), # "-" or "+" or ""
+        (re.compile("[-+]?[.]"), "0.0"), # "-."
+        (re.compile("([-+]?((?:[0-9]*[.])?[0-9]+))[eE]"), "\\1"), # "-5.e" turns into "-5."
+        (re.compile("([-+]?((?:[0-9]*[.])?[0-9]+))[eE][-+]"), "\\1") # "-5.e+" turns into "-5."
     ]
     def validate(self, input, pos):
         if not isfloat(input):
@@ -279,6 +284,7 @@ class InspectorSection(QWidget):
 
         self.name = name
         self.component = None
+        self.prevent_modify = False
         self.header = QLabel(self.name, self)
         self.header.setFont(self.__class__.large_font)
         self.grid_layout.addWidget(self.header)
@@ -303,6 +309,7 @@ class InspectorSection(QWidget):
 
         self.grid_layout.addWidget(label)
         self.grid_layout.addWidget(input_box)
+        return input_box
 
     inputs = {
         str: InspectorTextEdit,

@@ -11,6 +11,12 @@ class HierarchyItem(QTreeWidgetItem):
     def add_child(self, child):
         self.children.append(child)
         self.addChild(child)
+    
+    def rename(self, textedit):
+        text = textedit.value
+        self.setText(0, text)
+        self.name = text
+        assert self.gameObject.name == text
 
 class Hierarchy(QTreeWidget):
     SPACER = None
@@ -52,4 +58,4 @@ class Hierarchy(QTreeWidget):
                 items[gameObject.transform.parent.gameObject])
 
     def on_click(self, item, column):
-        self.inspector.load(item.gameObject)
+        self.inspector.load(item)

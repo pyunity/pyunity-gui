@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
 import os
-import importlib
 from .resources import *
+from .render import SceneEditor
 
 class Window(QMainWindow):
     def __init__(self, app):
@@ -43,6 +43,10 @@ class Window(QMainWindow):
     def set_icon(self, path):
         directory = os.path.dirname(os.path.abspath(__file__))
         self.setWindowIcon(QIcon(os.path.join(directory, path)))
+    
+    def select_none(self):
+        if isinstance(self.app.focusWidget(), SceneEditor):
+            print("select none")
 
 class SceneButtons(QWidget):
     def __init__(self, window):
