@@ -51,9 +51,9 @@ class Inspector(QWidget):
             section = self.add_section(component.__class__.__name__)
             for name, val in component.shown.items():
                 if val.type in InspectorSection.inputs:
-                    section.add_value(name, val.type, getattr(component, name))
+                    section.add_value(val.name, val.type, getattr(component, name))
                 else:
-                    section.add_value(name, None)
+                    section.add_value(val.name, None)
 
 class InspectorSection(QWidget):
     large_font = QFont("Segoe UI", 12)
