@@ -197,6 +197,76 @@ class InspectorVector3Edit(InspectorInput):
             self.edited.emit(self)
         return inner
 
+class InspectorQuaternionEdit(InspectorInput):
+    edited = pyqtSignal(object)
+    def __init__(self, parent, prop, orig):
+        super(InspectorQuaternionEdit, self).__init__(parent)
+        self.prop = prop
+        self.orig = orig
+        self.labels = [QLabel("X", self), QLabel("Y", self), QLabel("Z", self)]
+        self.inputs = [QLineEdit(self), QLineEdit(self), QLineEdit(self)]
+        for i in range(len(self.inputs)):
+            self.inputs[i].modified = False
+            self.inputs[i].value = 0
+            self.inputs[i].label = self.labels[i]
+            self.inputs[i].setValidator(FloatValidator(self.inputs[i]))
+            self.inputs[i].editingFinished.connect(self.on_edit(i))
+        
+        self.hbox_layout = QHBoxLayout(self)
+        self.hbox_layout.setSpacing(2)
+        self.hbox_layout.setContentsMargins(0, 0, 0, 0)
+        for i in range(3):
+            self.hbox_layout.addWidget(self.labels[i])
+            self.hbox_layout.addWidget(self.inputs[i])
+        
+        self.modified = False
+        self.value = pyu.Vector3.zero()
+    
+    def setText(self, quat):
+        w, x, y, z = list(map(float, quat[11: -1].split(", ")))
+        x, y, z = pyu.Quaternion(w, x, y, z).eulerAngles
+        self.inputs[0].setText(str(float(x)))
+        self.inputs[1].setText(str(float(y)))
+        self.inputs[2].setText(str(float(z)))
+    
+    def setVec(self, vec):
+        x, y, z = vec
+        self.inputs[0].setText(str(float(x)))
+        self.inputs[1].setText(str(float(y)))
+        self.inputs[2].setText(str(float(z)))
+    
+    def get(self):
+        x = float(self.inputs[0].text())
+        y = float(self.inputs[1].text())
+        z = float(self.inputs[2].text())
+        return pyu.Quaternion.Euler(pyu.Vector3(x, y, z))
+    
+    def getVec(self):
+        x = float(self.inputs[0].text())
+        y = float(self.inputs[1].text())
+        z = float(self.inputs[2].text())
+        return pyu.Vector3(x, y, z)
+    
+    def on_edit(self, input):
+        def inner():
+            text = float(self.inputs[input].text())
+            if text != self.value[input]:
+                self.modified = True
+                font = self.label.font()
+                font.setBold(self.modified)
+                self.label.setFont(font)
+                
+                self.inputs[input].modified = True
+                font = self.inputs[input].label.font()
+                font.setBold(self.inputs[input].modified)
+                self.inputs[input].label.setFont(font)
+            vec = list(self.getVec())
+            vec[input] = text
+            self.value = pyu.Vector3(vec)
+            self.setVec(self.value)
+            self.edited.emit(self)
+        return inner
+
 class InspectorSection(QWidget):
     large_font = QFont("Segoe UI", 12)
     edited = pyqtSignal(object, object, str)
@@ -239,6 +309,7 @@ class InspectorSection(QWidget):
         int: InspectorIntEdit,
         float: InspectorFloatEdit,
         pyu.Vector3: InspectorVector3Edit,
+        pyu.Quaternion: InspectorQuaternionEdit,
     }
 
     def on_edit(self, input):
