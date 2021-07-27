@@ -26,6 +26,7 @@ class OpenGLFrame(QOpenGLWidget):
         self.scene = None
         self.original = None
         self.paused = False
+        self.file_tracker = None
     
     def set_buttons(self, buttons):
         self.buttons = buttons.buttons
@@ -64,6 +65,7 @@ class OpenGLFrame(QOpenGLWidget):
                 self.console.clear()
             if not self.paused:
                 self.timer.start(1000 / config.fps)
+            self.file_tracker.stop()
     
     @patch
     def stop(self, on):
@@ -74,6 +76,7 @@ class OpenGLFrame(QOpenGLWidget):
             self.buttons[2].setChecked(True)
             self.paused = False
             self.update()
+            self.file_tracker.start(5)
         else:
             self.buttons[2].setChecked(True)
     

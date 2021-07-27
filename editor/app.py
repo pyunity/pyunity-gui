@@ -6,7 +6,7 @@ from .window import Editor, SceneButtons, Window
 from .views import Hierarchy
 from .inspector import Inspector
 from .render import OpenGLFrame, Console
-from pyunity import Loader, SceneManager, Logger
+from pyunity import SceneManager, Logger
 import sys
 import subprocess
 import time
@@ -19,7 +19,6 @@ def testing(string):
 class Application(QApplication):
     def __init__(self, path):
         super(Application, self).__init__(sys.argv)
-        self.project = Loader.LoadProject(path)
 
         self.window = Window(self)
         self.window.set_icon("icons/icon.png")
@@ -86,8 +85,11 @@ class Application(QApplication):
         inspector_content = self.inspector.set_window_type(Inspector)
 
         game_content = self.game.set_window_type(OpenGLFrame)
-        game_content.original = SceneManager.GetSceneByIndex(self.project.firstScene)
         game_content.set_buttons(self.buttons)
+        game_content.file_tracker = FileTracker(self, path)
+        game_content.file_tracker.start(1)
+        game_content.original = SceneManager.GetSceneByIndex(
+            game_content.file_tracker.project.firstScene)
 
         hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
         hierarchy_content.load_scene(game_content.original)
@@ -97,9 +99,6 @@ class Application(QApplication):
         for i in range(10):
             console_content.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), Logger.OUTPUT, "Test")
         game_content.console = console_content
-
-        self.file_tracker = FileTracker(path)
-        self.file_tracker.start(5)
 
     def start(self):
         self.window.showMaximized()
