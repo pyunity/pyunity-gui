@@ -1,0 +1,14 @@
+Project
+    name: Test
+    firstScene: 0
+Files
+    a8d4bfee-edcc-4554-9731-93a0d55c7e3d: Meshes/Side.mesh
+    cfe07efc-a241-4013-818b-5a59996ee403: Scenes/Scene.scene
+    2f34d065-340f-42d8-8721-1f2549c23ab7: Scripts/Oscillator.py
+    ab7fb6c2-2209-4ee1-9100-8ed196cb5c07: Scripts/Oscillator.py
+    3dc9e86c-246d-47a0-9cea-5db97baa2819: Scripts/Oscillator.py
+    6b6338ef-a8a6-4655-b174-e29f5be7d6aa: Scripts/Oscillator.py
+    d6243a3d-7627-4146-9560-3e7d708dd929: Scripts/Oscillator.py
+    730e42ba-c711-4eca-a3ed-be1d965b8a47: Scripts/Oscillator.py
+    51d8c864-7886-4d7b-bf91-c65467a34fb7: Scripts/Oscillator2.py
+    62ee49bc-e78e-4919-8d57-55eed47dfe4d: Scripts/Rotator.py

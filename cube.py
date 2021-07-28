@@ -5,6 +5,9 @@ class Oscillator(Behaviour):
     a = 0
     speed = ShowInInspector(int, 5)
     renderer = ShowInInspector(MeshRenderer)
+    def Start(self):
+        self.renderer.mat = Material(Color(255, 0, 0))
+
     def Update(self, dt):
         self.a += dt * self.speed / 10
         x = 255 * (1 - abs((self.a % 3 * 2) % 2 - 1))
@@ -49,8 +52,7 @@ for direction in [Vector3.up(), Vector3.right(), Vector3.forward()]:
         side = direction * parity
         go = GameObject("Side", root)
         renderer = go.AddComponent(MeshRenderer)
-        renderer.mesh = Mesh.double_quad(2)
-        renderer.mat = Material(Color(255, 0, 0))
+        renderer.mesh = Loader.Primitives.double_quad
         oscillator = go.AddComponent(Oscillator)
         oscillator.renderer = renderer
         oscillator.speed = i
@@ -65,4 +67,4 @@ for direction in [Vector3.up(), Vector3.right(), Vector3.forward()]:
         scene.Add(go)
 
 SceneManager.LoadScene(scene)
-Loader.SaveSceneToProject(scene)
+Loader.SaveAllScenes("Test")
