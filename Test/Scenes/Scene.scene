@@ -44,7 +44,7 @@ Transform(Component) : 1164c2a8-70c9-4c27-a32d-9bf9a45be361
     localScale: Vector3(1, 1, 1)
 Camera(Component) : eb5ffe92-4176-4936-bac9-f0a16f23b7f3
     gameObject: 00c6852a-f3e6-4faa-8e3e-4bcbe206057c
-    clearColor: Color(0, 0, 0)
+    clearColor: RGB(0, 0, 0)
     far: 200
     near: 0.05
 AudioListener(Component) : b36037cb-f072-4062-827c-3b152f7c134d
@@ -79,7 +79,7 @@ Transform(Component) : d9cc414b-3b51-4aa5-b6a2-323977a751d6
     localScale: Vector3(1, 1, 1)
 MeshRenderer(Component) : 494de522-5ac7-4d69-88d9-4843d0dc9a49
     gameObject: 52446045-424c-4033-b68f-ed3789ea0321
-    mat: None
+    mat: default
     mesh: ffca55dd-52f6-4591-a3e9-a9ea0d2df2d8
 Oscillator(Behaviour) : 162056cc-5036-435f-b537-5dd8071346e9
     gameObject: 52446045-424c-4033-b68f-ed3789ea0321
@@ -94,7 +94,7 @@ Transform(Component) : 5288f26e-f308-40f2-bb15-3e4a28ab7e4a
     localScale: Vector3(1, 1, 1)
 MeshRenderer(Component) : e6bf8c4c-bf2c-468b-9099-a34bce401601
     gameObject: 56fd1af4-8584-492b-95b7-883d2d0f749f
-    mat: None
+    mat: default
     mesh: ffca55dd-52f6-4591-a3e9-a9ea0d2df2d8
 Oscillator(Behaviour) : 850a7b1a-a36a-4965-b540-cc7591845784
     gameObject: 56fd1af4-8584-492b-95b7-883d2d0f749f
@@ -109,7 +109,7 @@ Transform(Component) : 900cdc34-6312-4503-aab7-219b2a45597f
     localScale: Vector3(1, 1, 1)
 MeshRenderer(Component) : 3f0a05c2-49a7-454d-8e9a-335a069615df
     gameObject: 7cfdf7e3-12d6-464c-a9e4-45ffca6c58bf
-    mat: None
+    mat: default
     mesh: ffca55dd-52f6-4591-a3e9-a9ea0d2df2d8
 Oscillator(Behaviour) : ff34a4d7-b17d-41d0-aa1d-4f36fb8226d3
     gameObject: 7cfdf7e3-12d6-464c-a9e4-45ffca6c58bf
@@ -124,7 +124,7 @@ Transform(Component) : cd086f11-4879-4fb5-9e35-d92708051c9e
     localScale: Vector3(1, 1, 1)
 MeshRenderer(Component) : 8d2dcae3-ca88-4053-9311-f2b3730a3d5a
     gameObject: 96656365-92ff-43b4-af21-a1ac81d3570f
-    mat: None
+    mat: default
     mesh: ffca55dd-52f6-4591-a3e9-a9ea0d2df2d8
 Oscillator(Behaviour) : d097da97-aebb-474e-ab11-ec34fdcc0d34
     gameObject: 96656365-92ff-43b4-af21-a1ac81d3570f
@@ -139,7 +139,7 @@ Transform(Component) : af292955-a355-477b-bc78-c5e2727b5f03
     localScale: Vector3(1, 1, 1)
 MeshRenderer(Component) : e726b49b-bd5f-435c-936a-54d7699f889b
     gameObject: fd7835bd-72de-4292-9c6c-d4dbc7557f5c
-    mat: None
+    mat: default
     mesh: ffca55dd-52f6-4591-a3e9-a9ea0d2df2d8
 Oscillator(Behaviour) : 21c74e28-3702-48c2-bce1-5cbefd999203
     gameObject: fd7835bd-72de-4292-9c6c-d4dbc7557f5c
@@ -154,7 +154,7 @@ Transform(Component) : 6359290f-4772-46a1-a89a-e209dd9a4e94
     localScale: Vector3(1, 1, 1)
 MeshRenderer(Component) : bf7f48b1-1faf-4ad7-ab1d-d2a35f2fc51c
     gameObject: 663bba86-a3aa-406c-9bc5-de8cd0cbf157
-    mat: None
+    mat: default
     mesh: ffca55dd-52f6-4591-a3e9-a9ea0d2df2d8
 Oscillator(Behaviour) : c139bc3f-ab86-4e8e-ba22-25783bde2554
     gameObject: 663bba86-a3aa-406c-9bc5-de8cd0cbf157

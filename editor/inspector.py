@@ -41,7 +41,7 @@ class Inspector(QWidget):
     def load(self, hieararchyItem):
         self.gameObject = hieararchyItem.gameObject
         if len(self.sections):
-            list(self.sections[0].fields.keys()[0]).edited.disconnect()
+            list(self.sections[0].fields.keys())[0].edited.disconnect()
         num = len(self.sections)
         self.sections = []
         for i in range(num):
