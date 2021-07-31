@@ -91,12 +91,13 @@ class ToolBar:
         self.sub_menus[name] = {}
         return menu
     
-    def add_action(self, name, menu, shortcut, tip, func):
+    def add_action(self, name, menu, shortcut, tip, *funcs):
         action = QAction(name, self.instance)
         if shortcut:
             action.setShortcut(shortcut)
         action.setStatusTip(tip)
-        action.triggered.connect(func)
+        for func in funcs:
+            action.triggered.connect(func)
 
         if menu not in self.menus:
             menu_tab = self.add_menu(menu)

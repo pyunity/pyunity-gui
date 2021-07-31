@@ -66,6 +66,10 @@ class Inspector(QWidget):
         if section.prevent_modify or section.component is None:
             return
         setattr(section.component, attr, value)
+    
+    def reset_bold(self):
+        for section in self.sections:
+            section.reset_bold()
 
 class InspectorInput(QWidget):
     pass
@@ -92,6 +96,12 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
         self.value = text
         self.setText(str(self.value))
         self.edited.emit(self)
+    
+    def reset_bold(self):
+        self.modified = False
+        font = self.label.font()
+        font.setBold(self.modified)
+        self.label.setFont(font)
     
     def get(self):
         return self.value
@@ -201,6 +211,18 @@ class InspectorVector3Edit(InspectorInput):
             self.setText(str(self.value))
             self.edited.emit(self)
         return inner
+    
+    def reset_bold(self):
+        self.modified = False
+        font = self.label.font()
+        font.setBold(self.modified)
+        self.label.setFont(font)
+
+        for input in self.inputs:
+            input.modified = False
+            font = input.label.font()
+            font.setBold(input.modified)
+            input.label.setFont(font)
 
 class InspectorQuaternionEdit(InspectorInput):
     edited = pyqtSignal(object)
@@ -271,6 +293,18 @@ class InspectorQuaternionEdit(InspectorInput):
             self.setVec(self.value)
             self.edited.emit(self)
         return inner
+    
+    def reset_bold(self):
+        self.modified = False
+        font = self.label.font()
+        font.setBold(self.modified)
+        self.label.setFont(font)
+
+        for input in self.inputs:
+            input.modified = False
+            font = input.label.font()
+            font.setBold(input.modified)
+            input.label.setFont(font)
 
 class InspectorSection(QWidget):
     large_font = QFont("Segoe UI", 12)
@@ -323,3 +357,8 @@ class InspectorSection(QWidget):
         value = input.get()
         attr = self.fields[input][0]
         self.edited.emit(self, value, attr)
+    
+    def reset_bold(self):
+        for box in self.fields:
+            if isinstance(box, InspectorInput):
+                box.reset_bold()

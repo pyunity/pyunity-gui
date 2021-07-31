@@ -25,7 +25,7 @@ class Application(QApplication):
         
         self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
         self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", self.open)
-        self.window.toolbar.add_action("Save", "File", "Ctrl+S", "Save the current Scene", testing("save"))
+        self.window.toolbar.add_action("Save", "File", "Ctrl+S", "Save the current Scene", self.save)
         self.window.toolbar.add_action("Save As", "File", "Ctrl+Shift+S", "Save the current Scene as new file", testing("save as"))
         self.window.toolbar.add_action("Save a Copy As", "File", "Ctrl+Alt+S", "Save a copy of the current Scene", testing("save copy as"))
         self.window.toolbar.add_separator("File")
@@ -82,23 +82,23 @@ class Application(QApplication):
         
         self.editor.set_stretch((7, 2, 2))
 
-        inspector_content = self.inspector.set_window_type(Inspector)
+        self.inspector_content = self.inspector.set_window_type(Inspector)
 
-        game_content = self.game.set_window_type(OpenGLFrame)
-        game_content.set_buttons(self.buttons)
-        game_content.file_tracker = FileTracker(self, path)
-        game_content.file_tracker.start(1)
-        game_content.original = SceneManager.GetSceneByIndex(
-            game_content.file_tracker.project.firstScene)
+        self.game_content = self.game.set_window_type(OpenGLFrame)
+        self.game_content.set_buttons(self.buttons)
+        self.game_content.file_tracker = FileTracker(self, path)
+        self.game_content.file_tracker.start(1)
+        self.game_content.original = SceneManager.GetSceneByIndex(
+            self.game_content.file_tracker.project.firstScene)
 
-        hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
-        hierarchy_content.load_scene(game_content.original)
-        hierarchy_content.inspector = inspector_content
+        self.hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
+        self.hierarchy_content.load_scene(self.game_content.original)
+        self.hierarchy_content.inspector = self.inspector_content
         
-        console_content = self.console.set_window_type(Console)
+        self.console_content = self.console.set_window_type(Console)
         for i in range(10):
-            console_content.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), Logger.OUTPUT, "Test")
-        game_content.console = console_content
+            self.console_content.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), Logger.OUTPUT, "Test")
+        self.game_content.console = self.console_content
 
     def start(self):
         self.window.showMaximized()
@@ -110,6 +110,10 @@ class Application(QApplication):
         # Get opened project
         subprocess.Popen(["py", "cli.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.quit()
+    
+    def save(self):
+        self.game_content.save()
+        self.inspector_content.reset_bold()
     
     def quit_wrapper(self):
         message_box = QMessageBox(QMessageBox.Information, "Quit", "Are you sure you want to quit?", parent=self.window)

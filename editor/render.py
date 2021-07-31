@@ -89,6 +89,9 @@ class OpenGLFrame(QOpenGLWidget):
                 self.scene.lastFrame = time.time() - 1 / config.fps
                 self.timer.start(1000 // config.fps)
     
+    def save(self):
+        pyu.Loader.SaveScene(self.original, self.file_tracker.project)
+    
     def on_switch(self):
         self.console.timer.stop()
 
