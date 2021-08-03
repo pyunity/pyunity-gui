@@ -319,14 +319,22 @@ class InspectorSection(QWidget):
         self.name = name
         self.component = None
         self.prevent_modify = False
+        
         self.header = QLabel(self.name, self)
         self.header.setFont(self.__class__.large_font)
         self.grid_layout.addWidget(self.header)
         self.grid_layout.addWidget(QWidget(self))
+
+        self.label = QLabel("No properties", self)
+        self.grid_layout.addWidget(self.label, 1, 0, 1, 2)
+
         self.setLayout(self.grid_layout)
         self.fields = {}
     
     def add_value(self, orig, prop, value=None):
+        if len(self.fields) == 0:
+            self.grid_layout.removeWidget(self.label)
+            self.label.deleteLater()
         label = QLabel(capitalize(prop.name), self)
         label.setWordWrap(True)
 
