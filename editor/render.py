@@ -42,7 +42,7 @@ class OpenGLFrame(QOpenGLWidget):
         if self.scene is not None:
             self.scene.update()
         else:
-            self.original.mainCamera.Render(self.original.gameObjects)
+            self.original.mainCamera.Render(self.original.gameObjects, self.original.lights)
     
     def resizeGL(self, width, height):
         if self.scene is not None:
@@ -90,6 +90,7 @@ class OpenGLFrame(QOpenGLWidget):
                 self.timer.start(1000 // config.fps)
     
     def save(self):
+        print(self.original.ids)
         pyu.Loader.SaveScene(self.original, self.file_tracker.project)
     
     def on_switch(self):
