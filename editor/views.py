@@ -32,6 +32,8 @@ class Hierarchy(QWidget):
         self.hbox_layout = QHBoxLayout()
         # self.hbox_layout.setStretch(0, 1)
         self.title = QLabel("Untitled Scene")
+        self.vbox_layout.setContentsMargins(0, 0, 0, 0)
+        self.vbox_layout.setSpacing(0)
         self.hbox_layout.addWidget(self.title)
 
         self.add_button = QToolButton(self)
