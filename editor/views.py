@@ -1,4 +1,5 @@
 import os
+from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import *
 
@@ -30,12 +31,11 @@ class Hierarchy(QWidget):
 
         self.hbox_layout = QHBoxLayout()
         self.hbox_layout.setStretch(0, 1)
-        icon = QLabel(self)
-        icon.setPixmap(QPixmap(os.path.join("icons", "inspector", "logo.png")).scaled(16, 16))
-        self.hbox_layout.addWidget(icon, 1)
         self.hbox_layout.addWidget(QLabel("Untitled Scene"))
-        self.add_button = QPushButton(self)
-        self.add_button.setIcon(QIcon(os.path.join("icons", "inspector", "add.png")))
+        self.add_button = QToolButton(self)
+        self.add_button.setIcon(QIcon(os.path.join(os.path.dirname(
+            os.path.abspath(__file__)), "icons", "inspector", "add.png")))
+        self.add_button.setStyleSheet("padding: 3px;")
         self.hbox_layout.addWidget(self.add_button)
         self.vbox_layout.addLayout(self.hbox_layout)
 
