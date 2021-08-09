@@ -1,6 +1,6 @@
 import os
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 
 class HierarchyItem(QTreeWidgetItem):
@@ -30,12 +30,22 @@ class Hierarchy(QWidget):
         self.vbox_layout.setSpacing(2)
 
         self.hbox_layout = QHBoxLayout()
-        self.hbox_layout.setStretch(0, 1)
-        self.hbox_layout.addWidget(QLabel("Untitled Scene"))
+        # self.hbox_layout.setStretch(0, 1)
+        self.title = QLabel("Untitled Scene")
+        self.hbox_layout.addWidget(self.title)
+
         self.add_button = QToolButton(self)
         self.add_button.setIcon(QIcon(os.path.join(os.path.dirname(
             os.path.abspath(__file__)), "icons", "inspector", "add.png")))
         self.add_button.setStyleSheet("padding: 3px;")
+        self.add_button.setPopupMode(QToolButton.InstantPopup)
+        self.add_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+
+        self.menu = QMenu()
+        self.menu.addAction("New GameObject")
+        self.menu.addAction("New Child GameObject")
+        self.add_button.setMenu(self.menu)
+
         self.hbox_layout.addWidget(self.add_button)
         self.vbox_layout.addLayout(self.hbox_layout)
 
@@ -64,9 +74,10 @@ class Hierarchy(QWidget):
             parent = parent.children[num]
         parent.add_child(item)
         return item
-
+    
     def load_scene(self, scene):
         self.loaded = scene
+        self.title.setText(scene.name)
         items = {}
         for gameObject in self.loaded.rootGameObjects:
             items[gameObject] = self.add_item(gameObject)
