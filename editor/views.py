@@ -86,11 +86,12 @@ class Hierarchy(QWidget):
         self.add_item(new, item)
     
     def remove(self):
-        item = self.tree_widget.currentItem()
-        if item is None:
+        items = self.tree_widget.selectedItems()
+        if len(items) == 0:
             print("Nothing selected")
             return
-        print("Removing " + item.gameObject.name)
+        for item in items:
+            print("Removing " + item.gameObject.name)
 
     def add_item(self, gameObject, parent=None):
         item = HierarchyItem(gameObject)
