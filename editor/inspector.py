@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import pyunity as pyu
@@ -49,6 +49,7 @@ class Inspector(QWidget):
         return section
 
     def load(self, hierarchyItem):
+        self.currentItem = None
         if len(self.sections):
             list(self.sections[0].fields.keys())[0].edited.disconnect()
         num = len(self.sections)
@@ -67,6 +68,7 @@ class Inspector(QWidget):
         elif hierarchyItem is None:
             self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
             return
+        self.currentItem = hierarchyItem
         self.gameObject = hierarchyItem.gameObject
 
         main_section = self.add_section(self.gameObject)
@@ -78,16 +80,18 @@ class Inspector(QWidget):
         tag_input.prevent_modify = True # temporarily until i implement tag dropdowns
 
         enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
+        enabled_input.edited.connect(hierarchyItem.toggle)
 
         for component in self.gameObject.components:
             section = self.add_section(component)
             for name, val in component.shown.items():
                 section.add_value(name, val, getattr(component, name))
     
-    def on_edit(self, section, value, attr):
-        if section.prevent_modify or section.component is None:
+    def on_edit(self, section, item, value, attr):
+        if hasattr(item, "prevent_modify") or section.component is None:
             return
         setattr(section.component, attr, value)
+        self.currentItem.setBold(True)
     
     def reset_bold(self):
         for section in self.sections:
@@ -104,18 +108,25 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
         self.orig = orig
         self.modified = False
         self.value = ""
+        self.editingFinished.connect(self.edit)
     
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.clearFocus()
+        super(InspectorTextEdit, self).keyPressEvent(event)
     
-    def on_edit(self, text):
-        if text != self.value:
+    def edit(self):
+        self.on_edit()
+
+    def on_edit(self, value=None):
+        if value is None:
+            value = self.text()
+        if value != self.value:
             self.modified = True
             font = self.label.font()
             font.setBold(self.modified)
             self.label.setFont(font)
-        self.value = text
+        self.value = value
         self.setText(str(self.value))
         self.edited.emit(self)
     
@@ -186,9 +197,11 @@ class InspectorBoolEdit(QCheckBox, InspectorInput):
         self.orig = orig
         self.value = True
         self.label = None
+        self.stateChanged.connect(self.on_edit)
         self.setChecked(True)
     
-    def on_edit(self, value):
+    def on_edit(self, state):
+        value = state == Qt.Checked
         if value != self.value:
             self.modified = True
             font = self.label.font()
@@ -360,7 +373,7 @@ class InspectorQuaternionEdit(InspectorInput):
 
 class InspectorSection(QWidget):
     large_font = QFont("Segoe UI", 12)
-    edited = pyqtSignal(object, object, str)
+    edited = pyqtSignal(object, object, object, str)
     def __init__(self, name, parent):
         super(InspectorSection, self).__init__(parent)
         self.grid_layout = QGridLayout(self)
@@ -417,7 +430,7 @@ class InspectorSection(QWidget):
     def on_edit(self, input):
         value = input.get()
         attr = self.fields[input][0]
-        self.edited.emit(self, value, attr)
+        self.edited.emit(self, input, value, attr)
     
     def reset_bold(self):
         for box in self.fields:

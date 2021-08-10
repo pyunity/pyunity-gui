@@ -28,6 +28,14 @@ class HierarchyItem(QTreeWidgetItem):
         self.name = text
         assert self.gameObject.name == text
 
+    def toggle(self):
+        self.gameObject.enabled = not self.gameObject.enabled
+
+    def setBold(self, bold):
+        font = self.font(0)
+        font.setBold(bold)
+        self.setFont(0, font)
+
 class Hierarchy(QWidget):
     SPACER = None
     def __init__(self, parent):
@@ -137,6 +145,10 @@ class Hierarchy(QWidget):
             self.inspector.load(None)
         else:
             self.inspector.load(items[0])
+    
+    def reset_bold(self):
+        for item in self.items:
+            item.setBold(False)
 
 class CustomTreeWidget(QTreeWidget):
     def __init__(self, parent):

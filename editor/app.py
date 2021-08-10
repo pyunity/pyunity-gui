@@ -75,6 +75,7 @@ class Application(QApplication):
     def save(self):
         self.game_content.save()
         self.inspector_content.reset_bold()
+        self.hierarchy_content.reset_bold()
     
     def quit_wrapper(self):
         message_box = QMessageBox(QMessageBox.Information, "Quit", "Are you sure you want to quit?", parent=self.window)
