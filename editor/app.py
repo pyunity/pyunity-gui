@@ -23,47 +23,6 @@ class Application(QApplication):
         self.window = Window(self)
         self.window.set_icon("icons/icon.png")
         
-        self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
-        self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", self.open)
-        self.window.toolbar.add_action("Save", "File", "Ctrl+S", "Save the current Scene", self.save)
-        self.window.toolbar.add_action("Save As", "File", "Ctrl+Shift+S", "Save the current Scene as new file", testing("save as"))
-        self.window.toolbar.add_action("Save a Copy As", "File", "Ctrl+Alt+S", "Save a copy of the current Scene", testing("save copy as"))
-        self.window.toolbar.add_separator("File")
-        self.window.toolbar.add_action("Close Scene", "File", "Ctrl+W", "Closes the current Scene", testing("close"))
-        self.window.toolbar.add_action("Close All", "File", "Ctrl+Shift+W", "Closes all opened Scene", testing("close all"))
-        self.window.toolbar.add_separator("File")
-        self.window.toolbar.add_action("Quit", "File", "Ctrl+Q", "Close the Editor", self.quit_wrapper)
-        
-        self.window.toolbar.add_action("Undo", "Edit", "Ctrl+Z", "Undo the last action", testing("undo"))
-        self.window.toolbar.add_action("Redo", "Edit", "Ctrl+Shift+Z", "Redo the last action", testing("redo"))
-        self.window.toolbar.add_separator("Edit")
-        self.window.toolbar.add_action("Cut", "Edit", "Ctrl+X", "Deletes item and adds to clipboard", testing("cut"))
-        self.window.toolbar.add_action("Copy", "Edit", "Ctrl+C", "Adds item to clipboard", testing("copy"))
-        self.window.toolbar.add_action("Paste", "Edit", "Ctrl+V", "Pastes item from clipboard", testing("paste"))
-        self.window.toolbar.add_separator("Edit")
-        self.window.toolbar.add_action("Rename", "Edit", "F2", "Renames the selected item", testing("rename"))
-        self.window.toolbar.add_action("Duplicate", "Edit", "Ctrl+D", "Duplicates the selected item(s)", testing("duplicate"))
-        self.window.toolbar.add_action("Delete", "Edit", "Delete", "Deletes item", testing("delete"))
-        self.window.toolbar.add_separator("Edit")
-        self.window.toolbar.add_action("Select All", "Edit", "Ctrl+A", "Selects all items in the current Scene", testing("select all"))
-        self.window.toolbar.add_action("Select None", "Edit", "Escape", "Deselects all items", self.window.select_none)
-        
-        self.window.toolbar.add_sub_action("Folder", "Assets", "Create", "", "", testing("new folder"))
-        self.window.toolbar.add_sub_action("File", "Assets", "Create", "", "", testing("new file"))
-        self.window.toolbar.add_sub_separator("Assets", "Create")
-        self.window.toolbar.add_sub_action("Script", "Assets", "Create", "", "", testing("new script"))
-        self.window.toolbar.add_sub_separator("Assets", "Create")
-        self.window.toolbar.add_sub_action("Scene", "Assets", "Create", "", "", testing("new scene"))
-        self.window.toolbar.add_sub_action("Prefab", "Assets", "Create", "", "", testing("new prefab"))
-        self.window.toolbar.add_sub_action("Material", "Assets", "Create", "", "", testing("new mat"))
-        self.window.toolbar.add_sub_separator("Assets", "Create")
-        self.window.toolbar.add_sub_action("Physic Material", "Assets", "Create", "", "", testing("new phys mat"))
-        
-        self.window.toolbar.add_action("Open", "Assets", "", "Opens the selected asset", testing("open asset"))
-        self.window.toolbar.add_action("Delete", "Assets", "", "Deletes the selected asset", testing("del asset"))
-        
-        self.window.toolbar.add_action("Toggle Theme", "Window", "Ctrl+L", "Toggle theme between light and dark", self.window.toggle_theme)
-
         self.buttons = SceneButtons(self.window)
         self.buttons.add_button("play.png", "Run the scene")
         self.buttons.add_button("pause.png", "Pause the scene")
@@ -100,6 +59,8 @@ class Application(QApplication):
             self.console_content.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), Logger.OUTPUT, "Test")
         self.game_content.console = self.console_content
 
+        self.setup_toolbar()
+
     def start(self):
         self.window.showMaximized()
         os.environ["PYUNITY_EDITOR_LOADED"] = "1"
@@ -123,3 +84,46 @@ class Application(QApplication):
         ret = message_box.exec()
         if ret == QMessageBox.Ok:
             self.quit()
+    
+    def setup_toolbar(self):
+        self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
+        self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", self.open)
+        self.window.toolbar.add_action("Save", "File", "Ctrl+S", "Save the current Scene", self.save)
+        self.window.toolbar.add_action("Save As", "File", "Ctrl+Shift+S", "Save the current Scene as new file", testing("save as"))
+        self.window.toolbar.add_action("Save a Copy As", "File", "Ctrl+Alt+S", "Save a copy of the current Scene", testing("save copy as"))
+        self.window.toolbar.add_separator("File")
+        self.window.toolbar.add_action("Close Scene", "File", "Ctrl+W", "Closes the current Scene", testing("close"))
+        self.window.toolbar.add_action("Close All", "File", "Ctrl+Shift+W", "Closes all opened Scene", testing("close all"))
+        self.window.toolbar.add_separator("File")
+        self.window.toolbar.add_action("Quit", "File", "Ctrl+Q", "Close the Editor", self.quit_wrapper)
+        
+        self.window.toolbar.add_action("Undo", "Edit", "Ctrl+Z", "Undo the last action", testing("undo"))
+        self.window.toolbar.add_action("Redo", "Edit", "Ctrl+Shift+Z", "Redo the last action", testing("redo"))
+        self.window.toolbar.add_separator("Edit")
+        self.window.toolbar.add_action("Cut", "Edit", "Ctrl+X", "Deletes item and adds to clipboard", testing("cut"))
+        self.window.toolbar.add_action("Copy", "Edit", "Ctrl+C", "Adds item to clipboard", testing("copy"))
+        self.window.toolbar.add_action("Paste", "Edit", "Ctrl+V", "Pastes item from clipboard", testing("paste"))
+        self.window.toolbar.add_separator("Edit")
+        self.window.toolbar.add_action("Rename", "Edit", "F2", "Renames the selected item", testing("rename"))
+        self.window.toolbar.add_action("Duplicate", "Edit", "Ctrl+D", "Duplicates the selected item(s)", testing("duplicate"))
+        self.window.toolbar.add_action("Delete", "Edit", "Delete", "Deletes item", self.hierarchy_content.remove)
+        self.window.toolbar.add_separator("Edit")
+        self.window.toolbar.add_action("Select All", "Edit", "Ctrl+A", "Selects all items in the current Scene", self.hierarchy_content.tree_widget.selectAll)
+        self.window.toolbar.add_action("Select None", "Edit", "Escape", "Deselects all items", self.window.select_none)
+        
+        self.window.toolbar.add_sub_action("Folder", "Assets", "Create", "", "", testing("new folder"))
+        self.window.toolbar.add_sub_action("File", "Assets", "Create", "", "", testing("new file"))
+        self.window.toolbar.add_sub_separator("Assets", "Create")
+        self.window.toolbar.add_sub_action("Script", "Assets", "Create", "", "", testing("new script"))
+        self.window.toolbar.add_sub_separator("Assets", "Create")
+        self.window.toolbar.add_sub_action("Scene", "Assets", "Create", "", "", testing("new scene"))
+        self.window.toolbar.add_sub_action("Prefab", "Assets", "Create", "", "", testing("new prefab"))
+        self.window.toolbar.add_sub_action("Material", "Assets", "Create", "", "", testing("new mat"))
+        self.window.toolbar.add_sub_separator("Assets", "Create")
+        self.window.toolbar.add_sub_action("Physic Material", "Assets", "Create", "", "", testing("new phys mat"))
+        
+        self.window.toolbar.add_action("Open", "Assets", "", "Opens the selected asset", testing("open asset"))
+        self.window.toolbar.add_action("Delete", "Assets", "", "Deletes the selected asset", testing("del asset"))
+        
+        self.window.toolbar.add_action("Toggle Theme", "Window", "Ctrl+L", "Toggle theme between light and dark", self.window.toggle_theme)
+

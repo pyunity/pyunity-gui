@@ -23,12 +23,22 @@ def isfloat(string):
 
 class Inspector(QWidget):
     props = [pyu.ShowInInspector(str, "", "name"), pyu.ShowInInspector(int, "", "tag")]
+    font = QFont("Segoe UI", 12)
     def __init__(self, parent):
         super(Inspector, self).__init__(parent)
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.vbox_layout)
         self.sections = []
+
+        self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
+
+    def add_buffer(self, text):
+        label = QLabel(text)
+        label.setWordWrap(True)
+        label.setFont(self.__class__.font)
+        self.vbox_layout.addWidget(label)
+        return label
     
     def add_section(self, component):
         section = InspectorSection(component.__class__.__name__, self)
@@ -38,26 +48,33 @@ class Inspector(QWidget):
         self.vbox_layout.addWidget(section)
         return section
 
-    def load(self, hieararchyItem):
-        self.gameObject = hieararchyItem.gameObject
+    def load(self, hierarchyItem):
         if len(self.sections):
             list(self.sections[0].fields.keys())[0].edited.disconnect()
         num = len(self.sections)
         self.sections = []
+        if self.buffer is not None:
+            num += 1
+            self.buffer = None
         for i in range(num):
             item = self.vbox_layout.takeAt(0)
             widget = item.widget()
             self.vbox_layout.removeItem(item)
             widget.deleteLater()
-        if hieararchyItem.gameObject is None:
+        if hierarchyItem == []:
+            self.buffer = self.add_buffer("Select a single item to view its properties.")
             return
-        main_section = self.add_section(hieararchyItem.gameObject)
-        main_section.component = hieararchyItem.gameObject
-        name_input = main_section.add_value("name", self.props[0], hieararchyItem.gameObject.name)
-        name_input.edited.connect(hieararchyItem.rename)
-        tag_input = main_section.add_value("tag", self.props[1], hieararchyItem.gameObject.tag.tag)
+        elif hierarchyItem is None:
+            self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
+            return
+        self.gameObject = hierarchyItem.gameObject
+        main_section = self.add_section(self.gameObject)
+        main_section.component = self.gameObject
+        name_input = main_section.add_value("name", self.props[0], self.gameObject.name)
+        name_input.edited.connect(hierarchyItem.rename)
+        tag_input = main_section.add_value("tag", self.props[1], self.gameObject.tag.tag)
         tag_input.prevent_modify = True # temporarily until i implement tag dropdowns
-        for component in hieararchyItem.gameObject.components:
+        for component in self.gameObject.components:
             section = self.add_section(component)
             for name, val in component.shown.items():
                 section.add_value(name, val, getattr(component, name))

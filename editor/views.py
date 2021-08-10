@@ -1,5 +1,6 @@
 import os
-from PyQt5.QtCore import Qt
+import pyunity as pyu
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 
@@ -44,21 +45,53 @@ class Hierarchy(QWidget):
         self.add_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.menu = QMenu()
-        self.menu.addAction("New GameObject")
-        self.menu.addAction("New Child GameObject")
+        self.menu.addAction("New Root GameObject", self.new)
+        self.menu.addAction("New Child GameObject", self.new_child)
+        self.menu.addAction("New Sibling GameObject", self.new_sibling)
         self.add_button.setMenu(self.menu)
 
         self.hbox_layout.addWidget(self.add_button)
         self.vbox_layout.addLayout(self.hbox_layout)
 
         self.items = []
-        self.tree_widget = QTreeWidget(self)
+        self.tree_widget = CustomTreeWidget(self)
         self.vbox_layout.addWidget(self.tree_widget)
-        self.tree_widget.header().setVisible(False)
-        self.tree_widget.setIndentation(10)
-        self.tree_widget.itemClicked.connect(self.on_click)
+        self.tree_widget.itemSelectionChanged.connect(self.on_click)
         self.inspector = None
     
+    def new(self):
+        new = pyu.GameObject("GameObject")
+        self.loaded.Add(new)
+        self.add_item(new)
+
+    def new_child(self):
+        item = self.tree_widget.currentItem()
+        if item is None:
+            return self.new()
+        parent = item.gameObject
+        new = pyu.GameObject("GameObject", parent)
+        self.loaded.Add(new)
+        self.add_item(new, item)
+    
+    def new_sibling(self):
+        sibling = self.tree_widget.currentItem()
+        if sibling is None:
+            return self.new()
+        item = sibling.parent()
+        if item is None:
+            return self.new()
+        parent = item.gameObject
+        new = pyu.GameObject("GameObject", parent)
+        self.loaded.Add(new)
+        self.add_item(new, item)
+    
+    def remove(self):
+        item = self.tree_widget.currentItem()
+        if item is None:
+            print("Nothing selected")
+            return
+        print("Removing " + item.gameObject.name)
+
     def add_item(self, gameObject, parent=None):
         item = HierarchyItem(gameObject)
         if parent is None:
@@ -89,5 +122,29 @@ class Hierarchy(QWidget):
             self.add_item(gameObject,
                 items[gameObject.transform.parent.gameObject])
 
-    def on_click(self, item, column):
-        self.inspector.load(item)
+    def on_click(self):
+        items = self.tree_widget.selectedItems()
+        if len(items) > 1:
+            self.inspector.load([])
+        elif len(items) == 0:
+            self.inspector.load(None)
+        else:
+            self.inspector.load(items[0])
+
+class CustomTreeWidget(QTreeWidget):
+    def __init__(self, parent):
+        super(CustomTreeWidget, self).__init__(parent)
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.header().setVisible(False)
+        self.setIndentation(10)
+
+    # def mousePressEvent(self, event):
+    #     item = self.indexAt(event.pos())
+    #     selected = self.selectionModel().isSelected(item)
+    #     super(CustomTreeWidget, self).mousePressEvent(event)
+    #     if (item.row() == -1 and item.column() == -1) or selected:
+    #         self.clearSelection()
+    #         self.selectionModel().setCurrentIndex(QModelIndex(), QItemSelectionModel.Select)
+
+    def mouseMoveEvent(self, event):
+        event.accept()
