@@ -1,6 +1,7 @@
 import os
 import pyunity as pyu
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, Qt
+# from PyQt5.QtCore import QItemSelectionModel, QModelIndex
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 

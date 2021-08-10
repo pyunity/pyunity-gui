@@ -68,12 +68,15 @@ class Inspector(QWidget):
             self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
             return
         self.gameObject = hierarchyItem.gameObject
+
         main_section = self.add_section(self.gameObject)
         main_section.component = self.gameObject
+
         name_input = main_section.add_value("name", self.props[0], self.gameObject.name)
         name_input.edited.connect(hierarchyItem.rename)
-        tag_input = main_section.add_value("tag", self.props[1], self.gameObject.tag.tag)
+        tag_input = main_section.add_value("tag", self.props[2], self.gameObject.tag.tag)
         tag_input.prevent_modify = True # temporarily until i implement tag dropdowns
+
         for component in self.gameObject.components:
             section = self.add_section(component)
             for name, val in component.shown.items():
