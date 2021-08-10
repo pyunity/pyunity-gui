@@ -16,6 +16,11 @@ class HierarchyItem(QTreeWidgetItem):
         self.children.append(child)
         self.addChild(child)
     
+    def selectAll(self):
+        self.setSelected(True)
+        for child in self.children:
+            child.selectAll()
+    
     def rename(self, textedit):
         text = textedit.value
         self.setText(0, text)
@@ -138,6 +143,12 @@ class CustomTreeWidget(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.header().setVisible(False)
         self.setIndentation(10)
+    
+    def selectAll(self):
+        item = self.invisibleRootItem()
+        for i in range(self.invisibleRootItem().childCount()):
+            child = item.child(i)
+            child.selectAll()
 
     # def mousePressEvent(self, event):
     #     item = self.indexAt(event.pos())
