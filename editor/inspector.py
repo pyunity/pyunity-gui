@@ -97,13 +97,13 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
         super(InspectorTextEdit, self).__init__(parent)
         self.prop = prop
         self.orig = orig
-        self.editingFinished.connect(self.edit)
         self.modified = False
         self.value = ""
     
-    def edit(self):
-        self.on_edit(self.text())
-
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.clearFocus()
+    
     def on_edit(self, text):
         if text != self.value:
             self.modified = True

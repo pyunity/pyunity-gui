@@ -45,8 +45,14 @@ class Window(QMainWindow):
         self.setWindowIcon(QIcon(os.path.join(directory, path)))
     
     def select_none(self):
-        if isinstance(self.app.focusWidget(), SceneEditor):
-            print("select none")
+        if not isinstance(self.app.focusWidget(), QLineEdit):
+            self.app.hierarchy_content.tree_widget.clearSelection()
+    
+    def mousePressEvent(self, event):
+        focused = self.focusWidget()
+        if isinstance(focused, QLineEdit):
+            focused.clearFocus()
+        super(Window, self).mousePressEvent(event)
 
 class SceneButtons(QWidget):
     def __init__(self, window):
