@@ -74,8 +74,10 @@ class Inspector(QWidget):
 
         name_input = main_section.add_value("name", self.props[0], self.gameObject.name)
         name_input.edited.connect(hierarchyItem.rename)
-        tag_input = main_section.add_value("tag", self.props[2], self.gameObject.tag.tag)
+        tag_input = main_section.add_value("tag", self.props[1], self.gameObject.tag.tag)
         tag_input.prevent_modify = True # temporarily until i implement tag dropdowns
+
+        enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
 
         for component in self.gameObject.components:
             section = self.add_section(component)
@@ -174,6 +176,36 @@ class FloatValidator(QValidator):
             match = re.match(regex, string)
             if match is not None and match.group(0) == string:
                 return re.sub(regex, replace, string, 1)
+
+class InspectorBoolEdit(QCheckBox, InspectorInput):
+    edited = pyqtSignal(object)
+    def __init__(self, parent, prop, orig):
+        super(InspectorBoolEdit, self).__init__(parent)
+        self.setStyleSheet("QCheckBox{color: rgba(0,0,0,0);}")
+        self.prop = prop
+        self.orig = orig
+        self.value = True
+        self.label = None
+        self.setChecked(True)
+    
+    def on_edit(self, value):
+        if value != self.value:
+            self.modified = True
+            font = self.label.font()
+            font.setBold(self.modified)
+            self.label.setFont(font)
+        self.value = value
+        self.setChecked(self.value)
+        self.edited.emit(self)
+    
+    def reset_bold(self):
+        self.modified = False
+        font = self.label.font()
+        font.setBold(self.modified)
+        self.label.setFont(font)
+    
+    def get(self):
+        return self.value
 
 class InspectorVector3Edit(InspectorInput):
     edited = pyqtSignal(object)
@@ -377,6 +409,7 @@ class InspectorSection(QWidget):
         str: InspectorTextEdit,
         int: InspectorIntEdit,
         float: InspectorFloatEdit,
+        bool: InspectorBoolEdit,
         pyu.Vector3: InspectorVector3Edit,
         pyu.Quaternion: InspectorQuaternionEdit,
     }
