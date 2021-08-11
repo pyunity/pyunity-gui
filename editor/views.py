@@ -1,6 +1,6 @@
 import os
 import pyunity as pyu
-# from PyQt5.QtCore import QItemSelectionModel, QModelIndex
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import *
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
         super(HierarchyItem, self).__init__()
+        # self.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled | Qt.ItemIsDragEnabled)
         self.setText(0, gameObject.name)
         self.name = gameObject.name
         self.gameObject = gameObject
@@ -155,6 +156,10 @@ class CustomTreeWidget(QTreeWidget):
         super(CustomTreeWidget, self).__init__(parent)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.header().setVisible(False)
+        self.setDragEnabled(True)
+        # self.viewport().setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setIndentation(10)
     
     def selectAll(self):
@@ -165,9 +170,8 @@ class CustomTreeWidget(QTreeWidget):
 
     # def mousePressEvent(self, event):
     #     item = self.indexAt(event.pos())
-    #     selected = self.selectionModel().isSelected(item)
     #     super(CustomTreeWidget, self).mousePressEvent(event)
-    #     if (item.row() == -1 and item.column() == -1) or selected:
+    #     if item.row() == -1 and item.column() == -1:
     #         self.clearSelection()
     #         self.selectionModel().setCurrentIndex(QModelIndex(), QItemSelectionModel.Select)
 
