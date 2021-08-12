@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import *
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
         super(HierarchyItem, self).__init__()
-        # self.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled | Qt.ItemIsDragEnabled)
         self.setText(0, gameObject.name)
         self.name = gameObject.name
         self.gameObject = gameObject
@@ -105,8 +104,12 @@ class Hierarchy(QWidget):
         if len(items) == 0:
             print("Nothing selected")
             return
+        
         for item in items:
-            print("Removing " + item.gameObject.name)
+            item.selectAll()
+        items = self.tree_widget.selectedItems()
+        for item in items:
+            print("Removing", item.gameObject.name)
 
     def add_item(self, gameObject, parent=None):
         item = HierarchyItem(gameObject)
@@ -158,15 +161,33 @@ class CustomTreeWidget(QTreeWidget):
         self.header().setVisible(False)
         self.setDragEnabled(True)
         # self.viewport().setAcceptDrops(True)
-        self.setDropIndicatorShown(True)
+        # self.setDropIndicatorShown(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setIndentation(10)
+        self.hierarchy = parent
     
     def selectAll(self):
         item = self.invisibleRootItem()
         for i in range(self.invisibleRootItem().childCount()):
             child = item.child(i)
             child.selectAll()
+    
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+        menu.addAction("New Root GameObject", self.hierarchy.new)
+        menu.addAction("New Child GameObject", self.hierarchy.new_child)
+        menu.addAction("New Sibling GameObject", self.hierarchy.new_sibling)
+
+        num = len(self.selectedItems())
+        if num > 0:
+            menu.addSeparator()
+            if num == 1:
+                menu.addAction("Delete GameObject", self.hierarchy.remove)
+            else:
+                menu.addAction("Delete GameObjects", self.hierarchy.remove)
+
+        menu.exec(event.globalPos())
+        super(CustomTreeWidget, self).contextMenuEvent(event)
 
     # def mousePressEvent(self, event):
     #     item = self.indexAt(event.pos())

@@ -40,6 +40,18 @@
    <property name="selectionMode">
     <enum>QAbstractItemView::ExtendedSelection</enum>
    </property>
+   <property name="textElideMode">
+    <enum>Qt::ElideRight</enum>
+   </property>
+   <property name="indentation">
+    <number>10</number>
+   </property>
+   <property name="wordWrap">
+    <bool>false</bool>
+   </property>
+   <attribute name="headerVisible">
+    <bool>false</bool>
+   </attribute>
    <column>
     <property name="text">
      <string>1</string>
