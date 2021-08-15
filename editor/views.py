@@ -110,6 +110,8 @@ class Hierarchy(QWidget):
         items = self.tree_widget.selectedItems()
         for item in items:
             print("Removing", item.gameObject.name)
+            if self.loaded.Has(item.gameObject):
+                self.loaded.Remove(item.gameObject)
 
     def add_item(self, gameObject, parent=None):
         item = HierarchyItem(gameObject)
