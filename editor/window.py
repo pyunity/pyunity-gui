@@ -48,6 +48,11 @@ class Window(QMainWindow):
         if not isinstance(self.app.focusWidget(), QLineEdit):
             self.app.hierarchy_content.tree_widget.clearSelection()
     
+    def rename(self):
+        box = list(self.app.inspector_content.sections[0].fields.keys())[0]
+        box.setFocus()
+        box.selectAll()
+    
     def mousePressEvent(self, event):
         focused = self.focusWidget()
         if isinstance(focused, QLineEdit):

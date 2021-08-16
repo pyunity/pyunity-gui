@@ -72,6 +72,7 @@ class Hierarchy(QWidget):
         self.vbox_layout.addWidget(self.tree_widget)
         self.tree_widget.itemSelectionChanged.connect(self.on_click)
         self.inspector = None
+        self.preview = None
     
     def new(self):
         new = pyu.GameObject("GameObject")
@@ -114,6 +115,7 @@ class Hierarchy(QWidget):
             self.tree_widget.invisibleRootItem().removeChild(item)
             if self.loaded.Has(item.gameObject):
                 self.loaded.Remove(item.gameObject)
+        self.preview.update()
 
     def add_item(self, gameObject, parent=None):
         item = HierarchyItem(gameObject)

@@ -53,6 +53,7 @@ class Application(QApplication):
         self.hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
         self.hierarchy_content.load_scene(self.game_content.original)
         self.hierarchy_content.inspector = self.inspector_content
+        self.hierarchy_content.preview = self.game_content
         
         self.console_content = self.console.set_window_type(Console)
         for i in range(10):
@@ -105,7 +106,7 @@ class Application(QApplication):
         self.window.toolbar.add_action("Copy", "Edit", "Ctrl+C", "Adds item to clipboard", testing("copy"))
         self.window.toolbar.add_action("Paste", "Edit", "Ctrl+V", "Pastes item from clipboard", testing("paste"))
         self.window.toolbar.add_separator("Edit")
-        self.window.toolbar.add_action("Rename", "Edit", "F2", "Renames the selected item", testing("rename"))
+        self.window.toolbar.add_action("Rename", "Edit", "F2", "Renames the selected item", self.window.rename)
         self.window.toolbar.add_action("Duplicate", "Edit", "Ctrl+D", "Duplicates the selected item(s)", testing("duplicate"))
         self.window.toolbar.add_action("Delete", "Edit", "Delete", "Deletes item", self.hierarchy_content.remove)
         self.window.toolbar.add_separator("Edit")
