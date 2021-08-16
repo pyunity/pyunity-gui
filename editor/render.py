@@ -42,7 +42,7 @@ class OpenGLFrame(QOpenGLWidget):
         if self.scene is not None:
             self.scene.update()
         else:
-            self.original.mainCamera.Render(self.original.gameObjects, self.original.lights)
+            self.original.Render()
     
     def resizeGL(self, width, height):
         if self.scene is not None:

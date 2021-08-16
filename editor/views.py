@@ -1,6 +1,6 @@
 import os
 import pyunity as pyu
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex
+# from PyQt5.QtCore import QItemSelectionModel, QModelIndex
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
@@ -108,8 +108,10 @@ class Hierarchy(QWidget):
         for item in items:
             item.selectAll()
         items = self.tree_widget.selectedItems()
+        self.items = []
         for item in items:
             print("Removing", item.gameObject.name)
+            self.tree_widget.invisibleRootItem().removeChild(item)
             if self.loaded.Has(item.gameObject):
                 self.loaded.Remove(item.gameObject)
 
