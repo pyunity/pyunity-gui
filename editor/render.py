@@ -90,7 +90,7 @@ class OpenGLFrame(QOpenGLWidget):
                 self.timer.start(1000 // config.fps)
     
     def save(self):
-        print(self.original.ids)
+        pyu.Logger.Log(self.original.ids)
         pyu.Loader.SaveScene(self.original, self.file_tracker.project)
     
     def on_switch(self):

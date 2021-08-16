@@ -6,17 +6,15 @@ import builtins
 import sys
 from PIL import ImageTk, Image
 
-_print = builtins.print
 sys._stderr = sys.stderr
+sys._stdout = sys.stdout
 
 def disable_print():
-    def wrapper(*args, **kwargs):
-        pass
-    builtins.print = wrapper
+    sys.stdout = os.devnull
     sys.stderr = os.devnull
 
 def enable_print():
-    builtins.print = _print
+    sys.stdout = sys._stdout
     sys.stderr = sys._stderr
 
 def splash():

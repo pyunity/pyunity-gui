@@ -1,7 +1,4 @@
-# gui_scripts
-
 from setuptools import setup, find_packages
-import os
 import glob
 
 with open("README.md", "r") as fh:
@@ -37,6 +34,9 @@ setup(
     packages= ["editor"] + ["editor." + package for package in find_packages(where="editor")],
     package_data={"editor": [file[7:] for file in data_files]},
     entry_points={
+        # "gui_scripts": [
+        #     "pyunity-editor=editor.cli:gui"
+        # ]
         "console_scripts": [
             "pyunity-editor=editor.cli:run"
         ]

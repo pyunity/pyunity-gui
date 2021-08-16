@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtGui import QFont
-from pyunity import Loader
+from pyunity import Loader, Logger
 import os
 import glob
 import enum
@@ -27,14 +27,14 @@ class FileTracker:
         files2 = set(glob.glob(os.path.join(self.path, "**/*"), recursive=True))
         for file in self.files:
             if file not in files2:
-                print("Removed " + file)
+                Logger.Log("Removed " + file)
                 self.changed.append((file, FileState.DELETED))
             elif self.times[file] < os.stat(file)[8]:
-                print("Modified " + file)
+                Logger.Log("Modified " + file)
                 self.changed.append((file, FileState.MODIFIED))
                 self.times[file] = os.stat(file)[8]
         for file in files2 - self.files:
-            print("Created " + file)
+            Logger.Log("Created " + file)
             self.changed.append((file, FileState.CREATED))
             self.times[file] = os.stat(file)[8]
         self.files = files2

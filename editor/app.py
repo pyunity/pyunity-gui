@@ -13,7 +13,7 @@ import time
 
 def testing(string):
     def inner():
-        print(string)
+        Logger.Log(string)
     return inner
 
 class Application(QApplication):
@@ -68,7 +68,7 @@ class Application(QApplication):
         self.exec_()
     
     def open(self):
-        print("Choosing folder...")
+        Logger.Log("Choosing folder...")
         # Get opened project
         subprocess.Popen(["py", "cli.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.quit()

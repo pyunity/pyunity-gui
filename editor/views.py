@@ -103,7 +103,7 @@ class Hierarchy(QWidget):
     def remove(self):
         items = self.tree_widget.selectedItems()
         if len(items) == 0:
-            print("Nothing selected")
+            pyu.Logger.Log("Nothing selected")
             return
         
         for item in items:
@@ -111,7 +111,7 @@ class Hierarchy(QWidget):
         items = self.tree_widget.selectedItems()
         self.items = []
         for item in items:
-            print("Removing", item.gameObject.name)
+            pyu.Logger.Log("Removing", item.gameObject.name)
             self.tree_widget.invisibleRootItem().removeChild(item)
             if self.loaded.Has(item.gameObject):
                 self.loaded.Remove(item.gameObject)

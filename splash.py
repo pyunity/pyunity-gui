@@ -1,3 +1,6 @@
+import sys
+sys.argv.append("Test")
+
 from editor.splash import start
 
 def main():
