@@ -112,6 +112,7 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
     
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
+            # self.setText(str(self.value))
             self.clearFocus()
         super(InspectorTextEdit, self).keyPressEvent(event)
     

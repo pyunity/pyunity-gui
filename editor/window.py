@@ -1,13 +1,14 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
 import os
 from .resources import *
-from .render import SceneEditor
 
 class Window(QMainWindow):
     def __init__(self, app):
         super(Window, self).__init__()
         self.setWindowTitle("PyUnity Editor")
+        self.setFocusPolicy(Qt.StrongFocus)
         self.app = app
         self.app.setFont(QFont("Segoe UI", 10))
         self.toolbar = ToolBar(self)
@@ -49,6 +50,7 @@ class Window(QMainWindow):
             self.app.hierarchy_content.tree_widget.clearSelection()
     
     def rename(self):
+        self.app.inspector.tab_widget.setCurrentWidget(self.app.inspector)
         box = list(self.app.inspector_content.sections[0].fields.keys())[0]
         box.setFocus()
         box.selectAll()
@@ -200,6 +202,7 @@ class Column(QWidget):
 class TabGroup(QTabWidget):
     def __init__(self, parent):
         super(TabGroup, self).__init__(parent)
+        self.setMovable(True)
         self.currentChanged.connect(self.tab_change)
 
     def tab_change(self, index):
