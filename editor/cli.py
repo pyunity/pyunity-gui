@@ -5,9 +5,11 @@ import sys
 
 def main():
     if len(sys.argv) < 2:
-        raise ValueError("Please specify a file.")
+        print("Please specify a file.")
+        return
     elif not os.path.isdir(sys.argv[1]):
-        raise ValueError("Please specify a valid directory.")
+        print("Please specify a valid directory.")
+        return
     
     from .app import Application
     app = Application(sys.argv[1])
