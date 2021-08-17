@@ -31,7 +31,7 @@ setup(
         "pillow",
     ],
     python_requires='>=3',
-    packages= ["editor"] + ["editor." + package for package in find_packages(where="editor")],
+    packages=["editor"] + ["editor." + package for package in find_packages(where="editor")],
     package_data={"editor": [file[7:] for file in data_files]},
     entry_points={
         # "gui_scripts": [
