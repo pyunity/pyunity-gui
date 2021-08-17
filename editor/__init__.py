@@ -1,4 +1,4 @@
-__version__ = "0.7.1"
+__version__ = "0.1.1"
 __copyright__ = "Copyright 2021 Ray Chen"
 __email__ = "tankimarshal2@gmail.com"
 __license__ = "MIT License"

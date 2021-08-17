@@ -1,9 +1,9 @@
 # PyUnity Editor
 
-[![License](https://img.shields.io/pypi/l/pyunity-gui.svg?logo=python&logoColor=FBE072)](https://github.com/pyunity/pyunity-gui/blob/master/LICENSE)
-[![PyPI version](https://img.shields.io/pypi/v/pyunity-gui.svg?logo=python&logoColor=FBE072)](https://pypi.python.org/pypi/pyunity-gui)
-[![Python version](https://img.shields.io/pypi/pyversions/pyunity-gui.svg?logo=python&logoColor=FBE072)](https://pypi.python.org/pypi/pyunity-gui)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/pyunity/pyunity-gui.svg?logo=lgtm)](https://lgtm.com/projects/g/pyunity/pyunity-gui/context:python)
+[![License](https://img.shields.io/pypi/l/pyunity-editor.svg?logo=python&logoColor=FBE072)](https://github.com/pyunity/pyunity-gui/blob/master/LICENSE)
+[![PyPI version](https://img.shields.io/pypi/v/pyunity-editor.svg?logo=python&logoColor=FBE072)](https://pypi.python.org/pypi/pyunity-gui)
+[![Python version](https://img.shields.io/pypi/pyversions/pyunity-editor.svg?logo=python&logoColor=FBE072)](https://pypi.python.org/pypi/pyunity-gui)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/pyunity/pyunity-editor.svg?logo=lgtm)](https://lgtm.com/projects/g/pyunity/pyunity-gui/context:python)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/pyunity/pyunity-gui.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/pyunity/pyunity-gui/alerts/)
 [![Discord](https://img.shields.io/discord/835911328693616680?logo=discord&label=discord)](https://discord.gg/zTn48BEbF9)
 [![Gitter](https://badges.gitter.im/pyunity/community.svg)](https://gitter.im/pyunity/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)

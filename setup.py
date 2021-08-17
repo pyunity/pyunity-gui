@@ -9,7 +9,7 @@ data_files = glob.glob("editor/**/*.qss", recursive=True) + \
 
 setup(
     name="pyunity-editor",
-    version="0.1.0",
+    version="0.1.1",
     author="Ray Chen",
     author_email="tankimarshal2@gmail.com",
     description="An Editor for PyUnity in the style of the UnityEditor",
