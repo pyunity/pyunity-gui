@@ -7,7 +7,6 @@ import os
 import copy
 import time
 
-
 def patch(func):
     def inner(*args, **kwargs):
         try:
@@ -35,8 +34,11 @@ class OpenGLFrame(QOpenGLWidget):
         self.buttons[2].clicked.connect(self.stop)
     
     def initializeGL(self):
+        pyu.SceneManager.windowObject = WidgetWindow(
+            self.original.name, self.original.mainCamera.Resize)
+        self.original.mainCamera.setup_buffers()
         for renderer in self.original.FindComponentsByType(pyu.MeshRenderer):
-            renderer.mesh.recompile()
+            renderer.mesh.compile()
     
     def paintGL(self):
         if self.scene is not None:
@@ -58,6 +60,8 @@ class OpenGLFrame(QOpenGLWidget):
         else:
             self.makeCurrent()
             self.scene = copy.deepcopy(self.original)
+            pyu.SceneManager.windowObject = WidgetWindow(
+                self.scene.name, self.scene.mainCamera.Resize)
             self.scene.Start()
             self.scene.mainCamera.Resize(self.width(), self.height())
             self.buttons[2].setChecked(False)
@@ -95,6 +99,26 @@ class OpenGLFrame(QOpenGLWidget):
     
     def on_switch(self):
         self.console.timer.stop()
+
+class WidgetWindow(pyu.Window.ABCWindow):
+    def __init__(self, name, resize):
+        self.name = name
+        self.resize = resize
+
+    def get_mouse(self, mousecode, keystate):
+        return False
+    
+    def get_key(self, keycode, keystate):
+        return False
+
+    def get_mouse_pos(self):
+        return [0, 0]
+    
+    def quit(self):
+        pass
+
+    def start(self, update_func):
+        self.update_func = update_func
 
 class SceneEditor:
     pass
