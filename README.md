@@ -9,9 +9,9 @@
 [![Gitter](https://badges.gitter.im/pyunity/community.svg)](https://gitter.im/pyunity/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![GitHub Repo stars](https://img.shields.io/github/stars/pyunity/pyunity-gui?logo=github)](https://github.com/pyunity/pyunity-gui/stargazers)
 
-This is a pure Python editor to make PyUnity projects (see https://github.com/pyunity/pyunity).
-PyUnity is a pure Python Game Engine that is only inspired by Unity and not bindings for Unity,
-therefore this Editor is completely separate, but inspired by the UnityEditor.
+This is a pure Python editor to make <a href="https://github.com/pyunity/pyunity">PyUnity</a> projects.
+PyUnity is a pure Python Game Engine that is only inspired by Unity and does not contain or is not a binding for Unity itself.
+Therefore, PyUnity Editor is also completely seperate from UnityEditor.
 
 ## Installing
 
