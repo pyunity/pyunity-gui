@@ -16,8 +16,11 @@ ver = sys.version_info.minor
 
 apiUrl = "https://ci.appveyor.com/api"
 project = requests.get(f"{apiUrl}/projects/pyunity/pyunity")
-jobId = project.json()["build"]["jobs"][4 * job + 9 - ver]["jobId"]
+jobId = project.json()["build"]["jobs"][3 * job + 10 - ver]["jobId"]
 artifacts = requests.get(f"{apiUrl}/buildjobs/{jobId}/artifacts")
+if len(artifacts.json()) <= num:
+    print("No artifact found, check https://ci.appveyor.com/project/pyunity/pyunity for details")
+    exit(1)
 file = f"{apiUrl}/buildjobs/{jobId}/artifacts/{artifacts.json()[num]['fileName']}"
 os.system("pip3 uninstall -y pyunity")
 os.system("pip3 install -U pyunity@" + file)
