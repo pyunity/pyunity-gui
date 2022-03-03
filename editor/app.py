@@ -48,7 +48,8 @@ class Application(QApplication):
         self.game_content.file_tracker = FileTracker(self, path)
         self.game_content.file_tracker.start(1)
         self.game_content.original = SceneManager.GetSceneByIndex(
-            self.game_content.file_tracker.project.firstScene)
+            0)
+            # self.game_content.file_tracker.project.firstScene)
 
         self.hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
         self.hierarchy_content.load_scene(self.game_content.original)

@@ -67,4 +67,4 @@ for direction in [Vector3.up(), Vector3.right(), Vector3.forward()]:
         scene.Add(go)
 
 SceneManager.LoadScene(scene)
-Loader.SaveAllScenes("Test")
+Loader.GenerateProject("Test")

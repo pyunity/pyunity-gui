@@ -7,7 +7,7 @@ import os
 import copy
 import time
 
-def patch(func):
+def logPatch(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -161,7 +161,7 @@ class OpenGLFrame(QOpenGLWidget):
             return
         self.winObj.keys[self.keymap[event.key()]] = pyu.KeyState.UP
     
-    @patch
+    @logPatch
     def start(self, on):
         if self.scene is not None:
             self.stop()
@@ -179,7 +179,7 @@ class OpenGLFrame(QOpenGLWidget):
                 self.timer.start(1000 / config.fps)
             self.file_tracker.stop()
     
-    @patch
+    @logPatch
     def stop(self, on):
         if self.scene is not None:
             self.scene = None
@@ -203,7 +203,7 @@ class OpenGLFrame(QOpenGLWidget):
     
     def save(self):
         pyu.Logger.Log(self.original.ids)
-        pyu.Loader.SaveScene(self.original, self.file_tracker.project)
+        pyu.Loader.ResaveScene(self.original, self.file_tracker.project)
     
     def on_switch(self):
         self.console.timer.stop()
