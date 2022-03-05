@@ -49,8 +49,8 @@ Camera(Component) : 491d1e2b-1ec1-49e3-8e2a-59cef37ec44d
     far: 200
     near: 0.05
     ortho: False
-    shader: <pyunity.Shader object at 0x046EED48>
-    skybox: <pyunity.Skybox object at 0x046EECB8>
+    shader: <pyunity.Shader object at 0x0660A1D8>
+    skybox: <pyunity.Skybox object at 0x0660A148>
     skyboxEnabled: True
 AudioListener(Component) : fa0b59b8-4419-4431-a58e-a1291fda1935
     gameObject: 098b57e9-c1a7-422b-acb9-1a68a586177f
@@ -81,7 +81,7 @@ Oscillator2(Behaviour) : 967d6c67-e62e-47a6-92a6-42435e7ef6ef
 Transform(Component) : 0724bb71-9f58-4e77-900b-83fc8d41a363
     gameObject: 5006ffc0-556c-4369-a428-e88d16154487
     localPosition: Vector3(0, -1, 0)
-    localRotation: Quaternion(0.7071067811865476, 0.7071067811865475, 0.0, 0.0)
+    localRotation: Quaternion(0.7071067811865476, 0.7071067811865475, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: d4a2352e-ccc9-48e6-baa4-a2e3b7784a02
 MeshRenderer(Component) : 82844fba-0692-4add-88f8-a212d17f8bcf
@@ -96,7 +96,7 @@ Oscillator(Behaviour) : 44bf8003-5248-4aad-a1d3-1b98a3b6221a
 Transform(Component) : defc196e-0401-46ae-9638-adba0a56b1a3
     gameObject: 38b8bdae-b0cf-45cd-8c4b-c85757c153fd
     localPosition: Vector3(0, 1, 0)
-    localRotation: Quaternion(0.7071067811865476, -0.7071067811865475, 0.0, 0.0)
+    localRotation: Quaternion(0.7071067811865476, -0.7071067811865475, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: d4a2352e-ccc9-48e6-baa4-a2e3b7784a02
 MeshRenderer(Component) : 741173ba-3ad3-4b29-85a3-a8a985b7fcd7
@@ -111,7 +111,7 @@ Oscillator(Behaviour) : 4e20485c-4c6a-4c06-bcf6-cd53e1941ef2
 Transform(Component) : 21a7e29d-26fe-4762-94dd-52c99a84dc57
     gameObject: 40e94d91-c0e1-4388-8322-41e70233de3a
     localPosition: Vector3(-1, 0, 0)
-    localRotation: Quaternion(0.7071067811865476, 0.0, -0.7071067811865475, 0.0)
+    localRotation: Quaternion(0.7071067811865476, 0, -0.7071067811865475, 0)
     localScale: Vector3(1, 1, 1)
     parent: d4a2352e-ccc9-48e6-baa4-a2e3b7784a02
 MeshRenderer(Component) : d0bd943b-262f-4472-a47d-63134529efa8
@@ -126,7 +126,7 @@ Oscillator(Behaviour) : 1eed5373-5f39-46bb-92bd-d66901e96d05
 Transform(Component) : 08aa3348-1f43-4d69-843a-a27a66879b1f
     gameObject: 323d3480-3fe3-4951-a4b1-cbf8773ae4cf
     localPosition: Vector3(1, 0, 0)
-    localRotation: Quaternion(0.7071067811865476, 0.0, 0.7071067811865475, 0.0)
+    localRotation: Quaternion(0.7071067811865476, 0, 0.7071067811865475, 0)
     localScale: Vector3(1, 1, 1)
     parent: d4a2352e-ccc9-48e6-baa4-a2e3b7784a02
 MeshRenderer(Component) : 3e14024d-508e-4047-8a5c-90106385cc20
@@ -141,7 +141,7 @@ Oscillator(Behaviour) : d8aeefc2-3647-465e-9547-02cb7712e941
 Transform(Component) : e09dd89f-65a7-47f2-a874-95e52fc68b23
     gameObject: b2526374-81c1-41c9-858f-ac4336bf94a9
     localPosition: Vector3(0, 0, -1)
-    localRotation: Quaternion(1.0, 0.0, 0.0, 0.0)
+    localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: d4a2352e-ccc9-48e6-baa4-a2e3b7784a02
 MeshRenderer(Component) : 3b0b7298-9fe6-4d42-8d01-733fc92ed06a
@@ -156,7 +156,7 @@ Oscillator(Behaviour) : b4805415-9b93-4c40-8540-4e672e654eed
 Transform(Component) : ba2eef43-9449-4d76-84a9-36f6331a3eea
     gameObject: af402935-72d3-4305-92e8-09649849e5e9
     localPosition: Vector3(0, 0, 1)
-    localRotation: Quaternion(1.0, 0.0, 0.0, 0.0)
+    localRotation: Quaternion(1, 0, 0, 0)
     localScale: Vector3(1, 1, 1)
     parent: d4a2352e-ccc9-48e6-baa4-a2e3b7784a02
 MeshRenderer(Component) : 012104bc-7504-4461-adf1-475548e860af

@@ -214,8 +214,18 @@ class OpenGLFrame(QOpenGLWidget):
                     self.timer.start(1000 // config.fps)
     
     def save(self):
-        Logger.Log(self.original.ids)
-        Loader.ResaveScene(self.original, self.file_tracker.project)
+        def callback():
+            Loader.ResaveScene(self.original, self.file_tracker.project)
+            message.done(0)
+
+        message = QMessageBox()
+        message.setText("Saving scene...")
+        message.setWindowTitle(self.file_tracker.project.name)
+        message.setStandardButtons(QMessageBox.StandardButton.NoButton)
+        message.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+        QTimer.singleShot(2000, callback)
+        message.setFont(QFont("Segoe UI", 12))
+        message.exec()
     
     def on_switch(self):
         self.console.timer.stop()
@@ -303,6 +313,8 @@ class Console(QListWidget):
     
     def on_switch(self):
         self.pending_entries = self.pending_entries[-100:]
+        if len(self.pending_entries) == 100:
+            self.clear()
         for entry in self.pending_entries:
             self.add_entry(*entry)
         self.pending_entries = []

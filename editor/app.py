@@ -9,7 +9,6 @@ from .render import OpenGLFrame, Console
 from pyunity import SceneManager, Logger
 import sys
 import subprocess
-import time
 
 def testing(string):
     def inner():
@@ -57,8 +56,6 @@ class Application(QApplication):
         self.hierarchy_content.preview = self.game_content
         
         self.console_content = self.console.set_window_type(Console)
-        for i in range(10):
-            self.console_content.add_entry(time.strftime("%Y-%m-%d %H:%M:%S"), Logger.OUTPUT, "Test")
         self.game_content.console = self.console_content
 
         self.setup_toolbar()
