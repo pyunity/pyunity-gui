@@ -173,7 +173,6 @@ class OpenGLFrame(QOpenGLWidget):
         if self.scene is not None:
             self.stop()
         else:
-            config.fps = 60
             self.makeCurrent()
             self.scene = copy.deepcopy(self.original)
             self.winObj = WidgetWindow(
@@ -185,12 +184,16 @@ class OpenGLFrame(QOpenGLWidget):
             if self.console.clear_on_run:
                 self.console.clear()
             if not self.paused:
-                self.timer.start(1000 / config.fps)
+                duration = 0 if config.fps == 0 else 1000 / config.fps
+                self.timer.start(duration)
+            else:
+                self.timer.stop()
             self.file_tracker.stop()
     
     @logPatch
     def stop(self, on):
         if self.scene is not None:
+            self.timer.stop()
             self.scene = None
             self.buttons[0].setChecked(False)
             self.buttons[1].setChecked(False)
@@ -208,10 +211,8 @@ class OpenGLFrame(QOpenGLWidget):
                 self.timer.stop()
             else:
                 self.scene.lastFrame = time.time()
-                if config.fps == 0:
-                    self.timer.start(1)
-                else:
-                    self.timer.start(1000 // config.fps)
+                duration = 0 if config.fps == 0 else 1000 / config.fps
+                self.timer.start(duration)
     
     def save(self):
         def callback():
