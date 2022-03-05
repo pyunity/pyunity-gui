@@ -1,5 +1,6 @@
 Project
     name: Test
+    firstScene: 0
 Files
     06c89310-7041-4314-93e7-61d2087a5801: Scripts/Rotator.py
     bec0b07c-a62a-46ef-83c0-17fc576905d3: Scripts/Oscillator2.py

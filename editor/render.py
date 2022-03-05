@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QFont, QIcon
-from pyunity import config
-import pyunity as pyu
+from pyunity import (Logger, SceneManager, KeyCode,
+    MouseCode, MeshRenderer, KeyState, Loader, Window, config, render)
 import os
 import copy
 import time
@@ -12,7 +12,7 @@ def logPatch(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            pyu.Logger.LogException(e)
+            Logger.LogException(e)
     return inner
 
 class OpenGLFrame(QOpenGLWidget):
@@ -31,11 +31,11 @@ class OpenGLFrame(QOpenGLWidget):
     
     @property
     def winObj(self):
-        return pyu.SceneManager.windowObject
+        return SceneManager.windowObject
     
     @winObj.setter
     def winObj(self, val):
-        pyu.SceneManager.windowObject = val
+        SceneManager.windowObject = val
     
     def set_buttons(self, buttons):
         self.buttons = buttons.buttons
@@ -44,10 +44,12 @@ class OpenGLFrame(QOpenGLWidget):
         self.buttons[2].clicked.connect(self.stop)
     
     def initializeGL(self):
-        self.winObj = WidgetWindow(
-            self.original.name, self.original.mainCamera.Resize)
+        render.compile_shaders()
+        self.original.mainCamera.skybox.compile()
+        # self.winObj = WidgetWindow(
+        #     self.original.name, self.original.mainCamera.Resize)
         self.original.mainCamera.setup_buffers()
-        for renderer in self.original.FindComponentsByType(pyu.MeshRenderer):
+        for renderer in self.original.FindComponentsByType(MeshRenderer):
             renderer.mesh.compile()
     
     def paintGL(self):
@@ -66,110 +68,117 @@ class OpenGLFrame(QOpenGLWidget):
         self.update()
     
     mousemap = {
-        Qt.LeftButton: pyu.MouseCode.Left,
-        Qt.RightButton: pyu.MouseCode.Right,
-        Qt.MiddleButton: pyu.MouseCode.Middle,
+        Qt.LeftButton: MouseCode.Left,
+        Qt.RightButton: MouseCode.Right,
+        Qt.MiddleButton: MouseCode.Middle,
     }
 
     keymap = {
-        Qt.Key_A: pyu.KeyCode.A,
-        Qt.Key_B: pyu.KeyCode.B,
-        Qt.Key_C: pyu.KeyCode.C,
-        Qt.Key_D: pyu.KeyCode.D,
-        Qt.Key_E: pyu.KeyCode.E,
-        Qt.Key_F: pyu.KeyCode.F,
-        Qt.Key_G: pyu.KeyCode.G,
-        Qt.Key_H: pyu.KeyCode.H,
-        Qt.Key_I: pyu.KeyCode.I,
-        Qt.Key_J: pyu.KeyCode.J,
-        Qt.Key_K: pyu.KeyCode.K,
-        Qt.Key_L: pyu.KeyCode.L,
-        Qt.Key_M: pyu.KeyCode.M,
-        Qt.Key_N: pyu.KeyCode.N,
-        Qt.Key_O: pyu.KeyCode.O,
-        Qt.Key_P: pyu.KeyCode.P,
-        Qt.Key_Q: pyu.KeyCode.Q,
-        Qt.Key_R: pyu.KeyCode.R,
-        Qt.Key_S: pyu.KeyCode.S,
-        Qt.Key_T: pyu.KeyCode.T,
-        Qt.Key_U: pyu.KeyCode.U,
-        Qt.Key_V: pyu.KeyCode.V,
-        Qt.Key_W: pyu.KeyCode.W,
-        Qt.Key_X: pyu.KeyCode.X,
-        Qt.Key_Y: pyu.KeyCode.Y,
-        Qt.Key_Z: pyu.KeyCode.Z,
-        Qt.Key_Space: pyu.KeyCode.Space,
-        Qt.Key_0: pyu.KeyCode.Alpha0,
-        Qt.Key_1: pyu.KeyCode.Alpha1,
-        Qt.Key_2: pyu.KeyCode.Alpha2,
-        Qt.Key_3: pyu.KeyCode.Alpha3,
-        Qt.Key_4: pyu.KeyCode.Alpha4,
-        Qt.Key_5: pyu.KeyCode.Alpha5,
-        Qt.Key_6: pyu.KeyCode.Alpha6,
-        Qt.Key_7: pyu.KeyCode.Alpha7,
-        Qt.Key_8: pyu.KeyCode.Alpha8,
-        Qt.Key_9: pyu.KeyCode.Alpha9,
-        Qt.Key_F1: pyu.KeyCode.F1,
-        Qt.Key_F2: pyu.KeyCode.F2,
-        Qt.Key_F3: pyu.KeyCode.F3,
-        Qt.Key_F4: pyu.KeyCode.F4,
-        Qt.Key_F5: pyu.KeyCode.F5,
-        Qt.Key_F6: pyu.KeyCode.F6,
-        Qt.Key_F7: pyu.KeyCode.F7,
-        Qt.Key_F8: pyu.KeyCode.F8,
-        Qt.Key_F9: pyu.KeyCode.F9,
-        Qt.Key_F10: pyu.KeyCode.F10,
-        Qt.Key_F11: pyu.KeyCode.F11,
-        Qt.Key_F12: pyu.KeyCode.F12,
-        # Qt.Key_: pyu.KeyCode.Keypad0,
-        # Qt.Key_: pyu.KeyCode.Keypad1,
-        # Qt.Key_: pyu.KeyCode.Keypad2,
-        # Qt.Key_: pyu.KeyCode.Keypad3,
-        # Qt.Key_: pyu.KeyCode.Keypad4,
-        # Qt.Key_: pyu.KeyCode.Keypad5,
-        # Qt.Key_: pyu.KeyCode.Keypad6,
-        # Qt.Key_: pyu.KeyCode.Keypad7,
-        # Qt.Key_: pyu.KeyCode.Keypad8,
-        # Qt.Key_: pyu.KeyCode.Keypad9,
-        Qt.Key_Up: pyu.KeyCode.Up,
-        Qt.Key_Down: pyu.KeyCode.Down,
-        Qt.Key_Left: pyu.KeyCode.Left,
-        Qt.Key_Right: pyu.KeyCode.Right,
+        Qt.Key_A: KeyCode.A,
+        Qt.Key_B: KeyCode.B,
+        Qt.Key_C: KeyCode.C,
+        Qt.Key_D: KeyCode.D,
+        Qt.Key_E: KeyCode.E,
+        Qt.Key_F: KeyCode.F,
+        Qt.Key_G: KeyCode.G,
+        Qt.Key_H: KeyCode.H,
+        Qt.Key_I: KeyCode.I,
+        Qt.Key_J: KeyCode.J,
+        Qt.Key_K: KeyCode.K,
+        Qt.Key_L: KeyCode.L,
+        Qt.Key_M: KeyCode.M,
+        Qt.Key_N: KeyCode.N,
+        Qt.Key_O: KeyCode.O,
+        Qt.Key_P: KeyCode.P,
+        Qt.Key_Q: KeyCode.Q,
+        Qt.Key_R: KeyCode.R,
+        Qt.Key_S: KeyCode.S,
+        Qt.Key_T: KeyCode.T,
+        Qt.Key_U: KeyCode.U,
+        Qt.Key_V: KeyCode.V,
+        Qt.Key_W: KeyCode.W,
+        Qt.Key_X: KeyCode.X,
+        Qt.Key_Y: KeyCode.Y,
+        Qt.Key_Z: KeyCode.Z,
+        Qt.Key_Space: KeyCode.Space,
+        Qt.Key_0: KeyCode.Alpha0,
+        Qt.Key_1: KeyCode.Alpha1,
+        Qt.Key_2: KeyCode.Alpha2,
+        Qt.Key_3: KeyCode.Alpha3,
+        Qt.Key_4: KeyCode.Alpha4,
+        Qt.Key_5: KeyCode.Alpha5,
+        Qt.Key_6: KeyCode.Alpha6,
+        Qt.Key_7: KeyCode.Alpha7,
+        Qt.Key_8: KeyCode.Alpha8,
+        Qt.Key_9: KeyCode.Alpha9,
+        Qt.Key_F1: KeyCode.F1,
+        Qt.Key_F2: KeyCode.F2,
+        Qt.Key_F3: KeyCode.F3,
+        Qt.Key_F4: KeyCode.F4,
+        Qt.Key_F5: KeyCode.F5,
+        Qt.Key_F6: KeyCode.F6,
+        Qt.Key_F7: KeyCode.F7,
+        Qt.Key_F8: KeyCode.F8,
+        Qt.Key_F9: KeyCode.F9,
+        Qt.Key_F10: KeyCode.F10,
+        Qt.Key_F11: KeyCode.F11,
+        Qt.Key_F12: KeyCode.F12,
+        # Qt.Key_: KeyCode.Keypad0,
+        # Qt.Key_: KeyCode.Keypad1,
+        # Qt.Key_: KeyCode.Keypad2,
+        # Qt.Key_: KeyCode.Keypad3,
+        # Qt.Key_: KeyCode.Keypad4,
+        # Qt.Key_: KeyCode.Keypad5,
+        # Qt.Key_: KeyCode.Keypad6,
+        # Qt.Key_: KeyCode.Keypad7,
+        # Qt.Key_: KeyCode.Keypad8,
+        # Qt.Key_: KeyCode.Keypad9,
+        Qt.Key_Up: KeyCode.Up,
+        Qt.Key_Down: KeyCode.Down,
+        Qt.Key_Left: KeyCode.Left,
+        Qt.Key_Right: KeyCode.Right,
     }
 
     def mouseMoveEvent(self, event):
         super(OpenGLFrame, self).mouseMoveEvent(event)
-        self.winObj.mpos = [event.x(), event.y()]
+        if self.winObj is not None:
+            self.winObj.mpos = [event.x(), event.y()]
     
     def mousePressEvent(self, event):
         super(OpenGLFrame, self).mousePressEvent(event)
-        self.winObj.mbuttons[self.mousemap[event.button()]] = pyu.KeyState.DOWN
+        if self.winObj is not None:
+            self.winObj.mbuttons[self.mousemap[event.button()]] = KeyState.DOWN
     
     def mouseReleaseEvent(self, event):
         super(OpenGLFrame, self).mouseReleaseEvent(event)
-        self.winObj.mbuttons[self.mousemap[event.button()]] = pyu.KeyState.UP
+        if self.winObj is not None:
+            self.winObj.mbuttons[self.mousemap[event.button()]] = KeyState.UP
     
     def keyPressEvent(self, event):
         super(OpenGLFrame, self).keyPressEvent(event)
-        if event.key() not in self.keymap:
-            return
-        self.winObj.keys[self.keymap[event.key()]] = pyu.KeyState.DOWN
+        if self.winObj is not None:
+            if event.key() not in self.keymap:
+                return
+            self.winObj.keys[self.keymap[event.key()]] = KeyState.DOWN
     
     def keyReleaseEvent(self, event):
         super(OpenGLFrame, self).keyReleaseEvent(event)
-        if event.key() not in self.keymap:
-            return
-        self.winObj.keys[self.keymap[event.key()]] = pyu.KeyState.UP
+        if self.winObj is not None:
+            if event.key() not in self.keymap:
+                return
+            self.winObj.keys[self.keymap[event.key()]] = KeyState.UP
     
     @logPatch
     def start(self, on):
         if self.scene is not None:
             self.stop()
         else:
+            config.fps = 60
             self.makeCurrent()
             self.scene = copy.deepcopy(self.original)
             self.winObj = WidgetWindow(
                 self.scene.name, self.scene.mainCamera.Resize)
+            # self.scene.mainCamera.skybox.compile()
             self.scene.Start()
             self.scene.mainCamera.Resize(self.width(), self.height())
             self.buttons[2].setChecked(False)
@@ -198,49 +207,52 @@ class OpenGLFrame(QOpenGLWidget):
             if self.paused:
                 self.timer.stop()
             else:
-                self.scene.lastFrame = time.time() - 1 / config.fps
-                self.timer.start(1000 // config.fps)
+                self.scene.lastFrame = time.time()
+                if config.fps == 0:
+                    self.timer.start(1)
+                else:
+                    self.timer.start(1000 // config.fps)
     
     def save(self):
-        pyu.Logger.Log(self.original.ids)
-        pyu.Loader.ResaveScene(self.original, self.file_tracker.project)
+        Logger.Log(self.original.ids)
+        Loader.ResaveScene(self.original, self.file_tracker.project)
     
     def on_switch(self):
         self.console.timer.stop()
 
-class WidgetWindow(pyu.Window.ABCWindow):
+class WidgetWindow(Window.ABCWindow):
     def __init__(self, name, resize):
         self.name = name
         self.resize = resize
         self.mpos = [0, 0]
-        self.mbuttons = [pyu.KeyState.NONE, pyu.KeyState.NONE, pyu.KeyState.NONE]
-        self.keys = [pyu.KeyState.NONE for i in range(pyu.KeyCode.Right + 1)]
+        self.mbuttons = [KeyState.NONE, KeyState.NONE, KeyState.NONE]
+        self.keys = [KeyState.NONE for i in range(KeyCode.Right + 1)]
 
     def check_keys(self):
         for i in range(len(self.keys)):
-            if self.keys[i] == pyu.KeyState.UP:
-                self.keys[i] = pyu.KeyState.NONE
-            elif self.keys[i] == pyu.KeyState.DOWN:
-                self.keys[i] = pyu.KeyState.PRESS
+            if self.keys[i] == KeyState.UP:
+                self.keys[i] = KeyState.NONE
+            elif self.keys[i] == KeyState.DOWN:
+                self.keys[i] = KeyState.PRESS
 
     def check_mouse(self):
         for i in range(len(self.mbuttons)):
-            if self.mbuttons[i] == pyu.KeyState.UP:
-                self.mbuttons[i] = pyu.KeyState.NONE
-            elif self.mbuttons[i] == pyu.KeyState.DOWN:
-                self.mbuttons[i] = pyu.KeyState.PRESS
+            if self.mbuttons[i] == KeyState.UP:
+                self.mbuttons[i] = KeyState.NONE
+            elif self.mbuttons[i] == KeyState.DOWN:
+                self.mbuttons[i] = KeyState.PRESS
 
     def get_mouse(self, mousecode, keystate):
-        if keystate == pyu.KeyState.PRESS:
-            if self.mbuttons[mousecode] in [pyu.KeyState.PRESS, pyu.KeyState.DOWN]:
+        if keystate == KeyState.PRESS:
+            if self.mbuttons[mousecode] in [KeyState.PRESS, KeyState.DOWN]:
                 return True
         if self.mbuttons[mousecode] == keystate:
             return True
         return False
     
     def get_key(self, keycode, keystate):
-        if keystate == pyu.KeyState.PRESS:
-            if self.keys[keycode] in [pyu.KeyState.PRESS, pyu.KeyState.DOWN]:
+        if keystate == KeyState.PRESS:
+            if self.keys[keycode] in [KeyState.PRESS, KeyState.DOWN]:
                 return True
         if self.keys[keycode] == keystate:
             return True
@@ -270,7 +282,7 @@ class Console(QListWidget):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.on_switch)
-        pyu.Logger.LogLine = self.modded_log(pyu.Logger.LogLine)
+        Logger.LogLine = self.modded_log(Logger.LogLine)
     
     def add_entry(self, timestamp, level, text):
         entry = ConsoleEntry(timestamp, level, text)
@@ -284,7 +296,7 @@ class Console(QListWidget):
     def modded_log(self, func):
         def inner(*args, **kwargs):
             timestamp, msg = func(*args, **kwargs, silent=True)
-            if args[0] != pyu.Logger.DEBUG:
+            if args[0] != Logger.DEBUG:
                 self.pending_entries.append([timestamp, args[0], msg])
             return timestamp, msg
         return inner
@@ -298,10 +310,10 @@ class Console(QListWidget):
 
 class ConsoleEntry(QListWidgetItem):
     icon_map = {
-        pyu.Logger.ERROR: "error.png",
-        pyu.Logger.INFO: "info.png",
-        pyu.Logger.OUTPUT: "output.png",
-        pyu.Logger.WARN: "warning.png"
+        Logger.ERROR: "error.png",
+        Logger.INFO: "info.png",
+        Logger.OUTPUT: "output.png",
+        Logger.WARN: "warning.png"
     }
     def __init__(self, timestamp, level, text):
         super(ConsoleEntry, self).__init__(
