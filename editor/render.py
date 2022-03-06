@@ -123,20 +123,23 @@ class OpenGLFrame(QOpenGLWidget):
         Qt.Key_F10: KeyCode.F10,
         Qt.Key_F11: KeyCode.F11,
         Qt.Key_F12: KeyCode.F12,
-        # Qt.Key_: KeyCode.Keypad0, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad1, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad2, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad3, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad4, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad5, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad6, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad7, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad8, # Numpad requires modifier
-        # Qt.Key_: KeyCode.Keypad9, # Numpad requires modifier
         Qt.Key_Up: KeyCode.Up,
         Qt.Key_Down: KeyCode.Down,
         Qt.Key_Left: KeyCode.Left,
         Qt.Key_Right: KeyCode.Right,
+    }
+
+    numberkeys = {
+        Qt.Key_0: KeyCode.Keypad0,
+        Qt.Key_1: KeyCode.Keypad1,
+        Qt.Key_2: KeyCode.Keypad2,
+        Qt.Key_3: KeyCode.Keypad3,
+        Qt.Key_4: KeyCode.Keypad4,
+        Qt.Key_5: KeyCode.Keypad5,
+        Qt.Key_6: KeyCode.Keypad6,
+        Qt.Key_7: KeyCode.Keypad7,
+        Qt.Key_8: KeyCode.Keypad8,
+        Qt.Key_9: KeyCode.Keypad9,
     }
 
     def mouseMoveEvent(self, event):
@@ -159,14 +162,20 @@ class OpenGLFrame(QOpenGLWidget):
         if self.winObj is not None:
             if event.key() not in self.keymap:
                 return
-            self.winObj.keys[self.keymap[event.key()]] = KeyState.DOWN
+            if event.key() in self.numberkeys and event.modifiers() & Qt.KeypadModifier:
+                self.winObj.keys[self.numberkeys[event.key()]] = KeyState.DOWN
+            else:
+                self.winObj.keys[self.keymap[event.key()]] = KeyState.DOWN
     
     def keyReleaseEvent(self, event):
         super(OpenGLFrame, self).keyReleaseEvent(event)
         if self.winObj is not None:
             if event.key() not in self.keymap:
                 return
-            self.winObj.keys[self.keymap[event.key()]] = KeyState.UP
+            if event.key() in self.numberkeys and event.modifiers() & Qt.KeypadModifier:
+                self.winObj.keys[self.numberkeys[event.key()]] = KeyState.UP
+            else:
+                self.winObj.keys[self.keymap[event.key()]] = KeyState.UP
     
     @logPatch
     def start(self, on=None):
