@@ -183,21 +183,22 @@ class OpenGLFrame(QOpenGLWidget):
             self.stop()
         else:
             self.makeCurrent()
+            if self.console.clear_on_run:
+                self.console.clear()
+            self.buttons[2].setChecked(False)
+            self.file_tracker.stop()
+
             self.scene = copy.deepcopy(self.original)
             self.winObj = WidgetWindow(
                 self.scene.name, self.scene.mainCamera.Resize)
             # self.scene.mainCamera.skybox.compile()
             self.scene.Start()
             self.scene.mainCamera.Resize(self.width(), self.height())
-            self.buttons[2].setChecked(False)
-            if self.console.clear_on_run:
-                self.console.clear()
             if not self.paused:
                 duration = 0 if config.fps == 0 else 1000 / config.fps
                 self.timer.start(duration)
             else:
                 self.timer.stop()
-            self.file_tracker.stop()
     
     @logPatch
     def stop(self, on=None):
@@ -294,7 +295,7 @@ class Console(QListWidget):
     def __init__(self, parent):
         super(Console, self).__init__(parent)
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setIconSize(QSize(100, 100))
+        self.setIconSize(QSize(50, 50))
         self.entries = []
         self.pending_entries = []
         self.clear_on_run = True
@@ -321,6 +322,7 @@ class Console(QListWidget):
         return inner
     
     def on_switch(self):
+        print(self.pending_entries)
         self.pending_entries = self.pending_entries[-100:]
         if len(self.pending_entries) == 100:
             self.clear()
@@ -337,9 +339,8 @@ class ConsoleEntry(QListWidgetItem):
         Logger.WARN: "warning.png"
     }
     def __init__(self, timestamp, level, text):
-        super(ConsoleEntry, self).__init__(
-            "|" + level.abbr + "| " + text + "\n" + timestamp)
-        self.setFont(QFont("Segoe UI", 14))
+        super(ConsoleEntry, self).__init__(text + "\n" + timestamp)
+        self.setFont(QFont("Segoe UI", 12))
         directory = os.path.dirname(os.path.abspath(__file__))
         self.setIcon(QIcon(os.path.join(directory,
             "icons", "console", ConsoleEntry.icon_map[level])))
