@@ -96,7 +96,7 @@ class Application(QApplication):
         self.window.toolbar.add_action("Close All", "File", "Ctrl+Shift+W", "Closes all opened Scene", testing("close all"))
         self.window.toolbar.add_separator("File")
         self.window.toolbar.add_action("Quit", "File", "Ctrl+Q", "Close the Editor", self.quit_wrapper)
-        
+
         self.window.toolbar.add_action("Undo", "Edit", "Ctrl+Z", "Undo the last action", testing("undo"))
         self.window.toolbar.add_action("Redo", "Edit", "Ctrl+Shift+Z", "Redo the last action", testing("redo"))
         self.window.toolbar.add_separator("Edit")
@@ -110,6 +110,9 @@ class Application(QApplication):
         self.window.toolbar.add_separator("Edit")
         self.window.toolbar.add_action("Select All", "Edit", "Ctrl+A", "Selects all items in the current Scene", self.hierarchy_content.tree_widget.selectAll)
         self.window.toolbar.add_action("Select None", "Edit", "Escape", "Deselects all items", self.window.select_none)
+
+        self.window.toolbar.add_sub_action("Start/Stop", "View", "Game", "Ctrl+Return", "Starts and stops the game", self.buttons.buttons[0].click)
+        self.window.toolbar.add_sub_action("Start/Stop", "View", "Game", "Space", "Toggles the pause state", self.game_content.buttons[1].click)
         
         self.window.toolbar.add_sub_action("Folder", "Assets", "Create", "", "", testing("new folder"))
         self.window.toolbar.add_sub_action("File", "Assets", "Create", "", "", testing("new file"))

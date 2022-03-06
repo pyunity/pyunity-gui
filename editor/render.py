@@ -123,16 +123,16 @@ class OpenGLFrame(QOpenGLWidget):
         Qt.Key_F10: KeyCode.F10,
         Qt.Key_F11: KeyCode.F11,
         Qt.Key_F12: KeyCode.F12,
-        # Qt.Key_: KeyCode.Keypad0,
-        # Qt.Key_: KeyCode.Keypad1,
-        # Qt.Key_: KeyCode.Keypad2,
-        # Qt.Key_: KeyCode.Keypad3,
-        # Qt.Key_: KeyCode.Keypad4,
-        # Qt.Key_: KeyCode.Keypad5,
-        # Qt.Key_: KeyCode.Keypad6,
-        # Qt.Key_: KeyCode.Keypad7,
-        # Qt.Key_: KeyCode.Keypad8,
-        # Qt.Key_: KeyCode.Keypad9,
+        # Qt.Key_: KeyCode.Keypad0, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad1, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad2, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad3, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad4, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad5, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad6, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad7, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad8, # Numpad requires modifier
+        # Qt.Key_: KeyCode.Keypad9, # Numpad requires modifier
         Qt.Key_Up: KeyCode.Up,
         Qt.Key_Down: KeyCode.Down,
         Qt.Key_Left: KeyCode.Left,
@@ -169,7 +169,7 @@ class OpenGLFrame(QOpenGLWidget):
             self.winObj.keys[self.keymap[event.key()]] = KeyState.UP
     
     @logPatch
-    def start(self, on):
+    def start(self, on=None):
         if self.scene is not None:
             self.stop()
         else:
@@ -191,9 +191,8 @@ class OpenGLFrame(QOpenGLWidget):
             self.file_tracker.stop()
     
     @logPatch
-    def stop(self, on):
+    def stop(self, on=None):
         if self.scene is not None:
-            self.timer.stop()
             self.scene = None
             self.buttons[0].setChecked(False)
             self.buttons[1].setChecked(False)
@@ -204,7 +203,7 @@ class OpenGLFrame(QOpenGLWidget):
         else:
             self.buttons[2].setChecked(True)
     
-    def pause(self, on):
+    def pause(self, on=None):
         self.paused = not self.paused
         if self.scene is not None:
             if self.paused:
