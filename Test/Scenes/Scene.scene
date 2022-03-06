@@ -39,25 +39,23 @@ GameObject : af402935-72d3-4305-92e8-09649849e5e9
     transform: ba2eef43-9449-4d76-84a9-36f6331a3eea
 Transform(Component) : ac2460f2-2906-4292-9b04-e0c69884567a
     gameObject: 098b57e9-c1a7-422b-acb9-1a68a586177f
-    localPosition: Vector3(0, 0, -10)
-    localRotation: Quaternion(1, 0, 0, 0)
+    localPosition: Vector3(0, 5, 5)
+    localRotation: Quaternion(5.657130561438501e-17, -2.3432602026631493e-17, 0.9238795325112867, -0.3826834323650898)
     localScale: Vector3(1, 1, 1)
     parent: None
 Camera(Component) : 491d1e2b-1ec1-49e3-8e2a-59cef37ec44d
     gameObject: 098b57e9-c1a7-422b-acb9-1a68a586177f
-    clearColor: RGB(0, 0, 0)
+    clearColor: RGB(255, 255, 255)
     far: 200
     near: 0.05
     ortho: False
-    shader: <pyunity.Shader object at 0x0660A1D8>
-    skybox: <pyunity.Skybox object at 0x0660A148>
-    skyboxEnabled: True
+    skyboxEnabled: False
 AudioListener(Component) : fa0b59b8-4419-4431-a58e-a1291fda1935
     gameObject: 098b57e9-c1a7-422b-acb9-1a68a586177f
 Transform(Component) : 7ef6a6ce-b613-475f-93d2-f090caffd65e
     gameObject: 2108d695-126d-4296-8bb3-2ab1934aa438
-    localPosition: Vector3(10, 10, -10)
-    localRotation: Quaternion(0.8535533905932737, -0.3535533905932738, 0.3535533905932738, -0.14644660940672624)
+    localPosition: Vector3(10, 10, 10)
+    localRotation: Quaternion(4.1550096333893767e-17, -1.2831805141575081e-17, 0.9238795325112867, 0.3826834323650898)
     localScale: Vector3(1, 1, 1)
     parent: None
 Light(Component) : bae19593-7be0-4d60-8789-dffee30b886d

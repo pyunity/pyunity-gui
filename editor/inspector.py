@@ -218,6 +218,11 @@ class InspectorBoolEdit(QCheckBox, InspectorInput):
         font.setBold(self.modified)
         self.label.setFont(font)
     
+    def setText(self, text):
+        super(InspectorBoolEdit, self).setText(text)
+        self.value = text == "True"
+        self.setChecked(self.value)
+    
     def get(self):
         return self.value
 
@@ -409,6 +414,7 @@ class InspectorSection(QWidget):
         else:
             input_box = self.__class__.inputs[prop.type](self, prop, orig)
         if isinstance(input_box, InspectorInput):
+            print(orig, prop, value, input_box.setText)
             input_box.label = label
             if value is not None:
                 input_box.setText(str(value))
