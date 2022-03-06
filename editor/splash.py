@@ -9,11 +9,11 @@ from PIL import ImageTk, Image
 sys._stderr = sys.stderr
 sys._stdout = sys.stdout
 
-def disable_print():
-    sys.stdout = os.devnull
-    sys.stderr = os.devnull
+def redirect_out(stream):
+    sys.stdout = stream
+    sys.stderr = stream
 
-def enable_print():
+def restore_out():
     sys.stdout = sys._stdout
     sys.stderr = sys._stderr
 

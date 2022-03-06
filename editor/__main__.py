@@ -1,9 +1,4 @@
-from .app import Application
-import sys
-
-def main():
-    app = Application(sys.argv[1])
-    app.start()
+from .cli import gui
 
 if __name__ == "__main__":
-    main()
+    gui()

@@ -1,5 +1,5 @@
 import sys
 sys.argv.append("Test")
 
-from editor.__main__ import main
-main()
+from editor.cli import run
+run()
