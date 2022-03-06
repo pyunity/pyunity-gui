@@ -322,7 +322,6 @@ class Console(QListWidget):
         return inner
     
     def on_switch(self):
-        print(self.pending_entries)
         self.pending_entries = self.pending_entries[-100:]
         if len(self.pending_entries) == 100:
             self.clear()

@@ -21,25 +21,26 @@ def run():
 def main():
     if not check():
         return
-    start(run())
+    start(run)
 
 def gui():
     if not check():
         return
     
-    temp_stream = io.StringIO()
-    redirect_out(temp_stream)
+    def inner():
+        temp_stream = io.StringIO()
+        redirect_out(temp_stream)
 
-    os.environ["PYUNITY_DEBUG_MODE"] = "0"
-    from pyunity import Logger
-    directory = os.path.join(os.path.dirname(Logger.folder), "Editor", "Logs")
-    os.makedirs(directory, exist_ok=True)
-    path = os.path.join(directory, strftime("%Y-%m-%d %H-%M-%S") + ".log")
-    f = open(path, "w+")
+        from pyunity import Logger
+        directory = os.path.join(os.path.dirname(Logger.folder), "Editor", "Logs")
+        os.makedirs(directory, exist_ok=True)
+        path = os.path.join(directory, strftime("%Y-%m-%d %H-%M-%S") + ".log")
+        f = open(path, "w+", buffering=1)
 
-    temp_stream.seek(0)
-    f.write(temp_stream.read())
-    temp_stream.close()
-    redirect_out(f)
-    Logger.SetStream(f)
-    start(run)
+        temp_stream.seek(0)
+        f.write(temp_stream.read())
+        temp_stream.close()
+        redirect_out(f)
+        Logger.SetStream(f)
+        run()
+    start(inner)

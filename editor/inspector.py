@@ -414,7 +414,6 @@ class InspectorSection(QWidget):
         else:
             input_box = self.__class__.inputs[prop.type](self, prop, orig)
         if isinstance(input_box, InspectorInput):
-            print(orig, prop, value, input_box.setText)
             input_box.label = label
             if value is not None:
                 input_box.setText(str(value))
