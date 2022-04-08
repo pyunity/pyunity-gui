@@ -39,7 +39,7 @@ class Inspector(QWidget):
         label.setFont(self.__class__.font)
         self.vbox_layout.addWidget(label)
         return label
-    
+
     def add_section(self, component):
         section = InspectorSection(component.__class__.__name__, self)
         section.component = component
@@ -86,13 +86,13 @@ class Inspector(QWidget):
             section = self.add_section(component)
             for name, val in component.shown.items():
                 section.add_value(name, val, getattr(component, name))
-    
+
     def on_edit(self, section, item, value, attr):
         if hasattr(item, "prevent_modify") or section.component is None:
             return
         setattr(section.component, attr, value)
         self.currentItem.setBold(True)
-    
+
     def reset_bold(self):
         for section in self.sections:
             section.reset_bold()
@@ -109,13 +109,13 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
         self.modified = False
         self.value = ""
         self.editingFinished.connect(self.edit)
-    
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             # self.setText(str(self.value))
             self.clearFocus()
         super(InspectorTextEdit, self).keyPressEvent(event)
-    
+
     def edit(self):
         self.on_edit()
 
@@ -130,13 +130,13 @@ class InspectorTextEdit(QLineEdit, InspectorInput):
         self.value = value
         self.setText(str(self.value))
         self.edited.emit(self)
-    
+
     def reset_bold(self):
         self.modified = False
         font = self.label.font()
         font.setBold(self.modified)
         self.label.setFont(font)
-    
+
     def get(self):
         return self.value
 
@@ -147,7 +147,7 @@ class InspectorIntEdit(InspectorTextEdit):
         self.value = 0
         self.setText("0")
         self.setValidator(QIntValidator(self))
-    
+
     def on_edit(self):
         super(InspectorIntEdit, self).on_edit(int(self.text()))
 
@@ -158,7 +158,7 @@ class InspectorFloatEdit(InspectorTextEdit):
         self.value = 0
         self.setText("0.0")
         self.setValidator(FloatValidator(self))
-    
+
     def on_edit(self):
         super(InspectorFloatEdit, self).on_edit(float(self.text()))
 
@@ -176,13 +176,13 @@ class FloatValidator(QValidator):
                 return QValidator.Intermediate, input, pos
             return QValidator.Invalid, input, pos
         return QValidator.Acceptable, input, pos
-    
+
     def fixup(self, input):
         new = self.check(input)
         if new is not None:
             return new
         return input
-    
+
     def check(self, string):
         for regex, replace in self.__class__.regexes:
             match = re.match(regex, string)
@@ -200,7 +200,7 @@ class InspectorBoolEdit(QCheckBox, InspectorInput):
         self.label = None
         self.stateChanged.connect(self.on_edit)
         self.setChecked(True)
-    
+
     def on_edit(self, state):
         value = state == Qt.Checked
         if value != self.value:
@@ -211,18 +211,18 @@ class InspectorBoolEdit(QCheckBox, InspectorInput):
         self.value = value
         self.setChecked(self.value)
         self.edited.emit(self)
-    
+
     def reset_bold(self):
         self.modified = False
         font = self.label.font()
         font.setBold(self.modified)
         self.label.setFont(font)
-    
+
     def setText(self, text):
         super(InspectorBoolEdit, self).setText(text)
         self.value = text == "True"
         self.setChecked(self.value)
-    
+
     def get(self):
         return self.value
 
@@ -240,29 +240,29 @@ class InspectorVector3Edit(InspectorInput):
             self.inputs[i].label = self.labels[i]
             self.inputs[i].setValidator(FloatValidator(self.inputs[i]))
             self.inputs[i].editingFinished.connect(self.on_edit(i))
-        
+
         self.hbox_layout = QHBoxLayout(self)
         self.hbox_layout.setSpacing(2)
         self.hbox_layout.setContentsMargins(0, 0, 0, 0)
         for i in range(3):
             self.hbox_layout.addWidget(self.labels[i])
             self.hbox_layout.addWidget(self.inputs[i])
-        
+
         self.modified = False
         self.value = pyu.Vector3.zero()
-    
+
     def setText(self, vec):
         x, y, z = vec[8: -1].split(", ")
         self.inputs[0].setText(str(float(x)))
         self.inputs[1].setText(str(float(y)))
         self.inputs[2].setText(str(float(z)))
-    
+
     def get(self):
         x = float(self.inputs[0].text())
         y = float(self.inputs[1].text())
         z = float(self.inputs[2].text())
         return pyu.Vector3(x, y, z)
-    
+
     def on_edit(self, input):
         def inner():
             text = float(self.inputs[input].text())
@@ -271,7 +271,7 @@ class InspectorVector3Edit(InspectorInput):
                 font = self.label.font()
                 font.setBold(self.modified)
                 self.label.setFont(font)
-                
+
                 self.inputs[input].modified = True
                 font = self.inputs[input].label.font()
                 font.setBold(self.inputs[input].modified)
@@ -282,7 +282,7 @@ class InspectorVector3Edit(InspectorInput):
             self.setText(str(self.value))
             self.edited.emit(self)
         return inner
-    
+
     def reset_bold(self):
         self.modified = False
         font = self.label.font()
@@ -309,42 +309,42 @@ class InspectorQuaternionEdit(InspectorInput):
             self.inputs[i].label = self.labels[i]
             self.inputs[i].setValidator(FloatValidator(self.inputs[i]))
             self.inputs[i].editingFinished.connect(self.on_edit(i))
-        
+
         self.hbox_layout = QHBoxLayout(self)
         self.hbox_layout.setSpacing(2)
         self.hbox_layout.setContentsMargins(0, 0, 0, 0)
         for i in range(3):
             self.hbox_layout.addWidget(self.labels[i])
             self.hbox_layout.addWidget(self.inputs[i])
-        
+
         self.modified = False
         self.value = pyu.Vector3.zero()
-    
+
     def setText(self, quat):
         w, x, y, z = list(map(float, quat[11: -1].split(", ")))
         x, y, z = pyu.Quaternion(w, x, y, z).eulerAngles
         self.inputs[0].setText(str(float(x)))
         self.inputs[1].setText(str(float(y)))
         self.inputs[2].setText(str(float(z)))
-    
+
     def setVec(self, vec):
         x, y, z = vec
         self.inputs[0].setText(str(float(x)))
         self.inputs[1].setText(str(float(y)))
         self.inputs[2].setText(str(float(z)))
-    
+
     def get(self):
         x = float(self.inputs[0].text())
         y = float(self.inputs[1].text())
         z = float(self.inputs[2].text())
         return pyu.Quaternion.Euler(pyu.Vector3(x, y, z))
-    
+
     def getVec(self):
         x = float(self.inputs[0].text())
         y = float(self.inputs[1].text())
         z = float(self.inputs[2].text())
         return pyu.Vector3(x, y, z)
-    
+
     def on_edit(self, input):
         def inner():
             text = float(self.inputs[input].text())
@@ -353,7 +353,7 @@ class InspectorQuaternionEdit(InspectorInput):
                 font = self.label.font()
                 font.setBold(self.modified)
                 self.label.setFont(font)
-                
+
                 self.inputs[input].modified = True
                 font = self.inputs[input].label.font()
                 font.setBold(self.inputs[input].modified)
@@ -364,7 +364,7 @@ class InspectorQuaternionEdit(InspectorInput):
             self.setVec(self.value)
             self.edited.emit(self)
         return inner
-    
+
     def reset_bold(self):
         self.modified = False
         font = self.label.font()
@@ -390,7 +390,7 @@ class InspectorSection(QWidget):
         self.name = name
         self.component = None
         self.prevent_modify = False
-        
+
         self.header = QLabel(self.name, self)
         self.header.setFont(self.__class__.large_font)
         self.grid_layout.addWidget(self.header)
@@ -401,7 +401,7 @@ class InspectorSection(QWidget):
 
         self.setLayout(self.grid_layout)
         self.fields = {}
-    
+
     def add_value(self, orig, prop, value=None):
         if len(self.fields) == 0:
             self.grid_layout.removeWidget(self.label)
@@ -437,7 +437,7 @@ class InspectorSection(QWidget):
         value = input.get()
         attr = self.fields[input][0]
         self.edited.emit(self, input, value, attr)
-    
+
     def reset_bold(self):
         for box in self.fields:
             if isinstance(box, InspectorInput):

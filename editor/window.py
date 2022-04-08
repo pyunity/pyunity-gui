@@ -20,7 +20,7 @@ class Window(QMainWindow):
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)
         widget.setLayout(self.vbox_layout)
         self.setCentralWidget(widget)
-        
+
         directory = os.path.dirname(os.path.abspath(__file__))
         self.styles = {}
         with open(os.path.join(directory, "theme", "dark.qss")) as f:
@@ -29,32 +29,32 @@ class Window(QMainWindow):
             self.styles["light"] = f.read()
         self.app.setStyleSheet(self.styles["dark"])
         self.theme = "dark"
-    
+
     def toggle_theme(self):
         if self.theme == "dark":
             self.theme = "light"
         else:
             self.theme = "dark"
         self.app.setStyleSheet(self.styles[self.theme])
-    
+
     def closeEvent(self, event):
         self.app.quit_wrapper()
         event.ignore()
-    
+
     def set_icon(self, path):
         directory = os.path.dirname(os.path.abspath(__file__))
         self.setWindowIcon(QIcon(os.path.join(directory, path)))
-    
+
     def select_none(self):
         if not isinstance(self.app.focusWidget(), QLineEdit):
             self.app.hierarchy_content.tree_widget.clearSelection()
-    
+
     def rename(self):
         self.app.inspector.tab_widget.setCurrentWidget(self.app.inspector)
         box = list(self.app.inspector_content.sections[0].fields.keys())[0]
         box.setFocus()
         box.selectAll()
-    
+
     def mousePressEvent(self, event):
         focused = self.focusWidget()
         if isinstance(focused, QLineEdit):
@@ -77,7 +77,7 @@ class SceneButtons(QWidget):
         self.spacers = [spacer1, spacer2]
 
         self.directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "buttons")
-    
+
     def add_button(self, icon, tip="", on=False):
         button = QToolButton(self)
         button.setIcon(QIcon(os.path.join(self.directory, icon)))
@@ -95,7 +95,7 @@ class ToolBar:
         self.sub_menus = {}
 
         instance.statusBar()
-    
+
     def add_menu(self, name):
         if name in self.menus:
             return
@@ -103,7 +103,7 @@ class ToolBar:
         self.menus[name] = menu
         self.sub_menus[name] = {}
         return menu
-    
+
     def add_action(self, name, menu, shortcut, tip, *funcs):
         action = QAction(name, self.instance)
         if shortcut:
@@ -116,9 +116,9 @@ class ToolBar:
             menu_tab = self.add_menu(menu)
         else:
             menu_tab = self.menus[menu]
-        
+
         menu_tab.addAction(action)
-    
+
     def add_sub_menu(self, name, menu):
         if menu not in self.menus:
             menu_tab = self.add_menu(menu)
@@ -127,7 +127,7 @@ class ToolBar:
         sub_menu = menu_tab.addMenu(name)
         self.sub_menus[menu][name] = sub_menu
         return sub_menu
-    
+
     def add_sub_action(self, name, menu, sub_menu, shortcut, tip, func):
         action = QAction(name, self.instance)
         if shortcut is not None:
@@ -139,13 +139,13 @@ class ToolBar:
             menu_tab = self.add_sub_menu(sub_menu, menu)
         else:
             menu_tab = self.sub_menus[menu][sub_menu]
-        
+
         menu_tab.addAction(action)
-    
+
     def add_separator(self, menu):
         if menu in self.menus:
             self.menus[menu].addSeparator()
-    
+
     def add_sub_separator(self, menu, sub):
         if menu in self.menus and sub in self.sub_menus[menu]:
             self.sub_menus[menu][sub].addSeparator()
@@ -160,7 +160,7 @@ class Editor(QWidget):
         self.hbox_layout.setSpacing(0)
         self.hbox_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.hbox_layout)
-    
+
     def add_tab(self, name, row, column):
         if len(self.columnWidgets) <= column:
             column = len(self.columnWidgets)
@@ -169,7 +169,7 @@ class Editor(QWidget):
             self.columnWidgets.append(columnWidget)
         columnWidget = self.columnWidgets[column]
         return columnWidget.add_tab(name, row)
-    
+
     def set_stretch(self, stretch):
         if len(stretch) != len(self.columnWidgets):
             raise ValueError("Argument 1: expected %d length, got %d length" % \
@@ -186,7 +186,7 @@ class Column(QWidget):
         self.setLayout(self.vbox_layout)
         self.tab_widgets = []
         self.tabs = []
-    
+
     def add_tab(self, name, row):
         if len(self.tabs) <= row:
             row = len(self.tabs)
@@ -216,17 +216,17 @@ class Tab(QWidget):
         super(Tab, self).__init__(tab_widget)
         self.tab_widget = tab_widget
         self.name = name
-        
+
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
 
         self.spacer = QSpacerItem(20, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.vbox_layout.addSpacerItem(self.spacer)
-        
+
         self.tab_widget.addTab(self, self.name)
         self.content = None
-    
+
     def set_window_type(self, window_type):
         self.content = window_type(self)
         self.vbox_layout.insertWidget(0, self.content)

@@ -22,7 +22,7 @@ class FileTracker:
         self.timer = QTimer()
         self.timer.timeout.connect(self.check)
         self.project = Loader.LoadProject(path)
-    
+
     def check(self):
         files2 = set(glob.glob(os.path.join(self.path, "**/*"), recursive=True))
         for file in self.files:
@@ -52,10 +52,10 @@ class FileTracker:
                 message.setFont(self.font)
                 message.exec()
             self.changed = []
-    
+
     def start(self, delay):
         self.check()
         self.timer.start(delay * 1000)
-    
+
     def stop(self):
         self.timer.stop()

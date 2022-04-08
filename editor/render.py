@@ -28,21 +28,21 @@ class OpenGLFrame(QOpenGLWidget):
         self.original = None
         self.paused = False
         self.file_tracker = None
-    
+
     @property
     def winObj(self):
         return SceneManager.windowObject
-    
+
     @winObj.setter
     def winObj(self, val):
         SceneManager.windowObject = val
-    
+
     def set_buttons(self, buttons):
         self.buttons = buttons.buttons
         self.buttons[0].clicked.connect(self.start)
         self.buttons[1].clicked.connect(self.pause)
         self.buttons[2].clicked.connect(self.stop)
-    
+
     def initializeGL(self):
         render.compile_shaders()
         self.original.mainCamera.skybox.compile()
@@ -51,7 +51,7 @@ class OpenGLFrame(QOpenGLWidget):
         self.original.mainCamera.setup_buffers()
         for renderer in self.original.FindComponentsByType(MeshRenderer):
             renderer.mesh.compile()
-    
+
     def paintGL(self):
         if self.scene is not None:
             self.scene.update()
@@ -59,14 +59,14 @@ class OpenGLFrame(QOpenGLWidget):
             self.winObj.check_mouse()
         else:
             self.original.Render()
-    
+
     def resizeGL(self, width, height):
         if self.scene is not None:
             self.scene.mainCamera.Resize(width, height)
         else:
             self.original.mainCamera.Resize(width, height)
         self.update()
-    
+
     mousemap = {
         Qt.LeftButton: MouseCode.Left,
         Qt.RightButton: MouseCode.Right,
@@ -146,17 +146,17 @@ class OpenGLFrame(QOpenGLWidget):
         super(OpenGLFrame, self).mouseMoveEvent(event)
         if self.winObj is not None:
             self.winObj.mpos = [event.x(), event.y()]
-    
+
     def mousePressEvent(self, event):
         super(OpenGLFrame, self).mousePressEvent(event)
         if self.winObj is not None:
             self.winObj.mbuttons[self.mousemap[event.button()]] = KeyState.DOWN
-    
+
     def mouseReleaseEvent(self, event):
         super(OpenGLFrame, self).mouseReleaseEvent(event)
         if self.winObj is not None:
             self.winObj.mbuttons[self.mousemap[event.button()]] = KeyState.UP
-    
+
     def keyPressEvent(self, event):
         super(OpenGLFrame, self).keyPressEvent(event)
         if self.winObj is not None:
@@ -166,7 +166,7 @@ class OpenGLFrame(QOpenGLWidget):
                 self.winObj.keys[self.numberkeys[event.key()]] = KeyState.DOWN
             else:
                 self.winObj.keys[self.keymap[event.key()]] = KeyState.DOWN
-    
+
     def keyReleaseEvent(self, event):
         super(OpenGLFrame, self).keyReleaseEvent(event)
         if self.winObj is not None:
@@ -176,7 +176,7 @@ class OpenGLFrame(QOpenGLWidget):
                 self.winObj.keys[self.numberkeys[event.key()]] = KeyState.UP
             else:
                 self.winObj.keys[self.keymap[event.key()]] = KeyState.UP
-    
+
     @logPatch
     def start(self, on=None):
         if self.scene is not None:
@@ -199,7 +199,7 @@ class OpenGLFrame(QOpenGLWidget):
                 self.timer.start(duration)
             else:
                 self.timer.stop()
-    
+
     @logPatch
     def stop(self, on=None):
         if self.scene is not None:
@@ -212,7 +212,7 @@ class OpenGLFrame(QOpenGLWidget):
             self.file_tracker.start(5)
         else:
             self.buttons[2].setChecked(True)
-    
+
     def pause(self, on=None):
         self.paused = not self.paused
         if self.scene is not None:
@@ -222,7 +222,7 @@ class OpenGLFrame(QOpenGLWidget):
                 self.scene.lastFrame = time.time()
                 duration = 0 if config.fps == 0 else 1000 / config.fps
                 self.timer.start(duration)
-    
+
     def save(self):
         def callback():
             Loader.ResaveScene(self.original, self.file_tracker.project)
@@ -236,7 +236,7 @@ class OpenGLFrame(QOpenGLWidget):
         QTimer.singleShot(2000, callback)
         message.setFont(QFont("Segoe UI", 12))
         message.exec()
-    
+
     def on_switch(self):
         self.console.timer.stop()
 
@@ -269,7 +269,7 @@ class WidgetWindow(Window.ABCWindow):
         if self.mbuttons[mousecode] == keystate:
             return True
         return False
-    
+
     def get_key(self, keycode, keystate):
         if keystate == KeyState.PRESS:
             if self.keys[keycode] in [KeyState.PRESS, KeyState.DOWN]:
@@ -280,12 +280,15 @@ class WidgetWindow(Window.ABCWindow):
 
     def get_mouse_pos(self):
         return self.mpos
-    
+
     def quit(self):
         pass
 
     def start(self, update_func):
         self.update_func = update_func
+
+    def refresh(self):
+        pass
 
 class SceneEditor:
     pass
@@ -303,16 +306,16 @@ class Console(QListWidget):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.on_switch)
         Logger.LogLine = self.modded_log(Logger.LogLine)
-    
+
     def add_entry(self, timestamp, level, text):
         entry = ConsoleEntry(timestamp, level, text)
         self.entries.append(entry)
         self.addItem(entry)
-    
+
     def clear(self):
         self.entries = []
         super(Console, self).clear()
-    
+
     def modded_log(self, func):
         def inner(*args, **kwargs):
             timestamp, msg = func(*args, **kwargs, silent=True)
@@ -320,7 +323,7 @@ class Console(QListWidget):
                 self.pending_entries.append([timestamp, args[0], msg])
             return timestamp, msg
         return inner
-    
+
     def on_switch(self):
         self.pending_entries = self.pending_entries[-100:]
         if len(self.pending_entries) == 100:

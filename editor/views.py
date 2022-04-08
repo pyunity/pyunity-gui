@@ -12,16 +12,16 @@ class HierarchyItem(QTreeWidgetItem):
         self.name = gameObject.name
         self.gameObject = gameObject
         self.children = []
-    
+
     def add_child(self, child):
         self.children.append(child)
         self.addChild(child)
-    
+
     def selectAll(self):
         self.setSelected(True)
         for child in self.children:
             child.selectAll()
-    
+
     def rename(self, textedit):
         text = textedit.value
         self.setText(0, text)
@@ -73,7 +73,7 @@ class Hierarchy(QWidget):
         self.tree_widget.itemSelectionChanged.connect(self.on_click)
         self.inspector = None
         self.preview = None
-    
+
     def new(self):
         new = pyu.GameObject("GameObject")
         self.loaded.Add(new)
@@ -87,7 +87,7 @@ class Hierarchy(QWidget):
         new = pyu.GameObject("GameObject", parent)
         self.loaded.Add(new)
         self.add_item(new, item)
-    
+
     def new_sibling(self):
         sibling = self.tree_widget.currentItem()
         if sibling is None:
@@ -99,13 +99,13 @@ class Hierarchy(QWidget):
         new = pyu.GameObject("GameObject", parent)
         self.loaded.Add(new)
         self.add_item(new, item)
-    
+
     def remove(self):
         items = self.tree_widget.selectedItems()
         if len(items) == 0:
             pyu.Logger.Log("Nothing selected")
             return
-        
+
         for item in items:
             item.selectAll()
         items = self.tree_widget.selectedItems()
@@ -125,7 +125,7 @@ class Hierarchy(QWidget):
         else:
             parent.add_child(item)
         return item
-    
+
     def add_item_pos(self, gameObject, *args):
         item = HierarchyItem(gameObject)
         parent = self.items[args[0]]
@@ -134,7 +134,7 @@ class Hierarchy(QWidget):
             parent = parent.children[num]
         parent.add_child(item)
         return item
-    
+
     def load_scene(self, scene):
         self.loaded = scene
         self.title.setText(scene.name)
@@ -155,7 +155,7 @@ class Hierarchy(QWidget):
             self.inspector.load(None)
         else:
             self.inspector.load(items[0])
-    
+
     def reset_bold(self):
         for item in self.items:
             item.setBold(False)
@@ -171,13 +171,13 @@ class CustomTreeWidget(QTreeWidget):
         self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setIndentation(10)
         self.hierarchy = parent
-    
+
     def selectAll(self):
         item = self.invisibleRootItem()
         for i in range(self.invisibleRootItem().childCount()):
             child = item.child(i)
             child.selectAll()
-    
+
     def contextMenuEvent(self, event):
         menu = QMenu()
         menu.addAction("New Root GameObject", self.hierarchy.new)

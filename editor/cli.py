@@ -26,7 +26,7 @@ def main():
 def gui():
     if not check():
         return
-    
+
     def inner():
         temp_stream = io.StringIO()
         redirect_out(temp_stream)
