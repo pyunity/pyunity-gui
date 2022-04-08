@@ -44,19 +44,25 @@ class OpenGLFrame(QOpenGLWidget):
         self.buttons[2].clicked.connect(self.stop)
 
     def initializeGL(self):
-        render.compile_shaders()
+        Logger.LogLine(Logger.DEBUG, "Compiling objects")
+        Logger.elapsed.tick()
+        Logger.LogLine(Logger.INFO, "Compiling shaders")
+        render.compileShaders()
+        Logger.LogSpecial(Logger.INFO, Logger.ELAPSED_TIME)
+        Logger.LogLine(Logger.INFO, "Loading skyboxes")
+        render.compileSkyboxes()
+        Logger.LogSpecial(Logger.INFO, Logger.ELAPSED_TIME)
+
         self.original.mainCamera.skybox.compile()
-        # self.winObj = WidgetWindow(
-        #     self.original.name, self.original.mainCamera.Resize)
-        self.original.mainCamera.setup_buffers()
+        self.original.mainCamera.setupBuffers()
         for renderer in self.original.FindComponentsByType(MeshRenderer):
             renderer.mesh.compile()
 
     def paintGL(self):
         if self.scene is not None:
             self.scene.update()
-            self.winObj.check_keys()
-            self.winObj.check_mouse()
+            self.winObj.checkKeys()
+            self.winObj.checkMouse()
         else:
             self.original.Render()
 
@@ -191,7 +197,8 @@ class OpenGLFrame(QOpenGLWidget):
             self.scene = copy.deepcopy(self.original)
             self.winObj = WidgetWindow(
                 self.scene.name, self.scene.mainCamera.Resize)
-            # self.scene.mainCamera.skybox.compile()
+
+            Logger.LogLine(Logger.DEBUG, "Starting scene")
             self.scene.Start()
             self.scene.mainCamera.Resize(self.width(), self.height())
             if not self.paused:
@@ -248,21 +255,21 @@ class WidgetWindow(Window.ABCWindow):
         self.mbuttons = [KeyState.NONE, KeyState.NONE, KeyState.NONE]
         self.keys = [KeyState.NONE for i in range(KeyCode.Right + 1)]
 
-    def check_keys(self):
+    def checkKeys(self):
         for i in range(len(self.keys)):
             if self.keys[i] == KeyState.UP:
                 self.keys[i] = KeyState.NONE
             elif self.keys[i] == KeyState.DOWN:
                 self.keys[i] = KeyState.PRESS
 
-    def check_mouse(self):
+    def checkMouse(self):
         for i in range(len(self.mbuttons)):
             if self.mbuttons[i] == KeyState.UP:
                 self.mbuttons[i] = KeyState.NONE
             elif self.mbuttons[i] == KeyState.DOWN:
                 self.mbuttons[i] = KeyState.PRESS
 
-    def get_mouse(self, mousecode, keystate):
+    def getMouse(self, mousecode, keystate):
         if keystate == KeyState.PRESS:
             if self.mbuttons[mousecode] in [KeyState.PRESS, KeyState.DOWN]:
                 return True
@@ -270,7 +277,7 @@ class WidgetWindow(Window.ABCWindow):
             return True
         return False
 
-    def get_key(self, keycode, keystate):
+    def getKey(self, keycode, keystate):
         if keystate == KeyState.PRESS:
             if self.keys[keycode] in [KeyState.PRESS, KeyState.DOWN]:
                 return True
@@ -278,14 +285,14 @@ class WidgetWindow(Window.ABCWindow):
             return True
         return False
 
-    def get_mouse_pos(self):
+    def getMousePos(self):
         return self.mpos
 
     def quit(self):
         pass
 
-    def start(self, update_func):
-        self.update_func = update_func
+    def start(self, updateFunc):
+        self.updateFunc = updateFunc
 
     def refresh(self):
         pass
