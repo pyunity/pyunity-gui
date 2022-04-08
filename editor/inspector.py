@@ -337,7 +337,9 @@ class InspectorQuaternionEdit(InspectorInput):
         x = float(self.inputs[0].text())
         y = float(self.inputs[1].text())
         z = float(self.inputs[2].text())
-        return pyu.Quaternion.Euler(pyu.Vector3(x, y, z))
+        q = pyu.Quaternion.identity()
+        q.SetBackward(pyu.Vector3(x, y, z))
+        return q
 
     def getVec(self):
         x = float(self.inputs[0].text())
