@@ -15,24 +15,10 @@ therefore this Editor is completely separate, but inspired by the UnityEditor.
 
 ## Installing
 
-The PyUnity Editor can be installed via pip:
-
-    > pip install pyunity-editor
-
-Alternatively, you can clone the repository to build the package from source. These builds are sometimes broken, so use at your own risk. You can build as follows:
-
-    > git clone https://github.com/pyunity/pyunity-gui
-    > git checkout master
-    > python setup.py install
-
-Its only dependencies are PyUnity, PyQt5 and Pillow. Microsoft Visual C++ Build Tools are required on Windows for building PyUnity from source (if there isn't a wheel available). The PyUnity Editor requires a PyUnity version of at least 0.7.1.
-
-## Running
-To run the PyUnity Editor, you run this command from the terminal:
-
-    > pyunity-editor project/
-
-where `project/` is your project folder. The PyUnity Editor will launch with a splash screen, then the editor window will appear.
+The PyPi package does not work with the latest releases of PyUnity, and as such the best way
+to use this editor is to clone this editor and regularly run `git pull` to update. From the repo,
+running `python -m editor ProjectPath/` will work. To create a new project, run
+`python -m editor --new ProjectPath/`.
 
 ## Contributing
 
