@@ -13,10 +13,7 @@ parser.add_argument("project", help="Path to PyUnity project")
 args = parser.parse_args()
 
 def check():
-    if len(sys.argv) < 2:
-        print("Please specify a project.")
-        return False
-    elif not os.path.isdir(args.project):
+    if not os.path.isdir(args.project):
         print("Please specify a valid directory.")
         return False
     return True
