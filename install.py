@@ -1,26 +1,42 @@
-import requests
+import urllib.request
 import os
 import sys
-import distutils.util
+import tempfile
+import zipfile
+import shutil
+import sysconfig
 
-plat = distutils.util.get_platform()
-num = int(plat == "win-amd64")
+plat = sysconfig.get_platform()
 if plat.startswith("win"):
-    job = 0
+    workflow = "windows"
+    name = f"python{sys.version_info.major}.{sys.version_info.minor}"
+    if plat == "win-amd64":
+        name += "-x64"
+    else:
+        name += "-x86"
 elif plat.startswith("linux"):
-    job = 1
+    workflow = "unix"
+    name = f"ubuntu-latest%20python{sys.version_info.major}.{sys.version_info.minor}"
 elif plat.startswith("macos"):
-    job = 2
-ver = sys.version_info.minor
+    workflow = "unix"
+    name = f"macos-latest%20python{sys.version_info.major}.{sys.version_info.minor}"
 
+print(f"Target artifact: {name}.zip")
 
-apiUrl = "https://ci.appveyor.com/api"
-project = requests.get(f"{apiUrl}/projects/pyunity/pyunity")
-jobId = project.json()["build"]["jobs"][3 * job + 10 - ver]["jobId"]
-artifacts = requests.get(f"{apiUrl}/buildjobs/{jobId}/artifacts")
-if len(artifacts.json()) <= num:
-    print("No artifact found, check https://ci.appveyor.com/project/pyunity/pyunity for details")
-    exit(1)
-file = f"{apiUrl}/buildjobs/{jobId}/artifacts/{artifacts.json()[num]['fileName']}"
+tmp = tempfile.mkdtemp()
+orig = os.getcwd()
+os.chdir(tmp)
+urllib.request.urlretrieve(f"https://nightly.link/pyunity/pyunity/workflows/{workflow}/develop/{name}.zip", "artifact.zip")
+
+with zipfile.ZipFile(os.path.join(tmp, "artifact.zip")) as zf:
+    files = zf.infolist()
+    name = files[0].filename
+    print(f"Target wheel: {name}")
+    zf.extract(name)
+
+print("Installing wheel")
 os.system("pip3 uninstall -y pyunity")
-os.system("pip3 install -U pyunity@" + file)
+os.system("pip3 install -U " + name)
+print("Cleaning up")
+os.chdir(orig)
+shutil.rmtree(tmp)
