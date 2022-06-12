@@ -114,7 +114,7 @@ class Hierarchy(QWidget):
             pyu.Logger.Log("Removing", item.gameObject.name)
             self.tree_widget.invisibleRootItem().removeChild(item)
             if self.loaded.Has(item.gameObject):
-                self.loaded.Remove(item.gameObject)
+                self.loaded.Destroy(item.gameObject)
         self.preview.update()
 
     def add_item(self, gameObject, parent=None):

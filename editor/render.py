@@ -145,7 +145,6 @@ class OpenGLFrame(QOpenGLWidget):
 
     def paintGL(self):
         if self.scene is not None:
-            print("update")
             try:
                 self.runner.updateFunc()
             except ChangeScene:
@@ -195,7 +194,7 @@ class OpenGLFrame(QOpenGLWidget):
     @logPatch
     def stop(self, on=None):
         if self.scene is not None:
-            self.runner.eventLoopManager.exceptions.append(PyUnityExit())
+            self.runner.quit()
             self.scene = None
             self.buttons[0].setChecked(False)
             self.buttons[1].setChecked(False)

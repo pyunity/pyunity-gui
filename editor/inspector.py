@@ -84,7 +84,7 @@ class Inspector(QWidget):
 
         for component in self.gameObject.components:
             section = self.add_section(component)
-            for name, val in component.shown.items():
+            for name, val in component._shown.items():
                 section.add_value(name, val, getattr(component, name))
 
     def on_edit(self, section, item, value, attr):
