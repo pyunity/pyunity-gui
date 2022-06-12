@@ -2,7 +2,12 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QFont, QIcon
 from pyunity import (Logger, SceneManager, KeyCode,
-    MouseCode, MeshRenderer, KeyState, Loader, Window, config, render)
+    MouseCode, MeshRenderer, KeyState, Loader, Window,
+    WaitForUpdate, WaitForRender, WaitForFixedUpdate, PyUnityException, PyUnityExit,
+    EventLoopManager, EventLoop,
+    config, render)
+from pyunity.scenes.runner import Runner, ChangeScene
+import asyncio
 import os
 import copy
 import time
@@ -12,8 +17,94 @@ def logPatch(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            Logger.LogException(e)
+            Logger.LogException(e, stacklevel=2)
     return inner
+
+class QEventLoopManager(EventLoopManager):
+    def start(self):
+        if EventLoopManager.current is not None:
+            raise PyUnityException("Only one EventLoopManager can be running")
+        EventLoopManager.current = self
+
+        self.waiting[self.mainWaitFor] = []
+
+        for loop in self.separateLoops:
+            loop.call_soon(loop.stop)
+            loop.run_forever() # Run until awaits are encountered
+        self.separateLoops.clear()
+
+        self.running = True
+        for thread in self.threads:
+            thread.start()
+
+        self.mainLoop = EventLoop()
+        asyncio.set_event_loop(self.mainLoop)
+
+        def inner():
+            if len(EventLoopManager.exceptions):
+                if isinstance(EventLoopManager.exceptions[0], ChangeScene):
+                    exc = EventLoopManager.exceptions.pop()
+                    EventLoopManager.exceptions.clear()
+                    raise exc
+                elif config.exitOnError:
+                    Logger.LogLine(Logger.ERROR,
+                                   f"Exception in Scene: {SceneManager.CurrentScene().name!r}")
+                    exc = EventLoopManager.exceptions.pop()
+                    EventLoopManager.exceptions.clear()
+                    raise exc
+                else:
+                    for exception in EventLoopManager.exceptions:
+                        Logger.LogLine(Logger.ERROR,
+                                    f"Exception ignored in Scene: {SceneManager.CurrentScene().name!r}")
+                        Logger.LogException(exception)
+                    EventLoopManager.exceptions.clear()
+
+            for waiter in self.waiting[self.mainWaitFor]:
+                waiter.loop.call_soon_threadsafe(waiter.event.set)
+
+            for func in self.updates:
+                func(loop)
+
+            for event in self.pending:
+                event.trigger()
+            self.pending.clear()
+
+            self.mainLoop.call_soon(self.mainLoop.stop)
+            self.mainLoop.run_forever()
+
+        return inner
+
+class QRunner(Runner):
+    def __init__(self, frame):
+        super(QRunner, self).__init__()
+        self.frame = frame
+
+    def open(self):
+        super(QRunner, self).open()
+        os.environ["PYUNITY_GL_CONTEXT"] = "1"
+        self.window = WidgetWindow("Editor")
+
+    def load(self):
+        if self.scene is None:
+            raise PyUnityException("Cannot load runner before setting a scene")
+        Logger.LogLine(Logger.DEBUG, "Starting scene")
+        self.eventLoopManager = QEventLoopManager()
+        self.eventLoopManager.schedule(self.scene.updateFixed, ups=50, waitFor=WaitForFixedUpdate)
+        self.eventLoopManager.addLoop(self.scene.startScripts())
+
+        self.eventLoopManager.schedule(
+            self.scene.updateScripts, self.window.updateFunc,
+            ups=config.fps, waitFor=WaitForUpdate)
+        self.eventLoopManager.schedule(
+            self.scene.Render, self.window.refresh,
+            main=True, waitFor=WaitForRender)
+        if self.scene.mainCamera is not None:
+            self.window.setResize(self.scene.mainCamera.Resize)
+        self.scene.startOpenGL()
+        self.scene.startLoop()
+
+    def start(self):
+        self.updateFunc = self.eventLoopManager.start()
 
 class OpenGLFrame(QOpenGLWidget):
     SPACER = None
@@ -28,14 +119,8 @@ class OpenGLFrame(QOpenGLWidget):
         self.original = None
         self.paused = False
         self.file_tracker = None
-
-    @property
-    def winObj(self):
-        return SceneManager.windowObject
-
-    @winObj.setter
-    def winObj(self, val):
-        SceneManager.windowObject = val
+        self.runner = QRunner(self)
+        SceneManager.runner = self.runner
 
     def set_buttons(self, buttons):
         self.buttons = buttons.buttons
@@ -55,14 +140,23 @@ class OpenGLFrame(QOpenGLWidget):
 
         self.original.mainCamera.skybox.compile()
         self.original.mainCamera.setupBuffers()
-        for renderer in self.original.FindComponentsByType(MeshRenderer):
+        for renderer in self.original.FindComponents(MeshRenderer):
             renderer.mesh.compile()
 
     def paintGL(self):
         if self.scene is not None:
-            self.scene.update()
-            self.winObj.checkKeys()
-            self.winObj.checkMouse()
+            print("update")
+            try:
+                self.runner.updateFunc()
+            except ChangeScene:
+                if self.runner.next is None:
+                    raise
+                self.runner.eventLoopManager.quit()
+                self.runner.scene.cleanUp()
+                self.runner.scene = self.runner.next
+                self.runner.next = None
+                self.runner.load()
+                self.runner.start()
         else:
             self.original.Render()
 
@@ -72,6 +166,73 @@ class OpenGLFrame(QOpenGLWidget):
         else:
             self.original.mainCamera.Resize(width, height)
         self.update()
+
+    @logPatch
+    def start(self, on=None):
+        if self.scene is not None:
+            self.stop()
+        else:
+            self.makeCurrent()
+            if self.console.clear_on_run:
+                self.console.clear()
+            self.buttons[2].setChecked(False)
+            self.file_tracker.stop()
+
+            self.scene = copy.deepcopy(self.original)
+            self.runner.setScene(self.scene)
+            if not self.runner.opened:
+                self.runner.open()
+            self.runner.load()
+            self.runner.start()
+
+            self.scene.mainCamera.Resize(self.width(), self.height())
+            if not self.paused:
+                duration = 0 if config.fps == 0 else 1000 / config.fps
+                self.timer.start(duration)
+            else:
+                self.timer.stop()
+
+    @logPatch
+    def stop(self, on=None):
+        if self.scene is not None:
+            self.runner.eventLoopManager.exceptions.append(PyUnityExit())
+            self.scene = None
+            self.buttons[0].setChecked(False)
+            self.buttons[1].setChecked(False)
+            self.buttons[2].setChecked(True)
+            self.paused = False
+            self.update()
+            self.file_tracker.start(5)
+        else:
+            self.buttons[2].setChecked(True)
+
+    def pause(self, on=None):
+        self.paused = not self.paused
+        if self.scene is not None:
+            if self.paused:
+                self.timer.stop()
+            else:
+                self.scene.lastFrame = time.perf_counter()
+                self.scene.lastFixedFrame = time.perf_counter()
+                duration = 0 if config.fps == 0 else 1000 / config.fps
+                self.timer.start(duration)
+
+    def save(self):
+        def callback():
+            Loader.ResaveScene(self.original, self.file_tracker.project)
+            message.done(0)
+
+        message = QMessageBox()
+        message.setText("Saving scene...")
+        message.setWindowTitle(self.file_tracker.project.name)
+        message.setStandardButtons(QMessageBox.StandardButton.NoButton)
+        message.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+        QTimer.singleShot(2000, callback)
+        message.setFont(QFont("Segoe UI", 12))
+        message.exec()
+
+    def on_switch(self):
+        self.console.timer.stop()
 
     mousemap = {
         Qt.LeftButton: MouseCode.Left,
@@ -150,110 +311,48 @@ class OpenGLFrame(QOpenGLWidget):
 
     def mouseMoveEvent(self, event):
         super(OpenGLFrame, self).mouseMoveEvent(event)
-        if self.winObj is not None:
-            self.winObj.mpos = [event.x(), event.y()]
+        if hasattr(self.runner, "window"):
+            self.runner.window.mpos = [event.x(), event.y()]
 
     def mousePressEvent(self, event):
         super(OpenGLFrame, self).mousePressEvent(event)
-        if self.winObj is not None:
-            self.winObj.mbuttons[self.mousemap[event.button()]] = KeyState.DOWN
+        if hasattr(self.runner, "window"):
+            self.runner.window.mbuttons[self.mousemap[event.button()]] = KeyState.DOWN
 
     def mouseReleaseEvent(self, event):
         super(OpenGLFrame, self).mouseReleaseEvent(event)
-        if self.winObj is not None:
-            self.winObj.mbuttons[self.mousemap[event.button()]] = KeyState.UP
+        if hasattr(self.runner, "window"):
+            self.runner.window.mbuttons[self.mousemap[event.button()]] = KeyState.UP
 
     def keyPressEvent(self, event):
         super(OpenGLFrame, self).keyPressEvent(event)
-        if self.winObj is not None:
+        if hasattr(self.runner, "window"):
             if event.key() not in self.keymap:
                 return
             if event.key() in self.numberkeys and event.modifiers() & Qt.KeypadModifier:
-                self.winObj.keys[self.numberkeys[event.key()]] = KeyState.DOWN
+                self.runner.window.keys[self.numberkeys[event.key()]] = KeyState.DOWN
             else:
-                self.winObj.keys[self.keymap[event.key()]] = KeyState.DOWN
+                self.runner.window.keys[self.keymap[event.key()]] = KeyState.DOWN
 
     def keyReleaseEvent(self, event):
         super(OpenGLFrame, self).keyReleaseEvent(event)
-        if self.winObj is not None:
+        if hasattr(self.runner, "window"):
             if event.key() not in self.keymap:
                 return
             if event.key() in self.numberkeys and event.modifiers() & Qt.KeypadModifier:
-                self.winObj.keys[self.numberkeys[event.key()]] = KeyState.UP
+                self.runner.window.keys[self.numberkeys[event.key()]] = KeyState.UP
             else:
-                self.winObj.keys[self.keymap[event.key()]] = KeyState.UP
-
-    @logPatch
-    def start(self, on=None):
-        if self.scene is not None:
-            self.stop()
-        else:
-            self.makeCurrent()
-            if self.console.clear_on_run:
-                self.console.clear()
-            self.buttons[2].setChecked(False)
-            self.file_tracker.stop()
-
-            self.scene = copy.deepcopy(self.original)
-            self.winObj = WidgetWindow(
-                self.scene.name, self.scene.mainCamera.Resize)
-
-            Logger.LogLine(Logger.DEBUG, "Starting scene")
-            self.scene.Start()
-            self.scene.mainCamera.Resize(self.width(), self.height())
-            if not self.paused:
-                duration = 0 if config.fps == 0 else 1000 / config.fps
-                self.timer.start(duration)
-            else:
-                self.timer.stop()
-
-    @logPatch
-    def stop(self, on=None):
-        if self.scene is not None:
-            self.scene = None
-            self.buttons[0].setChecked(False)
-            self.buttons[1].setChecked(False)
-            self.buttons[2].setChecked(True)
-            self.paused = False
-            self.update()
-            self.file_tracker.start(5)
-        else:
-            self.buttons[2].setChecked(True)
-
-    def pause(self, on=None):
-        self.paused = not self.paused
-        if self.scene is not None:
-            if self.paused:
-                self.timer.stop()
-            else:
-                self.scene.lastFrame = time.time()
-                duration = 0 if config.fps == 0 else 1000 / config.fps
-                self.timer.start(duration)
-
-    def save(self):
-        def callback():
-            Loader.ResaveScene(self.original, self.file_tracker.project)
-            message.done(0)
-
-        message = QMessageBox()
-        message.setText("Saving scene...")
-        message.setWindowTitle(self.file_tracker.project.name)
-        message.setStandardButtons(QMessageBox.StandardButton.NoButton)
-        message.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint)
-        QTimer.singleShot(2000, callback)
-        message.setFont(QFont("Segoe UI", 12))
-        message.exec()
-
-    def on_switch(self):
-        self.console.timer.stop()
+                self.runner.window.keys[self.keymap[event.key()]] = KeyState.UP
 
 class WidgetWindow(Window.ABCWindow):
-    def __init__(self, name, resize):
+    def __init__(self, name):
         self.name = name
-        self.resize = resize
         self.mpos = [0, 0]
         self.mbuttons = [KeyState.NONE, KeyState.NONE, KeyState.NONE]
         self.keys = [KeyState.NONE for i in range(KeyCode.Right + 1)]
+
+    def setResize(self, resize):
+        self.resize = resize
 
     def checkKeys(self):
         for i in range(len(self.keys)):
@@ -291,8 +390,8 @@ class WidgetWindow(Window.ABCWindow):
     def quit(self):
         pass
 
-    def start(self, updateFunc):
-        self.updateFunc = updateFunc
+    def updateFunc(self):
+        pass
 
     def refresh(self):
         pass
@@ -325,7 +424,7 @@ class Console(QListWidget):
 
     def modded_log(self, func):
         def inner(*args, **kwargs):
-            timestamp, msg = func(*args, **kwargs, silent=True)
+            timestamp, msg = func(*args, **kwargs)
             if args[0] != Logger.DEBUG:
                 self.pending_entries.append([timestamp, args[0], msg])
             return timestamp, msg

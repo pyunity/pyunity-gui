@@ -19,6 +19,15 @@ def check():
     return True
 
 def run():
+    if not args.new and not os.path.isdir(args.project):
+        raise Exception("Project not found")
+
+    from pyunity import SceneManager, Loader
+    if args.new:
+        SceneManager.AddScene("Scene")
+        Loader.GenerateProject(args.project)
+        SceneManager.RemoveAllScenes()
+
     from .app import Application
     app = Application(args.project)
     app.start()
@@ -29,19 +38,11 @@ def main():
     start(run)
 
 def gui():
-    if not args.new and not os.path.isdir(args.project):
-        raise Exception("Project not found")
-
     def inner():
         temp_stream = io.StringIO()
         redirect_out(temp_stream)
 
-        from pyunity import Logger, SceneManager, Loader
-        if args.new:
-            SceneManager.AddScene("Scene")
-            Loader.GenerateProject(args.project)
-            SceneManager.RemoveAllScenes()
-
+        from pyunity import Logger
         directory = os.path.join(os.path.dirname(Logger.folder), "Editor", "Logs")
         os.makedirs(directory, exist_ok=True)
         path = os.path.join(directory, strftime("%Y-%m-%d %H-%M-%S") + ".log")
