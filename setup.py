@@ -26,8 +26,8 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     install_requires=[
-        "pyunity",
-        "pyqt5",
+        "pyunity==0.9.0",
+        "pyqt5>=5.4",
         "pillow",
     ],
     python_requires='>=3',
