@@ -115,7 +115,6 @@ class OpenGLFrame(QOpenGLWidget):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.console = None
-        self.scene = None
         self.original = None
         self.paused = False
         self.file_tracker = None
@@ -142,9 +141,10 @@ class OpenGLFrame(QOpenGLWidget):
         self.original.mainCamera.setupBuffers()
         for renderer in self.original.FindComponents(MeshRenderer):
             renderer.mesh.compile()
+        self.original.Render()
 
     def paintGL(self):
-        if self.scene is not None:
+        if self.runner.opened:
             try:
                 self.runner.updateFunc()
             except ChangeScene:
@@ -160,15 +160,15 @@ class OpenGLFrame(QOpenGLWidget):
             self.original.Render()
 
     def resizeGL(self, width, height):
-        if self.scene is not None:
-            self.scene.mainCamera.Resize(width, height)
+        if self.runner.opened:
+            self.runner.scene.mainCamera.Resize(width, height)
         else:
             self.original.mainCamera.Resize(width, height)
         self.update()
 
     @logPatch
     def start(self, on=None):
-        if self.scene is not None:
+        if self.runner.opened:
             self.stop()
         else:
             self.makeCurrent()
@@ -177,14 +177,13 @@ class OpenGLFrame(QOpenGLWidget):
             self.buttons[2].setChecked(False)
             self.file_tracker.stop()
 
-            self.scene = copy.deepcopy(self.original)
-            self.runner.setScene(self.scene)
+            self.runner.setScene(copy.deepcopy(self.original))
             if not self.runner.opened:
                 self.runner.open()
             self.runner.load()
             self.runner.start()
 
-            self.scene.mainCamera.Resize(self.width(), self.height())
+            self.runner.scene.mainCamera.Resize(self.width(), self.height())
             if not self.paused:
                 duration = 0 if config.fps == 0 else 1000 / config.fps
                 self.timer.start(duration)
@@ -193,9 +192,8 @@ class OpenGLFrame(QOpenGLWidget):
 
     @logPatch
     def stop(self, on=None):
-        if self.scene is not None:
+        if self.runner.opened:
             self.runner.quit()
-            self.scene = None
             self.buttons[0].setChecked(False)
             self.buttons[1].setChecked(False)
             self.buttons[2].setChecked(True)
@@ -207,12 +205,12 @@ class OpenGLFrame(QOpenGLWidget):
 
     def pause(self, on=None):
         self.paused = not self.paused
-        if self.scene is not None:
+        if self.runner.opened:
             if self.paused:
                 self.timer.stop()
             else:
-                self.scene.lastFrame = time.perf_counter()
-                self.scene.lastFixedFrame = time.perf_counter()
+                self.runner.scene.lastFrame = time.perf_counter()
+                self.runner.scene.lastFixedFrame = time.perf_counter()
                 duration = 0 if config.fps == 0 else 1000 / config.fps
                 self.timer.start(duration)
 
