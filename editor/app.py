@@ -1,6 +1,7 @@
 import os
 os.environ["PYUNITY_DEBUG_MODE"] = "1"
 from editor.files import FileTracker
+from PyQt5.QtCore import QThread, QObject, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window
 from .views import Hierarchy
@@ -14,6 +15,16 @@ def testing(string):
     def inner():
         Logger.Log(string)
     return inner
+
+class VersionWorker(QObject):
+    finished = pyqtSignal()
+
+    def run(self):
+        from pyunity.__main__ import version
+        with Logger.TempRedirect(silent=True) as r:
+            version()
+        self.lines = r.get().split("\n")[3:]
+        self.finished.emit()
 
 class Application(QApplication):
     def __init__(self, path):
@@ -85,6 +96,31 @@ class Application(QApplication):
         if ret == QMessageBox.Ok:
             self.quit()
 
+    def showVersion(self):
+        if self.worker is not None:
+            return
+        self.worker = VersionWorker()
+        self.vThread = QThread()
+        self.worker.moveToThread(self.vThread)
+        self.vThread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.vThread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.vThread.finished.connect(self.cleanUpWorker)
+        self.vThread.finished.connect(self.vThread.deleteLater)
+        self.vThread.start()
+
+    def cleanUpWorker(self):
+        msg = QMessageBox()
+        msg.setText("PyUnity Version Info")
+        msg.setInformativeText("\n".join(
+            [x for x in self.worker.lines if not x.startswith("Warning: ")]))
+        msg.setWindowTitle("PyUnity information")
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.exec()
+
+        self.worker = None
+        self.vThread = None
+
     def setup_toolbar(self):
         self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
         self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", self.open)
@@ -128,5 +164,8 @@ class Application(QApplication):
         self.window.toolbar.add_action("Open", "Assets", "", "Opens the selected asset", testing("open asset"))
         self.window.toolbar.add_action("Delete", "Assets", "", "Deletes the selected asset", testing("del asset"))
 
+        self.worker = None
+        self.vThread = None
+        self.window.toolbar.add_action("Show PyUnity information", "Window", "", "Show information about PyUnity, the PyUnity Editor and all its dependencies.", self.showVersion)
         self.window.toolbar.add_action("Toggle Theme", "Window", "Ctrl+L", "Toggle theme between light and dark", self.window.toggle_theme)
 
