@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QFont, QIcon
+from .smoothScroll import QSmoothListWidget
 from pyunity import (Logger, SceneManager, KeyCode,
     MouseCode, MeshRenderer, KeyState, Loader, Window,
     WaitForUpdate, WaitForRender, WaitForFixedUpdate, PyUnityException,
@@ -396,7 +397,7 @@ class WidgetWindow(Window.ABCWindow):
 class SceneEditor:
     pass
 
-class Console(QListWidget):
+class Console(QSmoothListWidget):
     SPACER = None
     def __init__(self, parent):
         super(Console, self).__init__(parent)

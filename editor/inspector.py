@@ -1,6 +1,7 @@
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from .smoothScroll import QSmoothScrollArea
 import pyunity as pyu
 import re
 
@@ -12,7 +13,7 @@ def capitalize(string):
     match = re.findall(regex, string)
     while "" in match:
         match.remove("")
-    return " ".join(map(lambda a: a.capitalize(), match))
+    return " ".join(map(str.capitalize, match))
 
 def isfloat(string):
     try:
@@ -22,13 +23,29 @@ def isfloat(string):
         return False
 
 class Inspector(QWidget):
+    SPACER = True
     props = [pyu.ShowInInspector(str, "", "name"), pyu.ShowInInspector(int, "", "tag")]
     font = QFont("Segoe UI", 12)
     def __init__(self, parent):
         super(Inspector, self).__init__(parent)
-        self.vbox_layout = QVBoxLayout(self)
+        self.base_layout = QGridLayout(self)
+        self.base_layout.setContentsMargins(0, 0, 0, 0)
+        self.base_layout.setAlignment(Qt.AlignTop)
+        self.setLayout(self.base_layout)
+        self.base_widget = QWidget()
+
+        self.vbox_layout = QVBoxLayout(self.base_widget)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.vbox_layout)
+        self.vbox_layout.setAlignment(Qt.AlignTop)
+        self.base_widget.setLayout(self.vbox_layout)
+
+        self.scrollArea = QSmoothScrollArea(self)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setWidget(self.base_widget)
+        self.base_layout.addWidget(self.scrollArea)
+
         self.sections = []
 
         self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
@@ -81,6 +98,8 @@ class Inspector(QWidget):
 
         enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
         enabled_input.edited.connect(hierarchyItem.toggle)
+        enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
+        enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
 
         for component in self.gameObject.components:
             section = self.add_section(component)
@@ -337,8 +356,7 @@ class InspectorQuaternionEdit(InspectorInput):
         x = float(self.inputs[0].text())
         y = float(self.inputs[1].text())
         z = float(self.inputs[2].text())
-        q = pyu.Quaternion.identity()
-        q.SetBackward(pyu.Vector3(x, y, z))
+        q = pyu.Quaternion.Euler(pyu.Vector3(x, y, z))
         return q
 
     def getVec(self):
