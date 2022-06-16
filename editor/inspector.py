@@ -40,7 +40,7 @@ class Inspector(QWidget):
         self.base_widget.setLayout(self.vbox_layout)
 
         self.scrollArea = QSmoothScrollArea(self)
-        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.base_widget)

@@ -77,7 +77,9 @@ class Hierarchy(QWidget):
     def new(self):
         new = pyu.GameObject("GameObject")
         self.loaded.Add(new)
-        self.add_item(new)
+        newitem = self.add_item(new)
+        self.tree_widget.clearSelection()
+        newitem.setSelected(True)
 
     def new_child(self):
         item = self.tree_widget.currentItem()
@@ -86,7 +88,11 @@ class Hierarchy(QWidget):
         parent = item.gameObject
         new = pyu.GameObject("GameObject", parent)
         self.loaded.Add(new)
-        self.add_item(new, item)
+        newitem = self.add_item(new, item)
+        self.tree_widget.clearSelection()
+        item.setExpanded(True)
+        newitem.setSelected(True)
+        newitem.setSelected(True)
 
     def new_sibling(self):
         sibling = self.tree_widget.currentItem()
@@ -98,7 +104,9 @@ class Hierarchy(QWidget):
         parent = item.gameObject
         new = pyu.GameObject("GameObject", parent)
         self.loaded.Add(new)
-        self.add_item(new, item)
+        newitem = self.add_item(new, item)
+        self.tree_widget.clearSelection()
+        newitem.setSelected(True)
 
     def remove(self):
         items = self.tree_widget.selectedItems()
@@ -112,7 +120,7 @@ class Hierarchy(QWidget):
         self.items = []
         for item in items:
             pyu.Logger.Log("Removing", item.gameObject.name)
-            self.tree_widget.invisibleRootItem().removeChild(item)
+            item.parent().removeChild(item)
             if self.loaded.Has(item.gameObject):
                 self.loaded.Destroy(item.gameObject)
         self.preview.update()
@@ -166,6 +174,7 @@ class CustomTreeWidget(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.header().setVisible(False)
         self.setDragEnabled(True)
+        self.setAnimated(True)
         # self.viewport().setAcceptDrops(True)
         # self.setDropIndicatorShown(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)

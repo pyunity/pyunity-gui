@@ -52,7 +52,7 @@ class Application(QApplication):
         self.inspector = self.editor.add_tab("Inspector", 0, 2)
         self.navigation = self.editor.add_tab("Navigation", 0, 2)
 
-        self.editor.set_stretch((7, 2, 2))
+        self.editor.set_stretch((3, 1, 1))
 
         self.inspector_content = self.inspector.set_window_type(Inspector)
 
