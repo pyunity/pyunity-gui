@@ -151,7 +151,7 @@ class Application(QApplication):
         self.window.toolbar.add_action("Select None", "Edit", "Escape", "Deselects all items", self.window.select_none)
 
         self.window.toolbar.add_sub_action("Start/Stop", "View", "Game", "Ctrl+Return", "Starts and stops the game", self.buttons.buttons[0].click)
-        self.window.toolbar.add_sub_action("Start/Stop", "View", "Game", "Space", "Toggles the pause state", self.game_content.buttons[1].click)
+        self.window.toolbar.add_sub_action("Pause/Unpause", "View", "Game", "Space", "Toggles the pause state", self.game_content.buttons[1].click)
 
         self.window.toolbar.add_sub_action("Folder", "Assets", "Create", "", "", testing("new folder"))
         self.window.toolbar.add_sub_action("File", "Assets", "Create", "", "", testing("new file"))
