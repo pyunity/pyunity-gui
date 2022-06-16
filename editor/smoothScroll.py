@@ -1,7 +1,7 @@
 __all__ = ["SmoothMode", "QAbstractSmoothScroller", "QSmoothScrollArea", "QSmoothListWidget"]
 
 from PyQt5.QtCore import QTimer, Qt, QDateTime, QPoint
-from PyQt5.QtWidgets import QScrollBar, QAbstractScrollArea, QApplication, QScrollArea, QListWidget
+from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QScrollArea, QListWidget
 from PyQt5.QtGui import QWheelEvent
 import math
 import enum
