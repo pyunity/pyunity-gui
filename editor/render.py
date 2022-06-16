@@ -401,7 +401,9 @@ class Console(QSmoothListWidget):
     SPACER = None
     def __init__(self, parent):
         super(Console, self).__init__(parent)
+        self.scrollRatio = 0.5
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setIconSize(QSize(50, 50))
         self.entries = []
         self.pending_entries = []
@@ -418,6 +420,7 @@ class Console(QSmoothListWidget):
 
     def clear(self):
         self.entries = []
+        self.pending_entries = []
         super(Console, self).clear()
 
     def modded_log(self, func):
@@ -435,7 +438,7 @@ class Console(QSmoothListWidget):
         for entry in self.pending_entries:
             self.add_entry(*entry)
         self.pending_entries = []
-        self.timer.start(250)
+        self.timer.start(100)
 
 class ConsoleEntry(QListWidgetItem):
     icon_map = {

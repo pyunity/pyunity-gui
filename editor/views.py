@@ -4,6 +4,7 @@ import pyunity as pyu
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
+from .smoothScroll import QSmoothTreeWidget
 
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
@@ -181,9 +182,10 @@ class Hierarchy(QWidget):
         for item in self.items:
             item.setBold(False)
 
-class CustomTreeWidget(QTreeWidget):
+class CustomTreeWidget(QSmoothTreeWidget):
     def __init__(self, parent):
         super(CustomTreeWidget, self).__init__(parent)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.header().setVisible(False)
         self.setAnimated(True)

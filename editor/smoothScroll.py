@@ -1,7 +1,8 @@
-__all__ = ["SmoothMode", "QAbstractSmoothScroller", "QSmoothScrollArea", "QSmoothListWidget"]
+__all__ = ["SmoothMode", "QAbstractSmoothScroller", "SmoothScroller", "QSmoothScrollArea",
+           "QSmoothListWidget", "QSmoothTreeWidget"]
 
 from PyQt5.QtCore import QTimer, Qt, QDateTime, QPoint
-from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QScrollArea, QListWidget
+from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QScrollArea, QListWidget, QTreeWidget
 from PyQt5.QtGui import QWheelEvent
 import math
 import enum
@@ -14,12 +15,20 @@ class SmoothMode(enum.Enum):
     COSINE = enum.auto()
 
 class QAbstractSmoothScroller(QAbstractScrollArea):
+    pass
+
+def SmoothScroller(cls):
+    if QAbstractScrollArea not in cls.__mro__:
+        raise Exception("Cannot create SmoothScroller for a class that does not "
+                        "inherit QAbstractScrollArea")
+
     def __init__(self, parent=None):
-        super(QAbstractSmoothScroller, self).__init__(parent)
+        cls.__bases__[0].__init__(self, parent)
         self.lastWheelEvent = 0
         self.smoothMoveTimer = QTimer(self)
         self.smoothMoveTimer.timeout.connect(self.slotSmoothMove)
 
+        self.scrollRatio = 1
         self.fps = 60
         self.duration = 200
         self.smoothMode = SmoothMode.COSINE
@@ -35,7 +44,7 @@ class QAbstractSmoothScroller(QAbstractScrollArea):
 
     def wheelEvent(self, event):
         if self.smoothMode == SmoothMode.NO_SMOOTH:
-            super(QAbstractSmoothScroller, self).wheelEvent(event)
+            cls.__bases__[0].wheelEvent(self, event)
             return
 
         now = QDateTime.currentDateTime().toMSecsSinceEpoch()
@@ -50,7 +59,7 @@ class QAbstractSmoothScroller(QAbstractScrollArea):
             self.lastWheelEvent = event
 
         self.stepsTotal = self.fps * self.duration // 1000
-        multiplier = 1
+        multiplier = self.scrollRatio
         if QApplication.keyboardModifiers() & self.smallStepModifier:
             multiplier *= self.smallStepRatio
         if QApplication.keyboardModifiers() & self.bigStepModifier:
@@ -103,13 +112,19 @@ class QAbstractSmoothScroller(QAbstractScrollArea):
             return (math.cos(x * math.pi / m) + 1) / (2 * m) * delta
         return 0
 
-class QSmoothScrollArea(QScrollArea, QAbstractSmoothScroller):
-    def __init__(self, parent=None):
-        QAbstractSmoothScroller.__init__(self, parent)
-        QScrollArea.__init__(self, parent)
+    for func in [__init__, wheelEvent, slotSmoothMove, subDelta]:
+        setattr(cls, func.__name__, func)
 
-class QSmoothListWidget(QListWidget, QAbstractSmoothScroller):
-    def __init__(self, parent=None):
-        QAbstractSmoothScroller.__init__(self, parent)
-        QListWidget.__init__(self, parent)
-        self.verticalScrollBar().setSingleStep(20)
+    return cls
+
+@SmoothScroller
+class QSmoothScrollArea(QScrollArea):
+    pass
+
+@SmoothScroller
+class QSmoothListWidget(QListWidget):
+    pass
+
+@SmoothScroller
+class QSmoothTreeWidget(QTreeWidget):
+    pass

@@ -2,7 +2,6 @@ import os
 import tkinter
 import time
 import threading
-import builtins
 import sys
 from PIL import ImageTk, Image
 
