@@ -1,7 +1,7 @@
-__all__ = ["SmoothMode", "QAbstractSmoothScrollArea", "QSmoothScrollArea", "QSmoothListWidget"]
+__all__ = ["SmoothMode", "QAbstractSmoothScroller", "QSmoothScrollArea", "QSmoothListWidget"]
 
 from PyQt5.QtCore import QTimer, Qt, QDateTime, QPoint
-from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QScrollArea, QListWidget
+from PyQt5.QtWidgets import QScrollBar, QAbstractScrollArea, QApplication, QScrollArea, QListWidget
 from PyQt5.QtGui import QWheelEvent
 import math
 import enum
@@ -13,17 +13,17 @@ class SmoothMode(enum.Enum):
     QUADRATIC = enum.auto()
     COSINE = enum.auto()
 
-class QAbstractSmoothScrollArea(QAbstractScrollArea):
+class QAbstractSmoothScroller(QAbstractScrollArea):
     def __init__(self, parent=None):
-        super(QAbstractSmoothScrollArea, self).__init__(parent)
+        super(QAbstractSmoothScroller, self).__init__(parent)
         self.lastWheelEvent = 0
         self.smoothMoveTimer = QTimer(self)
         self.smoothMoveTimer.timeout.connect(self.slotSmoothMove)
 
         self.fps = 60
-        self.duration = 400
+        self.duration = 200
         self.smoothMode = SmoothMode.COSINE
-        self.acceleration = 2.5
+        self.acceleration = 0.5
 
         self.smallStepModifier = Qt.SHIFT
         self.smallStepRatio = 1/5
@@ -35,7 +35,7 @@ class QAbstractSmoothScrollArea(QAbstractScrollArea):
 
     def wheelEvent(self, event):
         if self.smoothMode == SmoothMode.NO_SMOOTH:
-            super(QAbstractSmoothScrollArea, self).wheelEvent(event)
+            super(QAbstractSmoothScroller, self).wheelEvent(event)
             return
 
         now = QDateTime.currentDateTime().toMSecsSinceEpoch()
@@ -103,12 +103,13 @@ class QAbstractSmoothScrollArea(QAbstractScrollArea):
             return (math.cos(x * math.pi / m) + 1) / (2 * m) * delta
         return 0
 
-class QSmoothScrollArea(QScrollArea, QAbstractSmoothScrollArea):
+class QSmoothScrollArea(QScrollArea, QAbstractSmoothScroller):
     def __init__(self, parent=None):
-        QAbstractSmoothScrollArea.__init__(self, parent)
+        QAbstractSmoothScroller.__init__(self, parent)
         QScrollArea.__init__(self, parent)
 
-class QSmoothListWidget(QListWidget, QAbstractSmoothScrollArea):
+class QSmoothListWidget(QListWidget, QAbstractSmoothScroller):
     def __init__(self, parent=None):
-        QAbstractSmoothScrollArea.__init__(self, parent)
+        QAbstractSmoothScroller.__init__(self, parent)
         QListWidget.__init__(self, parent)
+        self.verticalScrollBar().setSingleStep(20)
