@@ -48,6 +48,8 @@ class Inspector(QWidget):
 
         self.sections = []
 
+        self.button = QPushButton("Add Component")
+        self.button.setStyleSheet("margin: 10px")
         self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
 
     def add_buffer(self, text):
@@ -105,6 +107,14 @@ class Inspector(QWidget):
             section = self.add_section(component)
             for name, val in component._shown.items():
                 section.add_value(name, val, getattr(component, name))
+
+        self.addComponentButton()
+
+    def addComponentButton(self):
+        self.vbox_layout.addWidget(self.button)
+
+    def addComponent(self):
+        pass
 
     def on_edit(self, section, item, value, attr):
         if hasattr(item, "prevent_modify") or section.component is None:
