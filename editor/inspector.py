@@ -119,7 +119,30 @@ class Inspector(QWidget):
 class InspectorInput(QWidget):
     pass
 
-class InspectorTextEdit(QLineEdit, InspectorInput):
+class AutoSelectLineEdit(QLineEdit):
+    def __init__(self, parent):
+        super(AutoSelectLineEdit, self).__init__(parent)
+        self.readyToEdit = True
+
+    def setText(self, text):
+        super(AutoSelectLineEdit, self).setText(text)
+        self.setCursorPosition(0)
+
+    def mouseReleaseEvent(self, event):
+        super(AutoSelectLineEdit, self).mouseReleaseEvent(event)
+        if not self.selectedText():
+            if self.readyToEdit:
+                self.selectAll()
+                self.readyToEdit = False
+        else:
+            self.readyToEdit = False
+
+    def focusOutEvent(self, e):
+        super(AutoSelectLineEdit, self).focusOutEvent(e)
+        self.readyToEdit = True
+        self.setCursorPosition(0)
+
+class InspectorTextEdit(AutoSelectLineEdit, InspectorInput):
     edited = pyqtSignal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorTextEdit, self).__init__(parent)
@@ -252,7 +275,7 @@ class InspectorVector3Edit(InspectorInput):
         self.prop = prop
         self.orig = orig
         self.labels = [QLabel("X", self), QLabel("Y", self), QLabel("Z", self)]
-        self.inputs = [QLineEdit(self), QLineEdit(self), QLineEdit(self)]
+        self.inputs = [AutoSelectLineEdit(self), AutoSelectLineEdit(self), AutoSelectLineEdit(self)]
         for i in range(len(self.inputs)):
             self.inputs[i].modified = False
             self.inputs[i].value = 0
@@ -321,7 +344,7 @@ class InspectorQuaternionEdit(InspectorInput):
         self.prop = prop
         self.orig = orig
         self.labels = [QLabel("X", self), QLabel("Y", self), QLabel("Z", self)]
-        self.inputs = [QLineEdit(self), QLineEdit(self), QLineEdit(self)]
+        self.inputs = [AutoSelectLineEdit(self), AutoSelectLineEdit(self), AutoSelectLineEdit(self)]
         for i in range(len(self.inputs)):
             self.inputs[i].modified = False
             self.inputs[i].value = 0
