@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import QFont, QIcon
 from pyunity import (Logger, SceneManager, KeyCode,
     MouseCode, MeshRenderer, KeyState, Loader, Window,
-    WaitForUpdate, WaitForRender, WaitForFixedUpdate, PyUnityException, PyUnityExit,
+    WaitForUpdate, WaitForRender, WaitForFixedUpdate, PyUnityException,
     EventLoopManager, EventLoop,
     config, render)
 from pyunity.scenes.runner import Runner, ChangeScene

@@ -8,8 +8,10 @@ from .views import Hierarchy
 from .inspector import Inspector
 from .render import OpenGLFrame, Console
 from pyunity import SceneManager, Logger
+import io
 import sys
 import subprocess
+import contextlib
 
 def testing(string):
     def inner():
@@ -21,9 +23,10 @@ class VersionWorker(QObject):
 
     def run(self):
         from pyunity.__main__ import version
-        with Logger.TempRedirect(silent=True) as r:
+        r = io.StringIO()
+        with contextlib.redirect_stdout(r):
             version()
-        self.lines = r.get().split("\n")[3:]
+        self.lines = r.getvalue().rstrip().split("\n")[3:]
         self.finished.emit()
 
 class Application(QApplication):
