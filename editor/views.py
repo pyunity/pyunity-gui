@@ -125,6 +125,19 @@ class Hierarchy(QWidget):
                 self.loaded.Destroy(item.gameObject)
         self.preview.update()
 
+    def reparent(self, items, indices, parents):
+        for item, index, parent in zip(items, indices, parents):
+            if parent is None:
+                item.gameObject.transform.ReparentTo(None)
+                print("Move", item.gameObject.name, "to root, index", index)
+            else:
+                print("Move", item.gameObject.name, "under", parent.gameObject.name, "index", index)
+                transform = item.gameObject.transform
+                parentTransform = parent.gameObject.transform
+                transform.ReparentTo(parentTransform)
+                parentTransform.children.remove(transform)
+                parentTransform.children.insert(index, transform)
+
     def add_item(self, gameObject, parent=None):
         item = HierarchyItem(gameObject)
         if parent is None:
@@ -173,19 +186,33 @@ class CustomTreeWidget(QTreeWidget):
         super(CustomTreeWidget, self).__init__(parent)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.header().setVisible(False)
-        self.setDragEnabled(True)
         self.setAnimated(True)
-        # self.viewport().setAcceptDrops(True)
-        # self.setDropIndicatorShown(True)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
         self.setIndentation(10)
         self.hierarchy = parent
+
+        self.setDragEnabled(True)
+        self.setDragDropOverwriteMode(False)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.viewport().setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
 
     def selectAll(self):
         item = self.invisibleRootItem()
         for i in range(self.invisibleRootItem().childCount()):
             child = item.child(i)
             child.selectAll()
+
+    def dropEvent(self, event):
+        items = self.selectedItems()
+        indices = []
+        parents = []
+
+        super(CustomTreeWidget, self).dropEvent(event)
+
+        for item in items:
+            indices.append(self.indexFromItem(item).row())
+            parents.append(item.parent())
+        self.hierarchy.reparent(items, indices, parents)
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -203,13 +230,3 @@ class CustomTreeWidget(QTreeWidget):
 
         menu.exec(event.globalPos())
         super(CustomTreeWidget, self).contextMenuEvent(event)
-
-    # def mousePressEvent(self, event):
-    #     item = self.indexAt(event.pos())
-    #     super(CustomTreeWidget, self).mousePressEvent(event)
-    #     if item.row() == -1 and item.column() == -1:
-    #         self.clearSelection()
-    #         self.selectionModel().setCurrentIndex(QModelIndex(), QItemSelectionModel.Select)
-
-    def mouseMoveEvent(self, event):
-        event.accept()
