@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 import shutil
 import sysconfig
+import subprocess
 
 plat = sysconfig.get_platform()
 if plat.startswith("win"):
@@ -26,17 +27,21 @@ print(f"Target artifact: {name}.zip")
 tmp = tempfile.mkdtemp()
 orig = os.getcwd()
 os.chdir(tmp)
-urllib.request.urlretrieve(f"https://nightly.link/pyunity/pyunity/workflows/{workflow}/develop/{name}.zip", "artifact.zip")
+try:
+    urllib.request.urlretrieve(f"https://nightly.link/pyunity/pyunity/workflows/{workflow}/develop/{name}.zip", "artifact.zip")
 
-with zipfile.ZipFile(os.path.join(tmp, "artifact.zip")) as zf:
-    files = zf.infolist()
-    name = files[0].filename
-    print(f"Target wheel: {name}")
-    zf.extract(name)
+    with zipfile.ZipFile(os.path.join(tmp, "artifact.zip")) as zf:
+        files = zf.infolist()
+        name = files[0].filename
+        print(f"Target wheel: {name}")
+        zf.extract(name)
 
-print("Installing wheel")
-os.system("pip3 uninstall -y pyunity")
-os.system("pip3 install -U " + name)
-print("Cleaning up")
-os.chdir(orig)
-shutil.rmtree(tmp)
+    print("Installing wheel")
+    subprocess.call([sys.executable, "-m", "pip", "uninstall", "-y", "pyunity"],
+                    stdout=sys.stdout, stderr=sys.stderr)
+    subprocess.call([sys.executable, "-m", "pip", "install", "-U", name],
+                    stdout=sys.stdout, stderr=sys.stderr)
+finally:
+    print("Cleaning up")
+    os.chdir(orig)
+    shutil.rmtree(tmp)
