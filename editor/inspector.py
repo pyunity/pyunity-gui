@@ -22,6 +22,29 @@ def isfloat(string):
     except ValueError:
         return False
 
+class ComponentFinder(QMenu):
+    def __init__(self, parent):
+        super(ComponentFinder, self).__init__(parent)
+        self.label = QLabel("Select Component", self)
+        self.label.setStyleSheet("margin-bottom: 0px")
+        self.labelAction = QWidgetAction(self)
+        self.labelAction.setDefaultWidget(self.label)
+        self.addAction(self.labelAction)
+
+        self.inputBox = QLineEdit(self)
+        self.inputBox.setStyleSheet("margin-bottom: 0px")
+        self.inputAction = QWidgetAction(self)
+        self.inputAction.setDefaultWidget(self.inputBox)
+        self.addAction(self.inputAction)
+
+        self.listWidget = QListWidget(self)
+        self.listWidget.setStyleSheet("margin-bottom: 0px; margin-top: 0px")
+        self.listAction = QWidgetAction(self)
+        self.listAction.setDefaultWidget(self.listWidget)
+        self.addAction(self.listAction)
+
+        self.listWidget.addItem(QListWidgetItem("item 1", self.listWidget))
+
 class Inspector(QWidget):
     SPACER = True
     props = [pyu.ShowInInspector(str, "", "name"), pyu.ShowInInspector(int, "", "tag")]
@@ -49,7 +72,10 @@ class Inspector(QWidget):
         self.sections = []
 
         self.button = QPushButton("Add Component")
-        self.button.setStyleSheet("margin: 10px")
+        self.button.setStyleSheet("::menu-indicator{ image: none; }")
+        self.finder = ComponentFinder(self.button)
+        self.button.setMenu(self.finder)
+
         self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
 
     def add_buffer(self, text):
