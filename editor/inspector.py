@@ -466,12 +466,13 @@ class InspectorSection(QWidget):
         super(InspectorSection, self).__init__(parent)
         self.toggleButton = QToolButton(self)
         self.toggleButton.setFont(self.largeFont)
-        self.toggleButton.setStyleSheet("QToolButton { border: none; }")
+        self.toggleButton.setStyleSheet("QToolButton { margin: 0px; border: none; }")
         self.toggleButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         self.toggleButton.setArrowType(Qt.DownArrow)
         self.toggleButton.setText(name)
         self.toggleButton.setCheckable(True)
         self.toggleButton.setChecked(False)
+        self.toggleButton.clicked.connect(self.toggle)
 
         self.contentArea = QFrame(self)
         self.contentArea.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
@@ -491,7 +492,6 @@ class InspectorSection(QWidget):
         self.mainLayout.addWidget(self.toggleButton, 0, 0, Qt.AlignLeft)
         self.mainLayout.addWidget(self.contentArea, 1, 0, Qt.AlignLeft)
         self.setLayout(self.mainLayout)
-        self.toggleButton.clicked.connect(self.toggle)
 
         self.grid_layout = QGridLayout(self.contentArea)
         self.grid_layout.setColumnStretch(0, 1)
