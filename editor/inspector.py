@@ -1,7 +1,9 @@
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import (
+    pyqtSignal, Qt, QParallelAnimationGroup, QPropertyAnimation, QAbstractAnimation,
+    QTimer)
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from .smoothScroll import QSmoothScrollArea
+from .smoothScroll import QSmoothListWidget, QSmoothScrollArea
 import pyunity as pyu
 import re
 
@@ -26,24 +28,26 @@ class ComponentFinder(QMenu):
     def __init__(self, parent):
         super(ComponentFinder, self).__init__(parent)
         self.label = QLabel("Select Component", self)
-        self.label.setStyleSheet("margin-bottom: 0px")
+        self.label.setStyleSheet("margin: 5px; margin-bottom: 0px")
         self.labelAction = QWidgetAction(self)
         self.labelAction.setDefaultWidget(self.label)
         self.addAction(self.labelAction)
 
         self.inputBox = QLineEdit(self)
-        self.inputBox.setStyleSheet("margin-bottom: 0px")
+        self.inputBox.setStyleSheet("margin: 5px; margin-bottom: 0px")
         self.inputAction = QWidgetAction(self)
         self.inputAction.setDefaultWidget(self.inputBox)
         self.addAction(self.inputAction)
 
-        self.listWidget = QListWidget(self)
-        self.listWidget.setStyleSheet("margin-bottom: 0px; margin-top: 0px")
+        self.listWidget = QSmoothListWidget(self)
+        self.listWidget.setStyleSheet("margin: 5px; margin-top: 0px")
         self.listAction = QWidgetAction(self)
         self.listAction.setDefaultWidget(self.listWidget)
         self.addAction(self.listAction)
 
-        self.listWidget.addItem(QListWidgetItem("item 1", self.listWidget))
+        cpnts = pyu.Loader.GetComponentMap()
+        for name in sorted(cpnts):
+            self.listWidget.addItem(QListWidgetItem(name))
 
 class Inspector(QWidget):
     SPACER = True
@@ -72,7 +76,8 @@ class Inspector(QWidget):
         self.sections = []
 
         self.button = QPushButton("Add Component")
-        self.button.setStyleSheet("::menu-indicator{ image: none; }")
+        self.button.setStyleSheet("QPushButton { margin: 10px; }"
+                                  "QPushButton::menu-indicator{ image: none; }")
         self.finder = ComponentFinder(self.button)
         self.button.setMenu(self.finder)
 
@@ -80,6 +85,7 @@ class Inspector(QWidget):
 
     def add_buffer(self, text):
         label = QLabel(text)
+        label.setStyleSheet("margin: 5px")
         label.setWordWrap(True)
         label.setFont(self.__class__.font)
         self.vbox_layout.addWidget(label)
@@ -95,18 +101,15 @@ class Inspector(QWidget):
 
     def load(self, hierarchyItem):
         self.currentItem = None
-        if len(self.sections):
-            list(self.sections[0].fields.keys())[0].edited.disconnect()
-        num = len(self.sections)
         self.sections = []
-        if self.buffer is not None:
-            num += 1
-            self.buffer = None
-        for i in range(num):
+        for i in range(self.vbox_layout.count()):
             item = self.vbox_layout.takeAt(0)
             widget = item.widget()
             self.vbox_layout.removeItem(item)
-            widget.deleteLater()
+            if widget not in [self.button]:
+                widget.deleteLater()
+            else:
+                widget.setParent(None)
         if hierarchyItem == []:
             self.buffer = self.add_buffer("Select a single item to view its properties.")
             return
@@ -123,16 +126,15 @@ class Inspector(QWidget):
         name_input.edited.connect(hierarchyItem.rename)
         tag_input = main_section.add_value("tag", self.props[1], self.gameObject.tag.tag)
         tag_input.prevent_modify = True # temporarily until i implement tag dropdowns
-
         enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
         enabled_input.edited.connect(hierarchyItem.toggle)
-        enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
-        enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
+        main_section.adjustHeight()
 
         for component in self.gameObject.components:
             section = self.add_section(component)
             for name, val in component._shown.items():
                 section.add_value(name, val, getattr(component, name))
+            section.adjustHeight()
 
         self.addComponentButton()
 
@@ -457,11 +459,41 @@ class InspectorQuaternionEdit(InspectorInput):
             input.label.setFont(font)
 
 class InspectorSection(QWidget):
-    large_font = QFont("Segoe UI", 12)
+    largeFont = QFont("Segoe UI", 12)
     edited = pyqtSignal(object, object, object, str)
+
     def __init__(self, name, parent):
         super(InspectorSection, self).__init__(parent)
-        self.grid_layout = QGridLayout(self)
+        self.toggleButton = QToolButton(self)
+        self.toggleButton.setFont(self.largeFont)
+        self.toggleButton.setStyleSheet("QToolButton { border: none; }")
+        self.toggleButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.toggleButton.setArrowType(Qt.DownArrow)
+        self.toggleButton.setText(name)
+        self.toggleButton.setCheckable(True)
+        self.toggleButton.setChecked(False)
+
+        self.contentArea = QFrame(self)
+        self.contentArea.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        self.contentArea.setMaximumHeight(0)
+        self.contentArea.setMinimumHeight(0)
+
+        self.toggleAnimation = QParallelAnimationGroup(self)
+        self.toggleAnimation.addAnimation(QPropertyAnimation(self, b"minimumHeight"))
+        self.toggleAnimation.addAnimation(QPropertyAnimation(self, b"maximumHeight"))
+        self.toggleAnimation.addAnimation(
+            QPropertyAnimation(self.contentArea, b"maximumHeight"))
+
+        self.opened = True
+        self.mainLayout = QGridLayout(self)
+        self.mainLayout.setVerticalSpacing(0)
+        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        self.mainLayout.addWidget(self.toggleButton, 0, 0, Qt.AlignLeft)
+        self.mainLayout.addWidget(self.contentArea, 1, 0, Qt.AlignLeft)
+        self.setLayout(self.mainLayout)
+        self.toggleButton.clicked.connect(self.toggle)
+
+        self.grid_layout = QGridLayout(self.contentArea)
         self.grid_layout.setColumnStretch(0, 1)
         self.grid_layout.setColumnStretch(1, 2)
         self.grid_layout.setContentsMargins(4, 4, 4, 4)
@@ -469,17 +501,46 @@ class InspectorSection(QWidget):
         self.name = name
         self.component = None
         self.prevent_modify = False
-
-        self.header = QLabel(self.name, self)
-        self.header.setFont(self.__class__.large_font)
-        self.grid_layout.addWidget(self.header)
-        self.grid_layout.addWidget(QWidget(self))
+        self.fields = {}
 
         self.label = QLabel("No properties", self)
-        self.grid_layout.addWidget(self.label, 1, 0, 1, 2)
+        self.grid_layout.addWidget(self.label, 0, 0, 1, 2)
 
-        self.setLayout(self.grid_layout)
-        self.fields = {}
+        self.contentArea.setLayout(self.grid_layout)
+        self.adjustHeight()
+
+    def toggle(self):
+        if not self.opened:
+            self.toggleButton.setArrowType(Qt.DownArrow)
+            self.toggleAnimation.setDirection(QAbstractAnimation.Forward)
+            self.opened = True
+        else:
+            self.toggleButton.setArrowType(Qt.RightArrow)
+            self.toggleAnimation.setDirection(QAbstractAnimation.Backward)
+            self.opened = False
+        self.toggleButton.setChecked(False)
+        self.toggleAnimation.start()
+
+    def adjustHeight(self):
+        collapsedHeight = self.sizeHint().height() - self.contentArea.maximumHeight()
+        contentHeight = self.contentArea.sizeHint().height()
+        duration = contentHeight * 3 // 2
+        for i in range(self.toggleAnimation.animationCount() - 1):
+            anim = self.toggleAnimation.animationAt(i)
+            anim.setDuration(duration)
+            anim.setStartValue(collapsedHeight)
+            anim.setEndValue(collapsedHeight + contentHeight)
+        contentAnimation = self.toggleAnimation.animationAt(
+            self.toggleAnimation.animationCount() - 1)
+        contentAnimation.setDuration(duration)
+        contentAnimation.setStartValue(0)
+        contentAnimation.setEndValue(contentHeight)
+
+        # Open section
+        self.toggleAnimation.setCurrentTime(duration)
+        self.setMinimumHeight(collapsedHeight + contentHeight)
+        self.setMaximumHeight(collapsedHeight + contentHeight)
+        self.contentArea.setMaximumHeight(contentHeight)
 
     def add_value(self, orig, prop, value=None):
         if len(self.fields) == 0:
