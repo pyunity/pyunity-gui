@@ -121,7 +121,11 @@ class Hierarchy(QWidget):
         self.items = []
         for item in items:
             pyu.Logger.Log("Removing", item.gameObject.name)
-            item.parent().removeChild(item)
+            if item.parent() is not None:
+                item.parent().removeChild(item)
+            else:
+                idx = self.tree_widget.indexOfTopLevelItem(item)
+                self.tree_widget.takeTopLevelItem(idx)
             if self.loaded.Has(item.gameObject):
                 self.loaded.Destroy(item.gameObject)
         self.preview.update()
@@ -185,7 +189,6 @@ class Hierarchy(QWidget):
 class CustomTreeWidget(QSmoothTreeWidget):
     def __init__(self, parent):
         super(CustomTreeWidget, self).__init__(parent)
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.header().setVisible(False)
         self.setAnimated(True)

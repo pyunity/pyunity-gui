@@ -402,7 +402,6 @@ class Console(QSmoothListWidget):
     def __init__(self, parent):
         super(Console, self).__init__(parent)
         self.scrollRatio = 0.5
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setIconSize(QSize(50, 50))
         self.entries = []

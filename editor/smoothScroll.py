@@ -2,7 +2,8 @@ __all__ = ["SmoothMode", "QAbstractSmoothScroller", "SmoothScroller", "QSmoothSc
            "QSmoothListWidget", "QSmoothTreeWidget"]
 
 from PyQt5.QtCore import QTimer, Qt, QDateTime, QPoint
-from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QScrollArea, QListWidget, QTreeWidget
+from PyQt5.QtWidgets import (
+    QAbstractScrollArea, QAbstractItemView, QApplication, QScrollArea, QListWidget, QTreeWidget)
 from PyQt5.QtGui import QWheelEvent
 import math
 import enum
@@ -24,6 +25,8 @@ def SmoothScroller(cls):
 
     def __init__(self, parent=None):
         cls.__bases__[0].__init__(self, parent)
+        if issubclass(cls, QAbstractItemView):
+            self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.lastWheelEvent = 0
         self.smoothMoveTimer = QTimer(self)
         self.smoothMoveTimer.timeout.connect(self.slotSmoothMove)

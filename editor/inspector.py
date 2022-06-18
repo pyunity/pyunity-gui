@@ -40,7 +40,7 @@ class ComponentFinder(QMenu):
         self.addAction(self.inputAction)
 
         self.listWidget = QSmoothListWidget(self)
-        self.listWidget.setStyleSheet("margin: 5px; margin-top: 0px")
+        self.listWidget.setStyleSheet("margin: 5px 5px 10px")
         self.listAction = QWidgetAction(self)
         self.listAction.setDefaultWidget(self.listWidget)
         self.addAction(self.listAction)
@@ -524,20 +524,19 @@ class InspectorSection(QWidget):
     def adjustHeight(self):
         collapsedHeight = self.sizeHint().height() - self.contentArea.maximumHeight()
         contentHeight = self.contentArea.sizeHint().height()
-        duration = contentHeight * 3 // 2
         for i in range(self.toggleAnimation.animationCount() - 1):
             anim = self.toggleAnimation.animationAt(i)
-            anim.setDuration(duration)
+            anim.setDuration(300)
             anim.setStartValue(collapsedHeight)
             anim.setEndValue(collapsedHeight + contentHeight)
         contentAnimation = self.toggleAnimation.animationAt(
             self.toggleAnimation.animationCount() - 1)
-        contentAnimation.setDuration(duration)
+        contentAnimation.setDuration(300)
         contentAnimation.setStartValue(0)
         contentAnimation.setEndValue(contentHeight)
 
         # Open section
-        self.toggleAnimation.setCurrentTime(duration)
+        self.toggleAnimation.setCurrentTime(300)
         self.setMinimumHeight(collapsedHeight + contentHeight)
         self.setMaximumHeight(collapsedHeight + contentHeight)
         self.contentArea.setMaximumHeight(contentHeight)
