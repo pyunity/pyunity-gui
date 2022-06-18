@@ -150,22 +150,18 @@ class ToolBar:
         if menu in self.menus and sub in self.sub_menus[menu]:
             self.sub_menus[menu][sub].addSeparator()
 
-class Editor(QWidget):
+class Editor(QSplitter):
     def __init__(self, window):
-        super(Editor, self).__init__(window)
-        window.vbox_layout.addWidget(self)
+        super(Editor, self).__init__(Qt.Horizontal, window)
+        self.setHandleWidth(2)
+        self.setChildrenCollapsible(False)
         self.columnWidgets = []
-
-        self.hbox_layout = QHBoxLayout(self)
-        self.hbox_layout.setSpacing(0)
-        self.hbox_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.hbox_layout)
 
     def add_tab(self, name, row, column):
         if len(self.columnWidgets) <= column:
             column = len(self.columnWidgets)
             columnWidget = Column(self)
-            self.hbox_layout.addWidget(columnWidget)
+            self.addWidget(columnWidget)
             self.columnWidgets.append(columnWidget)
         columnWidget = self.columnWidgets[column]
         return columnWidget.add_tab(name, row)
@@ -175,15 +171,13 @@ class Editor(QWidget):
             raise ValueError("Argument 1: expected %d length, got %d length" % \
                 (len(stretch), len(self.columnWidgets)))
         for i in range(len(stretch)):
-            self.hbox_layout.setStretch(i, stretch[i])
+            self.setStretchFactor(i, stretch[i])
 
-class Column(QWidget):
+class Column(QSplitter):
     def __init__(self, parent):
-        super(Column, self).__init__(parent)
-        self.vbox_layout = QVBoxLayout(self)
-        self.vbox_layout.setSpacing(0)
-        self.vbox_layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(self.vbox_layout)
+        super(Column, self).__init__(Qt.Vertical, parent)
+        self.setHandleWidth(2)
+        self.setChildrenCollapsible(False)
         self.tab_widgets = []
         self.tabs = []
 
@@ -191,7 +185,7 @@ class Column(QWidget):
         if len(self.tabs) <= row:
             row = len(self.tabs)
             tab_widget = TabGroup(self)
-            self.vbox_layout.addWidget(tab_widget)
+            self.addWidget(tab_widget)
             self.tab_widgets.append(tab_widget)
             self.tabs.append([])
         tab_widget = self.tab_widgets[row]

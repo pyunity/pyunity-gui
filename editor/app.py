@@ -1,7 +1,7 @@
 import os
 os.environ["PYUNITY_DEBUG_MODE"] = "1"
 from editor.files import FileTracker
-from PyQt5.QtCore import QThread, QObject, pyqtSignal
+from PyQt5.QtCore import QThread, QObject, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window
 from .views import Hierarchy
@@ -40,9 +40,11 @@ class Application(QApplication):
         self.buttons.add_button("play.png", "Run the scene")
         self.buttons.add_button("pause.png", "Pause the scene")
         self.buttons.add_button("stop.png", "Stop the current running scene", True)
+        self.buttons.setMaximumHeight(self.buttons.sizeHint().height())
         self.window.vbox_layout.addWidget(self.buttons)
 
         self.editor = Editor(self.window)
+        self.window.vbox_layout.addWidget(self.editor)
         self.scene = self.editor.add_tab("Scene", 0, 0)
         self.game = self.editor.add_tab("Game", 1, 0)
         self.console = self.editor.add_tab("Console", 1, 0)
@@ -61,7 +63,6 @@ class Application(QApplication):
         self.game_content.file_tracker = FileTracker(self, path)
         self.game_content.file_tracker.start(1)
         self.game_content.original = SceneManager.GetSceneByIndex(
-            # 0)
             self.game_content.file_tracker.project.firstScene)
 
         self.hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
@@ -75,9 +76,9 @@ class Application(QApplication):
         self.setup_toolbar()
 
     def start(self):
-        self.window.showMaximized()
         os.environ["PYUNITY_EDITOR_LOADED"] = "1"
-        self.exec_()
+        QTimer.singleShot(1, self.window.showMaximized)
+        self.exec()
 
     def open(self):
         Logger.Log("Choosing folder...")

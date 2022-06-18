@@ -53,25 +53,26 @@ class Inspector(QWidget):
     SPACER = True
     props = [pyu.ShowInInspector(str, "", "name"), pyu.ShowInInspector(int, "", "tag")]
     font = QFont("Segoe UI", 12)
+
     def __init__(self, parent):
         super(Inspector, self).__init__(parent)
-        self.base_layout = QGridLayout(self)
-        self.base_layout.setContentsMargins(0, 0, 0, 0)
-        self.base_layout.setAlignment(Qt.AlignTop)
-        self.setLayout(self.base_layout)
-        self.base_widget = QWidget()
+        self.baseLayout = QGridLayout(self)
+        self.baseLayout.setContentsMargins(0, 0, 0, 0)
+        self.baseLayout.setAlignment(Qt.AlignTop)
+        self.setLayout(self.baseLayout)
+        self.baseWidget = QWidget(self)
 
-        self.vbox_layout = QVBoxLayout(self.base_widget)
+        self.vbox_layout = QVBoxLayout(self.baseWidget)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
         self.vbox_layout.setAlignment(Qt.AlignTop)
-        self.base_widget.setLayout(self.vbox_layout)
+        self.baseWidget.setLayout(self.vbox_layout)
 
         self.scrollArea = QSmoothScrollArea(self)
         self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setWidget(self.base_widget)
-        self.base_layout.addWidget(self.scrollArea)
+        self.scrollArea.setWidget(self.baseWidget)
+        self.baseLayout.addWidget(self.scrollArea)
 
         self.sections = []
 
@@ -85,6 +86,7 @@ class Inspector(QWidget):
 
     def add_buffer(self, text):
         label = QLabel(text)
+        label.setTextFormat(Qt.RichText)
         label.setStyleSheet("margin: 5px")
         label.setWordWrap(True)
         label.setFont(self.__class__.font)
@@ -465,6 +467,7 @@ class InspectorSection(QWidget):
     def __init__(self, name, parent):
         super(InspectorSection, self).__init__(parent)
         self.toggleButton = QToolButton(self)
+        self.toggleButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
         self.toggleButton.setFont(self.largeFont)
         self.toggleButton.setStyleSheet("QToolButton { margin: 0px; border: none; }")
         self.toggleButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
@@ -489,8 +492,8 @@ class InspectorSection(QWidget):
         self.mainLayout = QGridLayout(self)
         self.mainLayout.setVerticalSpacing(0)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
-        self.mainLayout.addWidget(self.toggleButton, 0, 0, Qt.AlignLeft)
-        self.mainLayout.addWidget(self.contentArea, 1, 0, Qt.AlignLeft)
+        self.mainLayout.addWidget(self.toggleButton, 0, 0, 1, 1, Qt.AlignLeft)
+        self.mainLayout.addWidget(self.contentArea, 1, 0, 1, 2, Qt.AlignLeft)
         self.setLayout(self.mainLayout)
 
         self.grid_layout = QGridLayout(self.contentArea)
