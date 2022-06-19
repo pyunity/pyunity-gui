@@ -44,8 +44,7 @@ People *love* thorough bug reports. I'm not even kidding.
 * Adhere to our naming convention (it's a little different to Python's standard one):
 
   - PascalCase for class names
-  - snake_case for user-defined functions and attributes
-  - camelCase for all functions relating to PyQt5
+  - camelCase for all functions and attributes, including Qt slots and event handlers
 
 * Add comments wherever needed, to explain what your changes do
 
