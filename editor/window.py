@@ -61,6 +61,9 @@ class Window(QMainWindow):
             focused.clearFocus()
         super(Window, self).mousePressEvent(event)
 
+    def resizeEvent(self, event):
+        self.app.editor.readjust()
+
 class SceneButtons(QWidget):
     def __init__(self, window):
         super(SceneButtons, self).__init__(window)
@@ -156,12 +159,29 @@ class Editor(QSplitter):
         self.setHandleWidth(2)
         self.setChildrenCollapsible(False)
         self.columnWidgets = []
+        self.stretch = []
+        self.splitterMoved.connect(self.setWidth)
+
+    def readjust(self):
+        part = self.width() / sum(self.stretch)
+        self.setSizes([int(stretch * part) for stretch in self.stretch])
+
+        for column in self.columnWidgets:
+            column.readjust()
+
+    def setWidth(self, pos, index):
+        part = self.height() / sum(self.stretch)
+        original = self.stretch[index - 1] * part
+        diff = (pos - original) / part
+        self.stretch[index - 1] += diff
+        self.stretch[index] -= diff
 
     def add_tab(self, name, row, column):
         if len(self.columnWidgets) <= column:
             column = len(self.columnWidgets)
             columnWidget = Column(self)
             self.addWidget(columnWidget)
+            self.stretch.append(1)
             self.columnWidgets.append(columnWidget)
         columnWidget = self.columnWidgets[column]
         return columnWidget.add_tab(name, row)
@@ -170,8 +190,7 @@ class Editor(QSplitter):
         if len(stretch) != len(self.columnWidgets):
             raise ValueError("Argument 1: expected %d length, got %d length" % \
                 (len(stretch), len(self.columnWidgets)))
-        for i in range(len(stretch)):
-            self.setStretchFactor(i, stretch[i])
+        self.stretch = list(stretch)
 
 class Column(QSplitter):
     def __init__(self, parent):
@@ -180,12 +199,26 @@ class Column(QSplitter):
         self.setChildrenCollapsible(False)
         self.tab_widgets = []
         self.tabs = []
+        self.stretch = []
+        self.splitterMoved.connect(self.setWidth)
+
+    def readjust(self):
+        part = self.height() / sum(self.stretch)
+        self.setSizes([int(stretch * part) for stretch in self.stretch])
+
+    def setWidth(self, pos, index):
+        part = self.height() / sum(self.stretch)
+        original = self.stretch[index - 1] * part
+        diff = (pos - original) / part
+        self.stretch[index - 1] += diff
+        self.stretch[index] -= diff
 
     def add_tab(self, name, row):
         if len(self.tabs) <= row:
             row = len(self.tabs)
             tab_widget = TabGroup(self)
             self.addWidget(tab_widget)
+            self.stretch.append(1)
             self.tab_widgets.append(tab_widget)
             self.tabs.append([])
         tab_widget = self.tab_widgets[row]
@@ -214,6 +247,7 @@ class Tab(QWidget):
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.vbox_layout)
 
         self.spacer = QSpacerItem(20, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.vbox_layout.addSpacerItem(self.spacer)

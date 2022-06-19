@@ -77,6 +77,7 @@ class Application(QApplication):
 
     def start(self):
         os.environ["PYUNITY_EDITOR_LOADED"] = "1"
+        self.window.resize(800, 500)
         QTimer.singleShot(1, self.window.showMaximized)
         self.exec()
 
