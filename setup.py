@@ -27,7 +27,7 @@ setup(
     ],
     install_requires=[
         "pyunity==0.9.0",
-        "pyqt5>=5.4",
+        "pyside6",
         "pillow",
     ],
     python_requires='>=3',
