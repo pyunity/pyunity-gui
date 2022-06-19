@@ -27,6 +27,8 @@ def isfloat(string):
 class ComponentFinder(QMenu):
     def __init__(self, parent):
         super(ComponentFinder, self).__init__(parent)
+        self.aboutToShow.connect(self.load)
+
         self.label = QLabel("Select Component", self)
         self.label.setStyleSheet("margin: 5px; margin-bottom: 0px")
         self.labelAction = QWidgetAction(self)
@@ -35,6 +37,7 @@ class ComponentFinder(QMenu):
 
         self.inputBox = QLineEdit(self)
         self.inputBox.setStyleSheet("margin: 5px; margin-bottom: 0px")
+        self.inputBox.textEdited.connect(self.updateSearch)
         self.inputAction = QWidgetAction(self)
         self.inputAction.setDefaultWidget(self.inputBox)
         self.addAction(self.inputAction)
@@ -45,9 +48,22 @@ class ComponentFinder(QMenu):
         self.listAction.setDefaultWidget(self.listWidget)
         self.addAction(self.listAction)
 
-        cpnts = pyu.Loader.GetComponentMap()
-        for name in sorted(cpnts):
+        self.components = pyu.Loader.GetComponentMap()
+        for name in sorted(self.components):
             self.listWidget.addItem(QListWidgetItem(name))
+        self.listWidget.addItem(QListWidgetItem("Create a new Behaviour..."))
+
+    def updateSearch(self, text):
+        self.listWidget.clear()
+        for name in sorted(self.components):
+            if name.lower().startswith(text.lower()):
+                self.listWidget.addItem(QListWidgetItem(name))
+        self.listWidget.addItem(QListWidgetItem("Create a new Behaviour..."))
+
+    def load(self):
+        self.inputBox.clear()
+        self.inputBox.setFocus(True)
+        QWidget.setTabOrder(self.inputBox, self.listWidget)
 
 class Inspector(QWidget):
     SPACER = True
