@@ -1,8 +1,7 @@
-from PyQt5.QtCore import (
-    pyqtSignal, Qt, QParallelAnimationGroup, QPropertyAnimation, QAbstractAnimation,
-    QTimer)
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import (
+    Signal, Qt, QParallelAnimationGroup, QPropertyAnimation, QAbstractAnimation)
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from .smoothScroll import QSmoothListWidget, QSmoothScrollArea
 import pyunity as pyu
 import re
@@ -199,7 +198,7 @@ class AutoSelectLineEdit(QLineEdit):
         self.setCursorPosition(0)
 
 class InspectorTextEdit(AutoSelectLineEdit, InspectorInput):
-    edited = pyqtSignal(object)
+    edited = Signal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorTextEdit, self).__init__(parent)
         self.prop = prop
@@ -239,7 +238,7 @@ class InspectorTextEdit(AutoSelectLineEdit, InspectorInput):
         return self.value
 
 class InspectorIntEdit(InspectorTextEdit):
-    edited = pyqtSignal(object)
+    edited = Signal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorIntEdit, self).__init__(parent, prop, orig)
         self.value = 0
@@ -250,7 +249,7 @@ class InspectorIntEdit(InspectorTextEdit):
         super(InspectorIntEdit, self).on_edit(int(self.text()))
 
 class InspectorFloatEdit(InspectorTextEdit):
-    edited = pyqtSignal(object)
+    edited = Signal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorFloatEdit, self).__init__(parent, prop, orig)
         self.value = 0
@@ -288,7 +287,7 @@ class FloatValidator(QValidator):
                 return re.sub(regex, replace, string, 1)
 
 class InspectorBoolEdit(QCheckBox, InspectorInput):
-    edited = pyqtSignal(object)
+    edited = Signal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorBoolEdit, self).__init__(parent)
         self.setStyleSheet("QCheckBox{color: rgba(0,0,0,0);}")
@@ -325,7 +324,7 @@ class InspectorBoolEdit(QCheckBox, InspectorInput):
         return self.value
 
 class InspectorVector3Edit(InspectorInput):
-    edited = pyqtSignal(object)
+    edited = Signal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorVector3Edit, self).__init__(parent)
         self.prop = prop
@@ -394,7 +393,7 @@ class InspectorVector3Edit(InspectorInput):
             input.label.setFont(font)
 
 class InspectorQuaternionEdit(InspectorInput):
-    edited = pyqtSignal(object)
+    edited = Signal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorQuaternionEdit, self).__init__(parent)
         self.prop = prop
@@ -478,7 +477,7 @@ class InspectorQuaternionEdit(InspectorInput):
 
 class InspectorSection(QWidget):
     largeFont = QFont("Segoe UI", 12)
-    edited = pyqtSignal(object, object, object, str)
+    edited = Signal(object, object, object, str)
 
     def __init__(self, name, parent):
         super(InspectorSection, self).__init__(parent)

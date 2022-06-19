@@ -1,6 +1,6 @@
-from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtGui import QFont
+from PySide6.QtCore import QTimer, Qt
+from PySide6.QtWidgets import QMessageBox
+from PySide6.QtGui import QFont
 from pyunity import Loader, Logger
 import os
 import glob

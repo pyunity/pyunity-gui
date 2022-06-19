@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import QFont, QIcon
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import QFont, QIcon
+from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from .smoothScroll import QSmoothListWidget
 from pyunity import (Logger, SceneManager, KeyCode,
     MouseCode, MeshRenderer, KeyState, Loader, Window,

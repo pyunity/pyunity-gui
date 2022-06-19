@@ -1,10 +1,10 @@
 __all__ = ["SmoothMode", "QAbstractSmoothScroller", "SmoothScroller", "QSmoothScrollArea",
            "QSmoothListWidget", "QSmoothTreeWidget"]
 
-from PyQt5.QtCore import QTimer, Qt, QDateTime, QPoint
-from PyQt5.QtWidgets import (
+from PySide6.QtCore import QTimer, Qt, QDateTime, QPoint
+from PySide6.QtWidgets import (
     QAbstractScrollArea, QAbstractItemView, QApplication, QScrollArea, QListWidget, QTreeWidget)
-from PyQt5.QtGui import QWheelEvent
+from PySide6.QtGui import QWheelEvent
 import math
 import enum
 
@@ -14,6 +14,15 @@ class SmoothMode(enum.Enum):
     LINEAR = enum.auto()
     QUADRATIC = enum.auto()
     COSINE = enum.auto()
+
+class WheelEventProxy:
+    def __init__(self, event):
+        self.position = event.position()
+        self.globalPosition = event.globalPosition()
+        self.buttons = event.buttons()
+        self.phase = event.phase()
+        self.inverted = event.inverted()
+        self.source = event.source()
 
 class QAbstractSmoothScroller(QAbstractScrollArea):
     pass
@@ -56,10 +65,7 @@ def SmoothScroller(cls):
             self.scrollStamps.pop(0)
         accelerationRatio = min(len(self.scrollStamps) / 15, 1)
 
-        if not self.lastWheelEvent:
-            self.lastWheelEvent = QWheelEvent(event)
-        else:
-            self.lastWheelEvent = event
+        self.lastWheelEvent = WheelEventProxy(event)
 
         self.stepsTotal = self.fps * self.duration // 1000
         multiplier = self.scrollRatio
@@ -84,15 +90,15 @@ def SmoothScroller(cls):
             self.stepsLeftQueue.pop(0)
 
         event = QWheelEvent(
-            self.lastWheelEvent.pos(),
-            self.lastWheelEvent.globalPos(),
+            self.lastWheelEvent.position,
+            self.lastWheelEvent.globalPosition,
             QPoint(0, 0),
             QPoint(0, round(totalDelta)),
-            self.lastWheelEvent.buttons(),
+            self.lastWheelEvent.buttons,
             Qt.NoModifier,
-            self.lastWheelEvent.phase(),
-            self.lastWheelEvent.inverted(),
-            self.lastWheelEvent.source()
+            self.lastWheelEvent.phase,
+            self.lastWheelEvent.inverted,
+            self.lastWheelEvent.source
         )
         QApplication.sendEvent(self.verticalScrollBar(), event)
 

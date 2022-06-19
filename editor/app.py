@@ -1,8 +1,8 @@
 import os
 os.environ["PYUNITY_DEBUG_MODE"] = "1"
 from editor.files import FileTracker
-from PyQt5.QtCore import QThread, QObject, pyqtSignal, QTimer
-from PyQt5.QtWidgets import QApplication, QMessageBox
+from PySide6.QtCore import QThread, QObject, Signal, QTimer
+from PySide6.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window
 from .views import Hierarchy
 from .inspector import Inspector
@@ -19,7 +19,7 @@ def testing(string):
     return inner
 
 class VersionWorker(QObject):
-    finished = pyqtSignal()
+    finished = Signal()
 
     def run(self):
         from pyunity.__main__ import version
