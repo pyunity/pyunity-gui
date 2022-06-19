@@ -3,22 +3,23 @@ from time import strftime
 import argparse
 import os
 import io
-import sys
 
 parser = argparse.ArgumentParser(
     prog="editor", description="Launch the PyUnity editor")
 parser.add_argument("-n", "--new",
                     action="store_true", help="Create a new PyUnity project")
 parser.add_argument("project", help="Path to PyUnity project")
-args = parser.parse_args()
 
-def check():
+def check(args):
     if not os.path.isdir(args.project):
         print("Please specify a valid directory.")
         return False
     return True
 
 def run():
+    args = parser.parse_args()
+    if not check(args):
+        return
     if not args.new and not os.path.isdir(args.project):
         raise Exception("Project not found")
 
@@ -33,8 +34,6 @@ def run():
     app.start()
 
 def main():
-    if not check():
-        return
     start(run)
 
 def gui():

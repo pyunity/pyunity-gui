@@ -1,22 +1,19 @@
 import os
-import tkinter
 import time
 import threading
 import sys
-from PIL import ImageTk, Image
-
-sys._stderr = sys.stderr
-sys._stdout = sys.stdout
 
 def redirect_out(stream):
     sys.stdout = stream
     sys.stderr = stream
 
 def restore_out():
-    sys.stdout = sys._stdout
-    sys.stderr = sys._stderr
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
 
 def splash():
+    import tkinter
+    from PIL import ImageTk, Image
     root = tkinter.Tk()
     root.overrideredirect(1)
     root.attributes("-topmost", True)
