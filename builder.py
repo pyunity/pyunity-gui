@@ -155,7 +155,8 @@ try:
         subprocess.call([
             "cl.exe", "/nologo", "/O2", "/Wall",
             "/Tcpyunity-editor.c", "/Fepyunity-editor.exe",
-            f"/LIBPATH:{sys.base_prefix}\\lib", f"-I{sys.base_prefix}\\include"
+            f"/I{sys.base_prefix}\\include",
+            "/link", f"/LIBPATH:{sys.base_prefix}\\lib"
         ], stdout=sys.stdout, stderr=sys.stderr)
     else:
         subprocess.call([
