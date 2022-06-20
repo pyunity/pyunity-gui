@@ -22,5 +22,9 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Python 3.10.5 Application
+          name: Zip archive
           path: python3.10.5.zip
+          name: 7z archive
+          path: python3.10.5.7z
+          name: Self-extracting archive
+          path: python3.10.5.exe

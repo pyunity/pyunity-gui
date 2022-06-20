@@ -167,10 +167,25 @@ try:
 
     print(f"ZIP python{version}.zip")
     os.chdir(tmp)
-    with zipfile.ZipFile(f"python{version}.zip", "w", **zipoptions) as zf:
-        for file in glob.glob(vername + "\\**\\*", recursive=True):
-            zf.write(file)
+    subprocess.call([
+        "7z.exe", "a", "-mx=9",
+        f"python{version}.zip", vername
+    ], stdout=sys.stdout, stderr=sys.stderr)
     shutil.copy(f"python{version}.zip", orig)
+
+    print(f"7Z python{version}.7z")
+    subprocess.call([
+        "7z.exe", "a", "-mx=9",
+        f"python{version}.7z", vername
+    ], stdout=sys.stdout, stderr=sys.stderr)
+    shutil.copy(f"python{version}.7z", orig)
+
+    print(f"SFX python{version}.exe")
+    subprocess.call([
+        "7z.exe", "a", "-sfx", "-mx=9",
+        f"python{version}.exe", vername
+    ], stdout=sys.stdout, stderr=sys.stderr)
+    shutil.copy(f"python{version}.exe", orig)
 
     if "GITHUB_ACTIONS" not in os.environ:
         input("Press Enter to continue ...")
