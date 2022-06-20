@@ -11,6 +11,8 @@ jobs:
         with:
           python-version: 3.10
           architecture: x64
+      - uses: ilammy/msvc-dev-cmd@v1
+        name: Set up MSVC
       - name: Build application
         env:
           USE_MSVC: 1
