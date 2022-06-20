@@ -59,7 +59,7 @@ try:
     print("BUILD pyunity")
     os.chdir("pyunity-develop")
     subprocess.call([sys.executable, "setup.py", "bdist_wheel"],
-                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL, stderr=sys.stderr,
                     env={**os.environ, "cython": "0"})
     shutil.copy(glob.glob("dist/*")[0], "..\\pyunity.whl")
 
