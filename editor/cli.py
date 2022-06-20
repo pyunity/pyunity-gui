@@ -16,12 +16,13 @@ def check(args):
         return False
     return True
 
-def run():
-    args = parser.parse_args()
-    if not check(args):
-        return
-    if not args.new and not os.path.isdir(args.project):
-        raise Exception("Project not found")
+def run(args=None):
+    if args is None:
+        args = parser.parse_args()
+        if not check(args):
+            return
+        if not args.new and not os.path.isdir(args.project):
+            raise Exception("Project not found")
 
     from pyunity import SceneManager, Loader
     if args.new:
@@ -34,9 +35,20 @@ def run():
     app.start()
 
 def main():
-    start(run)
+    args = parser.parse_args()
+    if not check(args):
+        return
+    if not args.new and not os.path.isdir(args.project):
+        raise Exception("Project not found")
+    start(run, [args])
 
 def gui():
+    args = parser.parse_args()
+    if not check(args):
+        return
+    if not args.new and not os.path.isdir(args.project):
+        raise Exception("Project not found")
+
     def inner():
         temp_stream = io.StringIO()
         redirect_out(temp_stream)
@@ -52,5 +64,5 @@ def gui():
         temp_stream.close()
         redirect_out(f)
         Logger.SetStream(f)
-        run()
+        run(args)
     start(inner)
