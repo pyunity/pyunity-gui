@@ -153,7 +153,7 @@ try:
     print("COMPILE pyunity-editor.exe")
     if "GITHUB_ACTIONS" in os.environ:
         subprocess.call([
-            "cl.exe", "/nologo", "/O2", "/Wall", "/GL"
+            "cl.exe", "/nologo", "/O2", "/Wall"
             "/Tcpyunity-editor.c", "/Fepyunity-editor.exe"
             "/LIBPATH:.", f"-I{sys.base_prefix}\\include"
         ], stdout=sys.stdout, stderr=sys.stderr)
