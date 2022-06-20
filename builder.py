@@ -10,9 +10,6 @@ from pathlib import Path
 import shutil
 import hashlib
 
-gcc_prefix = "D:\\RayChen\\Programs\\mingw64"
-pyunity_prefix = "D:\\RayChen\\python\\pyunity\\"
-editor_prefix = "D:\\RayChen\\python\\pyunity-gui\\"
 version = "3.10.5"
 arch = "amd64"
 zipoptions = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
@@ -44,7 +41,7 @@ def download(url, dest):
     shutil.copy(path, dest)
 
 tmp = tempfile.mkdtemp()
-orig = os.getcwd()
+orig = os.getcwd() + "\\"
 os.chdir(tmp)
 try:
     download(f"https://www.python.org/ftp/python/{version}/python-{version}-embed-{arch}.zip",
@@ -80,12 +77,12 @@ try:
             zf.write(file, file[11:])
 
         print("COMPILE editor")
-        zf.writepy(editor_prefix + "editor")
-        for file in glob.glob(editor_prefix + "\\editor\\**\\*", recursive=True) + \
-                glob.glob(editor_prefix + "\\pyunity_editor.egg-info\\**\\*", recursive=True):
+        zf.writepy(orig + "editor")
+        for file in glob.glob(orig + "\\editor\\**\\*", recursive=True) + \
+                glob.glob(orig + "\\pyunity_editor.egg-info\\**\\*", recursive=True):
             if file.endswith(".py") or file.endswith(".pyc"):
                 continue
-            zf.write(file, file[len(editor_prefix):])
+            zf.write(file, file[len(orig):])
 
         for name, url in wheels[0].items():
             download(url, "..\\" + name + ".whl")
@@ -154,11 +151,18 @@ try:
         }
         """))
     print("COMPILE pyunity-editor.exe")
-    subprocess.call([
-        f"{gcc_prefix}\\bin\\gcc.exe",
-        "-o", "pyunity-editor.exe", "pyunity-editor.c",
-        f"-L.", "-lpython310", f"-I{sys.base_prefix}\\include"
-    ], stdout=sys.stdout, stderr=sys.stderr)
+    if "USE_MSVC" in os.environ:
+        subprocess.call([
+            "cl.exe", "/nologo", "/O2", "/Wall", "/GL"
+            "/Tcpyunity-editor.c", "/Fepyunity-editor.exe"
+            "/LIBPATH:.", f"-I{sys.base_prefix}\\include"
+        ], stdout=sys.stdout, stderr=sys.stderr)
+    else:
+        subprocess.call([
+            "gcc.exe", "-O2", "-Wall"
+            "-o", "pyunity-editor.exe", "pyunity-editor.c",
+            "-L.", "-lpython310", f"-I{sys.base_prefix}\\include",
+        ], stdout=sys.stdout, stderr=sys.stderr)
 
     print(f"ZIP python{version}.zip")
     os.chdir(tmp)

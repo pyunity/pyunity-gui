@@ -1,0 +1,22 @@
+name: Build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    name: Python 3.10-x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10
+          architecture: x64
+      - name: Build application
+        env:
+          USE_MSVC: 1
+        run: python builder.py
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Python 3.10.5 Application
+          path: python3.10.5.zip
