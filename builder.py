@@ -14,6 +14,8 @@ gcc_prefix = "D:\\RayChen\\Programs\\mingw64"
 pyunity_prefix = "D:\\RayChen\\python\\pyunity\\"
 editor_prefix = "D:\\RayChen\\python\\pyunity-gui\\"
 version = "3.10.5"
+arch = "amd64"
+zipoptions = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
 wheels = [
     {
         "pyopengl": "https://files.pythonhosted.org/packages/80/07/003fe74d2af04be917035b42c53c7ea9e3abe1e353753cebccfe792b4e52/PyOpenGL-3.1.6-py3-none-any.whl",
@@ -32,6 +34,7 @@ wheels = [
 ]
 
 def download(url, dest):
+    print("GET", url, "->", os.path.basename(dest))
     directory = Path.home() / ".pyunity" / ".builder"
     directory.mkdir(parents=True, exist_ok=True)
     digest = hashlib.sha256(url.encode()).hexdigest()
@@ -44,22 +47,39 @@ tmp = tempfile.mkdtemp()
 orig = os.getcwd()
 os.chdir(tmp)
 try:
-    download(f"https://www.python.org/ftp/python/{version}/python-{version}-embed-amd64.zip",
+    download(f"https://www.python.org/ftp/python/{version}/python-{version}-embed-{arch}.zip",
              "embed.zip")
-    directory = f"python{version}"
-    os.makedirs(directory, exist_ok=True)
+    vername = f"python{version}"
+    os.makedirs(vername, exist_ok=True)
     with zipfile.ZipFile("embed.zip") as zf:
-        zf.extractall(directory)
-    os.chdir(directory)
+        print("EXTRACT embed.zip")
+        zf.extractall(vername)
 
-    with zipfile.PyZipFile("python" + "".join(version.split(".")[:2]) + ".zip", "a") as zf:
-        zf.writepy(pyunity_prefix + "pyunity")
-        for file in glob.glob(pyunity_prefix + "\\pyunity\\**\\*", recursive=True) + \
-                glob.glob(pyunity_prefix + "\\pyunity.egg-info\\**\\*", recursive=True):
+    urllib.request.urlretrieve("https://github.com/pyunity/pyunity/archive/refs/heads/develop.zip", "pyunity.zip")
+    with zipfile.ZipFile("pyunity.zip") as zf:
+        print("EXTRACT pyunity.zip")
+        zf.extractall()
+    print("BUILD pyunity")
+    os.chdir("pyunity-develop")
+    subprocess.call([sys.executable, "setup.py", "bdist_wheel"],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    env={**os.environ, "cython": "0"})
+    shutil.copy(glob.glob("dist/*")[0], "..\\pyunity.whl")
+
+    os.chdir(tmp + "\\" + vername)
+    zipname = "python" + "".join(version.split(".")[:2]) + ".zip"
+    with zipfile.PyZipFile(zipname, "a", optimize=1) as zf:
+        with zipfile.ZipFile("..\\pyunity.whl") as zf2:
+            print("EXTRACT pyunity.whl")
+            zf2.extractall("..\\pyunity")
+        print("COMPILE", "pyunity")
+        zf.writepy("..\\pyunity\\pyunity")
+        for file in glob.glob("..\\pyunity\\**\\*", recursive=True):
             if file.endswith(".py") or file.endswith(".pyc"):
                 continue
-            zf.write(file, file[len(pyunity_prefix):])
+            zf.write(file, file[11:])
 
+        print("COMPILE editor")
         zf.writepy(editor_prefix + "editor")
         for file in glob.glob(editor_prefix + "\\editor\\**\\*", recursive=True) + \
                 glob.glob(editor_prefix + "\\pyunity_editor.egg-info\\**\\*", recursive=True):
@@ -70,8 +90,10 @@ try:
         for name, url in wheels[0].items():
             download(url, "..\\" + name + ".whl")
             with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
+                print("EXTRACT " + name + ".whl")
                 zf2.extractall("..\\" + name)
             for package in glob.glob("..\\" + name + "\\*\\__init__.py"):
+                print("COMPILE", package[4 + len(name):-12].replace("\\", "."))
                 zf.writepy(os.path.dirname(package))
             for file in glob.glob("..\\" + name + "\\**\\*", recursive=True):
                 if file.endswith(".py") or file.endswith(".pyc"):
@@ -80,6 +102,7 @@ try:
 
     for name, url in wheels[1].items():
         download(url, "..\\" + name + ".whl")
+        print("COPY", name)
         with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
             zf2.extractall("Lib")
 
@@ -88,41 +111,62 @@ try:
     with open("python" + "".join(version.split(".")[:2]) + "._pth", "w") as f:
         f.write(".\\Lib\n" + contents)
 
+    print("WRITE pyunity-editor.c")
     with open("pyunity-editor.c", "w+") as f:
         f.write(textwrap.dedent("""
         #define PY_SSIZE_T_CLEAN
+        #define Py_LIMITED_API 0x03060000
         #include <Python.h>
+        #include <string.h>
 
         int main(int argc, char **argv) {
-            wchar_t *program = Py_DecodeLocale(argv[0], NULL);
-            if (program == NULL) {
+            Py_Initialize();
+            wchar_t **program = (wchar_t**)PyMem_Malloc(sizeof(wchar_t**) * argc);
+            for (int i = 0; i < argc; i++) {
+                program[i] = Py_DecodeLocale(argv[i], NULL);
+            }
+            if (program[0] == NULL) {
                 fprintf(stderr, "Fatal error: cannot decode argv[0]\\n");
                 exit(1);
             }
-            Py_SetProgramName(program);  /* optional but recommended */
-            PySys_SetArgvEx(argc, argv, 0);
-            Py_Initialize();
-            PyRun_SimpleString(
-                            "from editor.cli import main\\n"
-                            "main()\\n");
+            Py_SetProgramName(program[0]);  /* optional but recommended */
+            PySys_SetArgvEx(argc, program, 0);
+            PyObject *co = Py_CompileString(
+                "from editor.cli import run\\nrun()\\n",
+                "<pyunity-editor>",
+                Py_file_input
+            );
+            if (co == NULL) {
+                fprintf(stderr, "Fatal error: cannot compile code object\\n");
+                exit(1);
+            }
+            PyImport_ExecCodeModule(
+                "<pyunity-editor>",
+                co
+            );
             if (Py_FinalizeEx() < 0) {
                 exit(1);
             }
-            PyMem_RawFree(program);
+            for (int i = 0; i < argc; i++) {
+                PyMem_Free((void*)program[i]);
+            }
             return 0;
         }
         """))
+    print("COMPILE pyunity-editor.exe")
     subprocess.call([
         f"{gcc_prefix}\\bin\\gcc.exe",
         "-o", "pyunity-editor.exe", "pyunity-editor.c",
         f"-L.", "-lpython310", f"-I{sys.base_prefix}\\include"
     ], stdout=sys.stdout, stderr=sys.stderr)
 
+    print(f"ZIP python{version}.zip")
     os.chdir(tmp)
-    with zipfile.ZipFile(f"python{version}.zip", "w") as zf:
-        for file in glob.glob(directory + "\\**\\*", recursive=True):
+    with zipfile.ZipFile(f"python{version}.zip", "w", **zipoptions) as zf:
+        for file in glob.glob(vername + "\\**\\*", recursive=True):
             zf.write(file)
     shutil.copy(f"python{version}.zip", orig)
+
     input("Press Enter to continue ...")
 finally:
     print("Cleaning up")
