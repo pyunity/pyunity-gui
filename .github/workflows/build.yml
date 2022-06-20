@@ -17,7 +17,7 @@ jobs:
         name: Set up MSVC
       - name: Build application
         env:
-          USE_MSVC: 1
+          GITHUB_ACTIONS: 1
         run: python builder.py
       - name: Upload artifact
         uses: actions/upload-artifact@v3

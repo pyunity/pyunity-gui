@@ -151,7 +151,7 @@ try:
         }
         """))
     print("COMPILE pyunity-editor.exe")
-    if "USE_MSVC" in os.environ:
+    if "GITHUB_ACTIONS" in os.environ:
         subprocess.call([
             "cl.exe", "/nologo", "/O2", "/Wall", "/GL"
             "/Tcpyunity-editor.c", "/Fepyunity-editor.exe"
@@ -171,7 +171,8 @@ try:
             zf.write(file)
     shutil.copy(f"python{version}.zip", orig)
 
-    input("Press Enter to continue ...")
+    if "GITHUB_ACTIONS" not in os.environ:
+        input("Press Enter to continue ...")
 finally:
     print("Cleaning up")
     os.chdir(orig)
