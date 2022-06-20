@@ -19,12 +19,18 @@ jobs:
         env:
           GITHUB_ACTIONS: 1
         run: python builder.py
-      - name: Upload artifact
+      - name: Upload zip artifact
         uses: actions/upload-artifact@v3
         with:
           name: Zip archive
           path: python3.10.5.zip
+      - name: Upload 7z artifact
+        uses: actions/upload-artifact@v3
+        with:
           name: 7z archive
           path: python3.10.5.7z
+      - name: Upload sfx artifact
+        uses: actions/upload-artifact@v3
+        with:
           name: Self-extracting archive
           path: python3.10.5.exe
