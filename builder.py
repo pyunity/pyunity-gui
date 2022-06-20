@@ -154,7 +154,7 @@ try:
     if "GITHUB_ACTIONS" in os.environ:
         subprocess.call([
             "cl.exe", "/nologo", "/O2", "/Wall",
-            "/Tcpyunity-editor.c", "/Fepyunity-editor.exe"
+            "/Tcpyunity-editor.c", "/Fepyunity-editor.exe",
             "/LIBPATH:.", f"-I{sys.base_prefix}\\include"
         ], stdout=sys.stdout, stderr=sys.stderr)
     else:
