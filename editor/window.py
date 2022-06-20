@@ -2,7 +2,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import *
 from PySide6.QtGui import QIcon, QFont, QAction
 import os
-from .resources import *
+from .files import getPath
+from .resources import qInitResources
+qInitResources()
 
 class Window(QMainWindow):
     def __init__(self, app):
@@ -21,12 +23,10 @@ class Window(QMainWindow):
         widget.setLayout(self.vbox_layout)
         self.setCentralWidget(widget)
 
-        directory = os.path.dirname(os.path.abspath(__file__))
         self.styles = {}
-        with open(os.path.join(directory, "theme", "dark.qss")) as f:
-            self.styles["dark"] = f.read()
-        with open(os.path.join(directory, "theme", "light.qss")) as f:
-            self.styles["light"] = f.read()
+        for style in ["dark", "light"]:
+            with open(getPath(f"theme/{style}.qss")) as f:
+                self.styles[style] = f.read()
         self.app.setStyleSheet(self.styles["dark"])
         self.theme = "dark"
 
@@ -79,11 +79,9 @@ class SceneButtons(QWidget):
         self.hbox_layout.addSpacerItem(spacer2)
         self.spacers = [spacer1, spacer2]
 
-        self.directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "buttons")
-
     def add_button(self, icon, tip="", on=False):
         button = QToolButton(self)
-        button.setIcon(QIcon(os.path.join(self.directory, icon)))
+        button.setIcon(QIcon(getPath("icons/buttons/" + icon)))
         button.setStatusTip(tip)
         button.setCheckable(True)
         button.setChecked(on)

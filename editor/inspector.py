@@ -55,13 +55,13 @@ class ComponentFinder(QMenu):
     def updateSearch(self, text):
         self.listWidget.clear()
         for name in sorted(self.components):
-            if name.lower().startswith(text.lower()):
+            if text.lower() in name.lower():
                 self.listWidget.addItem(QListWidgetItem(name))
         self.listWidget.addItem(QListWidgetItem("Create a new Behaviour..."))
 
     def load(self):
         self.inputBox.clear()
-        self.inputBox.setFocus(True)
+        self.inputBox.setFocus()
         QWidget.setTabOrder(self.inputBox, self.listWidget)
 
 class Inspector(QWidget):

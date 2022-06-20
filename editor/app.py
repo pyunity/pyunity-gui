@@ -7,6 +7,7 @@ from .window import Editor, SceneButtons, Window
 from .views import Hierarchy
 from .inspector import Inspector
 from .render import OpenGLFrame, Console
+from .files import getPath
 from pyunity import SceneManager, Logger
 import io
 import sys
@@ -34,7 +35,7 @@ class Application(QApplication):
         super(Application, self).__init__(sys.argv)
 
         self.window = Window(self)
-        self.window.set_icon("icons/icon.png")
+        self.window.set_icon(getPath("icons/icon.png"))
 
         self.buttons = SceneButtons(self.window)
         self.buttons.add_button("play.png", "Run the scene")

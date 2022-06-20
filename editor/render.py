@@ -3,6 +3,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import QFont, QIcon
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from .smoothScroll import QSmoothListWidget
+from .files import getPath
 from pyunity import (Logger, SceneManager, KeyCode,
     MouseCode, MeshRenderer, KeyState, Loader, Window,
     WaitForUpdate, WaitForRender, WaitForFixedUpdate, PyUnityException,
@@ -450,6 +451,5 @@ class ConsoleEntry(QListWidgetItem):
     def __init__(self, timestamp, level, text):
         super(ConsoleEntry, self).__init__(text + "\n" + timestamp)
         self.setFont(QFont("Segoe UI", 12))
-        directory = os.path.dirname(os.path.abspath(__file__))
-        self.setIcon(QIcon(os.path.join(directory,
-            "icons", "console", ConsoleEntry.icon_map[level])))
+        self.setIcon(QIcon(getPath(
+            "icons/console/" + ConsoleEntry.icon_map[level])))

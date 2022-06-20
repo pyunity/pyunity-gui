@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import *
 from .smoothScroll import QSmoothTreeWidget
+from .files import getPath
 
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
@@ -53,8 +54,7 @@ class Hierarchy(QWidget):
         self.hbox_layout.addWidget(self.title)
 
         self.add_button = QToolButton(self)
-        self.add_button.setIcon(QIcon(os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), "icons", "inspector", "add.png")))
+        self.add_button.setIcon(QIcon(getPath("icons/inspector/add.png")))
         self.add_button.setStyleSheet("padding: 3px;")
         self.add_button.setPopupMode(QToolButton.InstantPopup)
         self.add_button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
