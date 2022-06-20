@@ -156,7 +156,7 @@ try:
             "cl.exe", "/nologo", "/O2", "/Wall",
             "/Tcpyunity-editor.c", "/Fepyunity-editor.exe",
             f"/I{sys.base_prefix}\\include",
-            "/link", f"/LIBPATH:{sys.base_prefix}\\lib"
+            "/link", f"/LIBPATH:{sys.base_prefix}\\libs"
         ], stdout=sys.stdout, stderr=sys.stderr)
     else:
         subprocess.call([
