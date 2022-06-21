@@ -10,17 +10,9 @@ parser.add_argument("-n", "--new",
                     action="store_true", help="Create a new PyUnity project")
 parser.add_argument("project", help="Path to PyUnity project")
 
-def check(args):
-    if not os.path.isdir(args.project):
-        print("Please specify a valid directory.")
-        return False
-    return True
-
 def run(args=None):
     if args is None:
         args = parser.parse_args()
-        if not check(args):
-            return
         if not args.new and not os.path.isdir(args.project):
             raise Exception("Project not found")
 
@@ -36,16 +28,12 @@ def run(args=None):
 
 def main():
     args = parser.parse_args()
-    if not check(args):
-        return
     if not args.new and not os.path.isdir(args.project):
         raise Exception("Project not found")
     start(run, [args])
 
 def gui():
     args = parser.parse_args()
-    if not check(args):
-        return
     if not args.new and not os.path.isdir(args.project):
         raise Exception("Project not found")
 
