@@ -25,11 +25,12 @@ def getPath(local):
         return str(dest)
     if egg:
         with zipfile.ZipFile(package) as zf:
-            src = str(Path(__package__) / local)
+            src = (Path(__package__) / local).as_posix()
             if src not in zf.namelist():
                 raise Exception(f"No resource at {package / src}")
             out = zf.extract(src, directory)
-            shutil.move(out, dest)
+            os.makedirs(dest.parent, exist_ok=True)
+            shutil.move(out, dest.parent)
             shutil.rmtree(Path(out).parent)
             return str(dest)
     else:
