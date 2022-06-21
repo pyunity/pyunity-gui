@@ -46,7 +46,7 @@ os.chdir(tmp)
 try:
     download(f"https://www.python.org/ftp/python/{version}/python-{version}-embed-{arch}.zip",
              "embed.zip")
-    vername = f"python{version}"
+    vername = f"pyunity-editor"
     os.makedirs(vername, exist_ok=True)
     with zipfile.ZipFile("embed.zip") as zf:
         print("EXTRACT embed.zip")
@@ -150,6 +150,7 @@ try:
             return 0;
         }
         """))
+
     print("COMPILE pyunity-editor.exe")
     if "GITHUB_ACTIONS" in os.environ:
         subprocess.call([
@@ -160,32 +161,26 @@ try:
         ], stdout=sys.stdout, stderr=sys.stderr)
     else:
         subprocess.call([
-            "gcc.exe", "-O2", "-Wall"
+            "gcc.exe", "-O2", "-Wall",
             "-o", "pyunity-editor.exe", "pyunity-editor.c",
             "-L.", "-lpython310", f"-I{sys.base_prefix}\\include",
         ], stdout=sys.stdout, stderr=sys.stderr)
+    os.remove("pyunity-editor.c")
 
-    print(f"ZIP python{version}.zip")
+    print(f"ZIP pyunity-editor.zip")
     os.chdir(tmp)
     subprocess.call([
         "7z.exe", "a", "-mx=9",
-        f"python{version}.zip", vername
+        f"pyunity-editor.zip", vername
     ], stdout=sys.stdout, stderr=sys.stderr)
-    shutil.copy(f"python{version}.zip", orig)
+    shutil.copy(f"pyunity-editor.zip", orig)
 
-    print(f"7Z python{version}.7z")
+    print(f"7Z pyunity-editor.7z")
     subprocess.call([
         "7z.exe", "a", "-mx=9",
-        f"python{version}.7z", vername
+        f"pyunity-editor.7z", vername
     ], stdout=sys.stdout, stderr=sys.stderr)
-    shutil.copy(f"python{version}.7z", orig)
-
-    print(f"SFX python{version}.exe")
-    subprocess.call([
-        "7z.exe", "a", "-sfx", "-mx=9",
-        f"python{version}.exe", vername
-    ], stdout=sys.stdout, stderr=sys.stderr)
-    shutil.copy(f"python{version}.exe", orig)
+    shutil.copy(f"pyunity-editor.7z", orig)
 
     if "GITHUB_ACTIONS" not in os.environ:
         input("Press Enter to continue ...")
