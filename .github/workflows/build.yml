@@ -23,9 +23,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Zip archive
-          path: python3.10.5.zip
+          path: pyunity-editor.zip
       - name: Upload 7z artifact
         uses: actions/upload-artifact@v3
         with:
           name: 7z archive
-          path: python3.10.5.7z
+          path: pyunity-editor.7z
