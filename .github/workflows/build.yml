@@ -29,8 +29,3 @@ jobs:
         with:
           name: 7z archive
           path: python3.10.5.7z
-      - name: Upload sfx artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: Self-extracting archive
-          path: python3.10.5.exe
