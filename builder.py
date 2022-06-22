@@ -30,6 +30,15 @@ wheels = [
     }
 ]
 
+class PyZipFile(zipfile.PyZipFile):
+    """Class to create ZIP archives with Python library files and packages."""
+
+    def __init__(self, file, mode="r", compression=zipfile.ZIP_STORED,
+                 allowZip64=True, optimize=-1, compresslevel=None):
+        zipfile.ZipFile.__init__(self, file, mode=mode, compression=compression,
+                         allowZip64=allowZip64, compresslevel=compresslevel)
+        self._optimize = optimize
+
 def download(url, dest):
     print("GET", url, "->", os.path.basename(dest))
     directory = Path.home() / ".pyunity" / ".builder"
@@ -67,7 +76,9 @@ try:
         print("EXTRACT embed.zip")
         zf.extractall(vername)
 
-    urllib.request.urlretrieve("https://github.com/pyunity/pyunity/archive/refs/heads/develop.zip", "pyunity.zip")
+    url = "https://github.com/pyunity/pyunity/archive/refs/heads/develop.zip"
+    print("GET", url, "-> pyunity.zip")
+    urllib.request.urlretrieve(url, "pyunity.zip")
     with zipfile.ZipFile("pyunity.zip") as zf:
         print("EXTRACT pyunity.zip")
         zf.extractall()
@@ -80,7 +91,7 @@ try:
 
     os.chdir(tmp + "\\" + vername)
     zipname = "python" + "".join(version.split(".")[:2]) + ".zip"
-    with zipfile.PyZipFile(zipname, "a", optimize=1) as zf:
+    with PyZipFile(zipname, "a", optimize=1, **zipoptions) as zf:
         with zipfile.ZipFile("..\\pyunity.whl") as zf2:
             print("EXTRACT pyunity.whl")
             zf2.extractall("..\\pyunity")
