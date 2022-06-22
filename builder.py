@@ -128,8 +128,9 @@ try:
         print("COPY", name)
         with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
             zf2.extractall("Lib")
-        if name == "pyside6":
-            stripPySide6()
+
+    print("STRIP PySide6")
+    stripPySide6()
 
     with open("python" + "".join(version.split(".")[:2]) + "._pth") as f:
         contents = f.read()
