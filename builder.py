@@ -123,24 +123,21 @@ try:
                 program[i] = Py_DecodeLocale(argv[i], NULL);
             }
             if (program[0] == NULL) {
-                fprintf(stderr, "Fatal error: cannot decode argv[0]\\n");
+                fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
                 exit(1);
             }
             Py_SetProgramName(program[0]);  /* optional but recommended */
             PySys_SetArgvEx(argc, program, 0);
-            PyObject *co = Py_CompileString(
-                "from editor.cli import run\\nrun()\\n",
-                "<pyunity-editor>",
-                Py_file_input
-            );
-            if (co == NULL) {
-                fprintf(stderr, "Fatal error: cannot compile code object\\n");
+
+            PyObject *editor = PyImport_ImportModule("editor.cli");
+            PyObject *func = PyObject_GetAttrString(editor, "run");
+
+            PyObject *res = PyObject_CallFunction(func, NULL);
+            if (res == NULL) {
+                PyErr_Print();
                 exit(1);
             }
-            PyImport_ExecCodeModule(
-                "<pyunity-editor>",
-                co
-            );
+
             if (Py_FinalizeEx() < 0) {
                 exit(1);
             }
