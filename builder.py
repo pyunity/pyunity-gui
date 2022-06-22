@@ -40,6 +40,21 @@ def download(url, dest):
         urllib.request.urlretrieve(url, path)
     shutil.copy(path, dest)
 
+def stripPySide6():
+    keep = [
+        "__init__.py", "QtCore.pyd", "QtGui.pyd", "QtOpenGL.pyd",
+        "QtOpenGLWidgets.pyd", "QtWidgets.pyd", "pyside6.abi3.dll",
+        "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll",
+        "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "plugins\\platforms\\qwindows.dll"
+    ]
+    for dir, subdirs, files in os.walk("Lib\\PySide6\\", topdown=False):
+        for name in files:
+            path = os.path.join(dir, name)
+            if path[12:] not in keep:
+                os.remove(path)
+        if len(os.listdir(dir)) == 0:
+            os.rmdir(dir)
+
 tmp = tempfile.mkdtemp()
 orig = os.getcwd() + "\\"
 os.chdir(tmp)
@@ -102,6 +117,8 @@ try:
         print("COPY", name)
         with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
             zf2.extractall("Lib")
+        if name == "pyside6":
+            stripPySide6()
 
     with open("python" + "".join(version.split(".")[:2]) + "._pth") as f:
         contents = f.read()
@@ -156,6 +173,7 @@ try:
             f"/I{sys.base_prefix}\\include",
             "/link", f"/LIBPATH:{sys.base_prefix}\\libs"
         ], stdout=sys.stdout, stderr=sys.stderr)
+        os.remove("pyunity-editor.obj")
     else:
         subprocess.call([
             "gcc.exe", "-O2", "-Wall",
