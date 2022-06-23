@@ -277,7 +277,7 @@ try:
     print("EXTRACT 7zS2.sfx")
     subprocess.call([
         "7z.exe", "e", "..\\lzma.7z", "bin\\7zS2.sfx",
-        "-o", ".."
+        "-o.."
     ], stdout=sys.stdout, stderr=sys.stderr)
 
     print("SFX pyunity-editor.exe")
