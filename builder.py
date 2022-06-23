@@ -115,7 +115,8 @@ try:
     with PyZipFile(zipname, "a", optimize=1, **zipoptions) as zf:
         print("COMPILE pyunity")
         os.chdir("..\\pyunity")
-        for file in glob.glob("pyunity\\**\\*", recursive=True):
+        for file in glob.glob("pyunity\\**\\*", recursive=True) + \
+                glob.glob("pyunity.egg-info\\**\\*", recursive=True):
             if file.endswith(".py"):
                 py_compile.compile(file, file + "c", file,
                                    doraise=True, optimize=1)
@@ -183,10 +184,12 @@ try:
         #define Py_LIMITED_API 0x03060000
         #include <Python.h>
         #include <string.h>
+        #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
         int main(int argc, char **argv) {
-            Py_Initialize();
-            wchar_t **program = (wchar_t**)PyMem_Malloc(sizeof(wchar_t**) * argc);
+            wchar_t *path = Py_DecodeLocale("python310.zip;Lib", NULL);
+            Py_SetPath(path);
+            wchar_t **program = (wchar_t**)malloc(sizeof(wchar_t**) * argc);
             for (int i = 0; i < argc; i++) {
                 program[i] = Py_DecodeLocale(argv[i], NULL);
             }
@@ -194,24 +197,26 @@ try:
                 fprintf(stderr, "Fatal error: cannot decode argv[0]\\n");
                 exit(1);
             }
-            Py_SetProgramName(program[0]);  /* optional but recommended */
+            Py_SetProgramName(program[0]);
+            Py_Initialize();
             PySys_SetArgvEx(argc, program, 0);
 
             PyObject *editor = PyImport_ImportModule("editor.cli");
+            CHECK(editor)
             PyObject *func = PyObject_GetAttrString(editor, "run");
+            CHECK(func)
 
             PyObject *res = PyObject_CallFunction(func, NULL);
-            if (res == NULL) {
-                PyErr_Print();
-                exit(1);
-            }
+            CHECK(res)
 
             if (Py_FinalizeEx() < 0) {
                 exit(1);
             }
             for (int i = 0; i < argc; i++) {
-                PyMem_Free((void*)program[i]);
+                free((void*)program[i]);
             }
+            free((void*)program);
+            free((void*)path);
             return 0;
         }
         """))
