@@ -29,3 +29,8 @@ jobs:
         with:
           name: 7z archive
           path: pyunity-editor.7z
+      - name: Upload self-extracting artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Self-extracting archive
+          path: pyunity-editor-install.exe

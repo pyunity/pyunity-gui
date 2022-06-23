@@ -12,6 +12,15 @@ import shutil
 import hashlib
 import py_compile
 
+path_7z = shutil.which("7z,exe")
+if path_7z is None:
+    raise Exception("7Zip is needed to build the PyUnity Editor.")
+if "GITHUB_ACTIONS" in os.environ:
+    if shutil.which("cl.exe") is None:
+        raise Exception("Microsoft Visual C is needed to build the PyUnity Editor.")
+elif shutil.which("gcc.exe") is None:
+    raise Exception("MinGW-w64 is needed to build the PyUnity Editor.")
+
 MSVC_RUNTIME = False
 version = "3.10.5"
 arch = "amd64"
@@ -264,6 +273,23 @@ try:
         f"pyunity-editor.7z", vername
     ], stdout=sys.stdout, stderr=sys.stderr)
     shutil.copy(f"pyunity-editor.7z", orig)
+
+    print("SFX pyunity-editor.exe")
+    sfx = os.path.join(path_7z, "7z.sfx")
+    with open("pyunity-editor-install.exe", "wb+") as f1:
+        with open(sfx, "rb") as f2:
+            while True:
+                data = f2.read(65536)
+                if not data:
+                    break
+                f1.write(data)
+        with open("pyunity-editor.7z", "rb") as f2:
+            while True:
+                data = f2.read(65536)
+                if not data:
+                    break
+                f1.write(data)
+    shutil.copy(f"pyunity-editor-install.exe", orig)
 
     if "GITHUB_ACTIONS" not in os.environ:
         input("Press Enter to continue ...")
