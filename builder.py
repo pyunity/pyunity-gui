@@ -12,7 +12,7 @@ import shutil
 import hashlib
 import py_compile
 
-path_7z = shutil.which("7z,exe")
+path_7z = shutil.which("7z.exe")
 if path_7z is None:
     raise Exception("7Zip is needed to build the PyUnity Editor.")
 if "GITHUB_ACTIONS" in os.environ:
