@@ -1,4 +1,5 @@
 import textwrap
+import traceback
 import urllib.request
 import tempfile
 import zipfile
@@ -9,6 +10,7 @@ import sys
 from pathlib import Path
 import shutil
 import hashlib
+import py_compile
 
 version = "3.10.5"
 arch = "amd64"
@@ -51,7 +53,7 @@ def download(url, dest):
 
 def stripPySide6():
     keep = [
-        "__init__.py", "QtCore.pyd", "QtGui.pyd", "QtOpenGL.pyd",
+        "__init__.pyc", "QtCore.pyd", "QtGui.pyd", "QtOpenGL.pyd",
         "QtOpenGLWidgets.pyd", "QtWidgets.pyd", "pyside6.abi3.dll",
         "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll",
         "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "plugins\\platforms\\qwindows.dll"
@@ -82,52 +84,85 @@ try:
     with zipfile.ZipFile("pyunity.zip") as zf:
         print("EXTRACT pyunity.zip")
         zf.extractall()
+
     print("BUILD pyunity")
     os.chdir("pyunity-develop")
     subprocess.call([sys.executable, "setup.py", "bdist_wheel"],
                     stdout=subprocess.DEVNULL, stderr=sys.stderr,
                     env={**os.environ, "cython": "0"})
-    shutil.copy(glob.glob("dist/*")[0], "..\\pyunity.whl")
+    shutil.move(glob.glob("dist/*")[0], "..\\pyunity.whl")
+    os.chdir(tmp)
 
-    os.chdir(tmp + "\\" + vername)
+    with zipfile.ZipFile("pyunity.whl") as zf:
+        print("EXTRACT pyunity.whl")
+        zf.extractall("pyunity")
+
+    print("BUILD pyunity-editor")
+    os.chdir(orig)
+    subprocess.call([sys.executable, "setup.py", "bdist_wheel"],
+                    stdout=subprocess.DEVNULL, stderr=sys.stderr)
+    shutil.move(glob.glob("dist/*")[0], tmp + "\\pyunity-editor.whl")
+    os.chdir(tmp)
+
+    with zipfile.ZipFile("pyunity-editor.whl") as zf:
+        print("EXTRACT pyunity-editor.whl")
+        zf.extractall("editor")
+
+    workdir = tmp + "\\" + vername
+    os.chdir(workdir)
+
     zipname = "python" + "".join(version.split(".")[:2]) + ".zip"
     with PyZipFile(zipname, "a", optimize=1, **zipoptions) as zf:
-        with zipfile.ZipFile("..\\pyunity.whl") as zf2:
-            print("EXTRACT pyunity.whl")
-            zf2.extractall("..\\pyunity")
-        print("COMPILE", "pyunity")
-        zf.writepy("..\\pyunity\\pyunity")
-        for file in glob.glob("..\\pyunity\\**\\*", recursive=True):
-            if file.endswith(".py") or file.endswith(".pyc"):
-                continue
-            zf.write(file, file[11:])
+        print("COMPILE pyunity")
+        os.chdir("..\\pyunity")
+        for file in glob.glob("pyunity\\**\\*", recursive=True):
+            if file.endswith(".py"):
+                py_compile.compile(file, file + "c", file,
+                                   doraise=True, optimize=1)
+                zf.write(file + "c")
+            elif not file.endswith(".pyc"):
+                zf.write(file)
+        os.chdir(workdir)
 
         print("COMPILE editor")
-        zf.writepy(orig + "editor")
-        for file in glob.glob(orig + "\\editor\\**\\*", recursive=True) + \
-                glob.glob(orig + "\\pyunity_editor.egg-info\\**\\*", recursive=True):
-            if file.endswith(".py") or file.endswith(".pyc"):
-                continue
-            zf.write(file, file[len(orig):])
+        os.chdir("..\\editor")
+        for file in glob.glob("editor\\**\\*", recursive=True) + \
+                glob.glob("pyunity_editor.egg-info\\**\\*", recursive=True):
+            if file.endswith(".py"):
+                py_compile.compile(file, file + "c", file,
+                                   doraise=True, optimize=1)
+                zf.write(file + "c")
+            elif not file.endswith(".pyc"):
+                zf.write(file)
+        os.chdir(workdir)
 
         for name, url in wheels[0].items():
             download(url, "..\\" + name + ".whl")
             with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
                 print("EXTRACT " + name + ".whl")
                 zf2.extractall("..\\" + name)
-            for package in glob.glob("..\\" + name + "\\*\\__init__.py"):
-                print("COMPILE", package[4 + len(name):-12].replace("\\", "."))
-                zf.writepy(os.path.dirname(package))
-            for file in glob.glob("..\\" + name + "\\**\\*", recursive=True):
-                if file.endswith(".py") or file.endswith(".pyc"):
-                    continue
-                zf.write(file, file[len(name) + 4:])
+
+            print("COMPILE", name)
+            os.chdir("..\\" + name)
+            for file in glob.glob("**\\*", recursive=True):
+                if file.endswith(".py"):
+                    py_compile.compile(file, file + "c", file,
+                                       doraise=True, optimize=1)
+                    zf.write(file + "c")
+                elif not file.endswith(".pyc"):
+                    zf.write(file)
+            os.chdir(workdir)
 
     for name, url in wheels[1].items():
         download(url, "..\\" + name + ".whl")
         print("COPY", name)
         with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
             zf2.extractall("Lib")
+    os.chdir("Lib")
+    for file in glob.glob("**\\*.py", recursive=True):
+        py_compile.compile(file, file + "c", optimize=1, quiet=0)
+        os.remove(file)
+    os.chdir(workdir)
 
     print("STRIP PySide6")
     stripPySide6()
@@ -211,6 +246,8 @@ try:
 
     if "GITHUB_ACTIONS" not in os.environ:
         input("Press Enter to continue ...")
+except BaseException as e:
+    print("".join(traceback.format_exception(e)))
 finally:
     print("Cleaning up")
     os.chdir(orig)
