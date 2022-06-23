@@ -167,6 +167,10 @@ try:
     print("STRIP PySide6")
     stripPySide6()
 
+    print("MOVE *.pyd")
+    for file in glob.glob("*.pyd"):
+        shutil.move(file, "Lib")
+
     with open("python" + "".join(version.split(".")[:2]) + "._pth") as f:
         contents = f.read()
     with open("python" + "".join(version.split(".")[:2]) + "._pth", "w") as f:
