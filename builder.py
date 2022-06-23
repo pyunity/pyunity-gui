@@ -12,6 +12,7 @@ import shutil
 import hashlib
 import py_compile
 
+MSVC_RUNTIME = False
 version = "3.10.5"
 arch = "amd64"
 zipoptions = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
@@ -111,8 +112,8 @@ try:
     workdir = tmp + "\\" + vername
     os.chdir(workdir)
 
-    zipname = "python" + "".join(version.split(".")[:2]) + ".zip"
-    with PyZipFile(zipname, "a", optimize=1, **zipoptions) as zf:
+    zipname = "python" + "".join(version.split(".")[:2])
+    with PyZipFile(zipname + ".zip", "a", optimize=1, **zipoptions) as zf:
         print("COMPILE pyunity")
         os.chdir("..\\pyunity")
         for file in glob.glob("pyunity\\**\\*", recursive=True) + \
@@ -175,7 +176,18 @@ try:
     os.remove("python.exe")
     os.remove("python.cat")
     os.remove("pythonw.exe")
-    os.remove(f"{vername}._pth")
+    os.remove(f"{zipname}._pth")
+
+    if MSVC_RUNTIME:
+        download("https://files.pythonhosted.org/packages/6d/4a/602120a9e6625169fbddbdd036fe5559af638986dc0c3c3b602d3d60f95e/msvc_runtime-14.29.30133-cp310-cp310-win_amd64.whl", "..\\msvc_runtime.whl")
+        with zipfile.ZipFile("..\\msvc_runtime.whl") as zf:
+            print("EXTRACT msvc_runtime.whl")
+            zf.extractall("..\\msvc_runtime")
+        datafolder = glob.glob("..\\msvc_runtime\\*.data\\data\\")[0]
+        print("COPY msvc_runtime")
+        for file in os.listdir(datafolder):
+            if file.endswith(".dll"):
+                shutil.copy(os.path.join(datafolder, file), ".")
 
     print("WRITE pyunity-editor.c")
     with open("pyunity-editor.c", "w+") as f:
@@ -187,7 +199,7 @@ try:
         #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
         int main(int argc, char **argv) {
-            wchar_t *path = Py_DecodeLocale(\"""" + vername + """.zip;Lib", NULL);
+            wchar_t *path = Py_DecodeLocale(\"""" + zipname + """.zip;Lib", NULL);
             Py_SetPath(path);
             wchar_t **program = (wchar_t**)malloc(sizeof(wchar_t**) * argc);
             for (int i = 0; i < argc; i++) {
@@ -234,7 +246,7 @@ try:
         subprocess.call([
             "gcc.exe", "-O2", "-Wall",
             "-o", "pyunity-editor.exe", "pyunity-editor.c",
-            "-L.", f"-l{vername}", f"-I{sys.base_prefix}\\include",
+            "-L.", f"-l{zipname}", f"-I{sys.base_prefix}\\include",
         ], stdout=sys.stdout, stderr=sys.stderr)
     os.remove("pyunity-editor.c")
 
