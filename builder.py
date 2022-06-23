@@ -12,8 +12,7 @@ import shutil
 import hashlib
 import py_compile
 
-path_7z = shutil.which("7z.exe")
-if path_7z is None:
+if shutil.which("7z.exe") is None:
     raise Exception("7Zip is needed to build the PyUnity Editor.")
 if "GITHUB_ACTIONS" in os.environ:
     if shutil.which("cl.exe") is None:
@@ -274,10 +273,16 @@ try:
     ], stdout=sys.stdout, stderr=sys.stderr)
     shutil.copy(f"pyunity-editor.7z", orig)
 
+    download("https://www.7-zip.org/a/lzma1900.7z", "..\\lzma.7z")
+    print("EXTRACT 7zS2.sfx")
+    subprocess.call([
+        "7z.exe", "e", "..\\lzma.7z", "bin\\7zS2.sfx",
+        "-o", ".."
+    ], stdout=sys.stdout, stderr=sys.stderr)
+
     print("SFX pyunity-editor.exe")
-    sfx = os.path.join(path_7z, "7z.sfx")
     with open("pyunity-editor-install.exe", "wb+") as f1:
-        with open(sfx, "rb") as f2:
+        with open("..\\7zS2.sfx", "rb") as f2:
             while True:
                 data = f2.read(65536)
                 if not data:
