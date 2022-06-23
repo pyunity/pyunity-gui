@@ -172,10 +172,10 @@ try:
     for file in glob.glob("*.pyd"):
         shutil.move(file, "Lib")
 
-    with open("python" + "".join(version.split(".")[:2]) + "._pth") as f:
-        contents = f.read()
-    with open("python" + "".join(version.split(".")[:2]) + "._pth", "w") as f:
-        f.write(".\\Lib\n" + contents)
+    os.remove("python.exe")
+    os.remove("python.cat")
+    os.remove("pythonw.exe")
+    os.remove(f"{vername}._pth")
 
     print("WRITE pyunity-editor.c")
     with open("pyunity-editor.c", "w+") as f:
@@ -187,7 +187,7 @@ try:
         #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
         int main(int argc, char **argv) {
-            wchar_t *path = Py_DecodeLocale("python310.zip;Lib", NULL);
+            wchar_t *path = Py_DecodeLocale(\"""" + vername + """.zip;Lib", NULL);
             Py_SetPath(path);
             wchar_t **program = (wchar_t**)malloc(sizeof(wchar_t**) * argc);
             for (int i = 0; i < argc; i++) {
@@ -234,7 +234,7 @@ try:
         subprocess.call([
             "gcc.exe", "-O2", "-Wall",
             "-o", "pyunity-editor.exe", "pyunity-editor.c",
-            "-L.", "-lpython310", f"-I{sys.base_prefix}\\include",
+            "-L.", f"-l{vername}", f"-I{sys.base_prefix}\\include",
         ], stdout=sys.stdout, stderr=sys.stderr)
     os.remove("pyunity-editor.c")
 
