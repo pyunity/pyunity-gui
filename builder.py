@@ -273,16 +273,9 @@ try:
     ], stdout=sys.stdout, stderr=sys.stderr)
     shutil.copy(f"pyunity-editor.7z", orig)
 
-    download("https://www.7-zip.org/a/lzma1900.7z", "..\\lzma.7z")
-    print("EXTRACT 7zS2.sfx")
-    subprocess.call([
-        "7z.exe", "e", "..\\lzma.7z", "bin\\7zS2.sfx",
-        "-o.."
-    ], stdout=sys.stdout, stderr=sys.stderr)
-
     print("SFX pyunity-editor.exe")
     with open("pyunity-editor-install.exe", "wb+") as f1:
-        with open("..\\7zS2.sfx", "rb") as f2:
+        with open(orig + "\\7z.sfx", "rb") as f2:
             while True:
                 data = f2.read(65536)
                 if not data:
@@ -300,6 +293,7 @@ try:
         input("Press Enter to continue ...")
 except BaseException as e:
     print("".join(traceback.format_exception(e)))
+    raise SystemExit
 finally:
     print("Cleaning up")
     os.chdir(orig)
