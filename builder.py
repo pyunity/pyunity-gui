@@ -184,7 +184,8 @@ try:
     os.remove("python.exe")
     os.remove("python.cat")
     os.remove("pythonw.exe")
-    os.remove(f"{zipname}._pth")
+    os.remove(zipname + "._pth")
+    shutil.move(zipname + ".zip", "Lib\\python.zip")
 
     if MSVC_RUNTIME:
         download("https://files.pythonhosted.org/packages/6d/4a/602120a9e6625169fbddbdd036fe5559af638986dc0c3c3b602d3d60f95e/msvc_runtime-14.29.30133-cp310-cp310-win_amd64.whl", "..\\msvc_runtime.whl")
@@ -207,7 +208,7 @@ try:
         #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
         int main(int argc, char **argv) {
-            wchar_t *path = Py_DecodeLocale(\"""" + zipname + """.zip;Lib", NULL);
+            wchar_t *path = Py_DecodeLocale("Lib\\python.zip;Lib", NULL);
             Py_SetPath(path);
             wchar_t **program = (wchar_t**)malloc(sizeof(wchar_t**) * argc);
             for (int i = 0; i < argc; i++) {
