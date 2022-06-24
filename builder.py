@@ -287,7 +287,7 @@ try:
                 if not data:
                     break
                 f1.write(data)
-    shutil.copyfile(f"pyunity-editor-install.exe", orig)
+    shutil.copyfile("pyunity-editor-install.exe", orig + "\\pyunity-editor-install.exe")
 
     if "GITHUB_ACTIONS" not in os.environ:
         input("Press Enter to continue ...")
