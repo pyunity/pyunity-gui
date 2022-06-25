@@ -248,13 +248,13 @@ try:
     if "GITHUB_ACTIONS" in os.environ:
         print("COMPILE icons.o")
         subprocess.call([
-            "rc.exe", "/fo..\\icons.res" "..\\icons.rc"
+            "rc.exe", "/fo", "..\\icons.res" "..\\icons.rc"
         ], stdout=sys.stdout, stderr=sys.stderr)
 
         print("COMPILE pyunity-editor.exe")
         subprocess.call([
             "cl.exe", "/nologo", "/O2", "/Wall",
-            "/Tcpyunity-editor.c", "/Fo..",
+            "/Tcpyunity-editor.c", "/Fo..\\pyunity-editor.obj",
             f"/I{sys.base_prefix}\\include",
             "/link", "..\\icons.res", f"/libpath:{sys.base_prefix}\\libs",
             "/out:pyunity-editor.exe"
