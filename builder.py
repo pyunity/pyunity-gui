@@ -259,7 +259,6 @@ try:
             "/link", "..\\icons.res", f"/libpath:{sys.base_prefix}\\libs",
             "/out:pyunity-editor.exe"
         ], stdout=sys.stdout, stderr=sys.stderr)
-        os.remove("pyunity-editor.obj")
     else:
         print("COMPILE icons.o")
         subprocess.call([
