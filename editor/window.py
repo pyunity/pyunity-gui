@@ -30,6 +30,13 @@ class Window(QMainWindow):
         self.app.setStyleSheet(self.styles["dark"])
         self.theme = "dark"
 
+        self.icon = QIcon()
+        for size in [16, 24, 32, 48, 64, 128, 256]:
+            filename = f"icon{size}x{size}.png"
+            fullPath = os.path.join("icons", "window", filename)
+            self.icon.addFile(str(getPath(fullPath)))
+        self.setWindowIcon(self.icon)
+
     def toggle_theme(self):
         if self.theme == "dark":
             self.theme = "light"
@@ -40,10 +47,6 @@ class Window(QMainWindow):
     def closeEvent(self, event):
         self.app.quit_wrapper()
         event.ignore()
-
-    def set_icon(self, path):
-        directory = os.path.dirname(os.path.abspath(__file__))
-        self.setWindowIcon(QIcon(os.path.join(directory, path)))
 
     def select_none(self):
         if not isinstance(self.app.focusWidget(), QLineEdit):

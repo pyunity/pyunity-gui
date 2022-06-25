@@ -208,7 +208,7 @@ try:
         #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
         int main(int argc, char **argv) {
-            wchar_t *path = Py_DecodeLocale("Lib\\python.zip;Lib", NULL);
+            wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib", NULL);
             Py_SetPath(path);
             wchar_t **program = (wchar_t**)malloc(sizeof(wchar_t**) * argc);
             for (int i = 0; i < argc; i++) {
@@ -242,19 +242,35 @@ try:
         }
         """))
 
-    print("COMPILE pyunity-editor.exe")
+    shutil.copy(orig + "\\standalone\\icons.ico", "..")
+    shutil.copy(orig + "\\standalone\\icons.rc", "..")
+
     if "GITHUB_ACTIONS" in os.environ:
+        print("COMPILE icons.o")
+        subprocess.call([
+            "rc.exe", "/fm..\\icons.res" "..\\icons.rc"
+        ], stdout=sys.stdout, stderr=sys.stderr)
+
+        print("COMPILE pyunity-editor.exe")
         subprocess.call([
             "cl.exe", "/nologo", "/O2", "/Wall",
-            "/Tcpyunity-editor.c", "/Fepyunity-editor.exe",
+            "/Tcpyunity-editor.c", "/Fo.."
             f"/I{sys.base_prefix}\\include",
-            "/link", f"/LIBPATH:{sys.base_prefix}\\libs"
+            "/link", "..\\icons.res", f"/libpath:{sys.base_prefix}\\libs",
+            "/out:pyunity-editor.exe"
         ], stdout=sys.stdout, stderr=sys.stderr)
         os.remove("pyunity-editor.obj")
     else:
+        print("COMPILE icons.o")
+        subprocess.call([
+            "windres.exe", "-O", "coff",
+            "..\\icons.rc", "..\\icons.o"
+        ], stdout=sys.stdout, stderr=sys.stderr)
+
+        print("COMPILE pyunity-editor.exe")
         subprocess.call([
             "gcc.exe", "-O2", "-Wall",
-            "-o", "pyunity-editor.exe", "pyunity-editor.c",
+            "-o", "pyunity-editor.exe", "pyunity-editor.c", "..\\icons.o",
             "-L.", f"-l{zipname}", f"-I{sys.base_prefix}\\include",
         ], stdout=sys.stdout, stderr=sys.stderr)
     os.remove("pyunity-editor.c")
@@ -276,7 +292,7 @@ try:
 
     print("SFX pyunity-editor.exe")
     with open("pyunity-editor-install.exe", "wb+") as f1:
-        with open(orig + "\\7z.sfx", "rb") as f2:
+        with open(orig + "\\standalone\\7z.sfx", "rb") as f2:
             while True:
                 data = f2.read(65536)
                 if not data:
