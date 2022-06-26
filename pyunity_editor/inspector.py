@@ -143,16 +143,16 @@ class Inspector(QWidget):
         self.currentItem = hierarchyItem
         self.gameObject = hierarchyItem.gameObject
 
-        main_section = self.add_section(self.gameObject)
-        main_section.component = self.gameObject
+        self.main_section = self.add_section(self.gameObject)
+        self.main_section.component = self.gameObject
 
-        name_input = main_section.add_value("name", self.props[0], self.gameObject.name)
-        name_input.edited.connect(hierarchyItem.rename)
-        tag_input = main_section.add_value("tag", self.props[1], self.gameObject.tag.tag)
+        self.name_input = self.main_section.add_value("name", self.props[0], self.gameObject.name)
+        self.name_input.edited.connect(hierarchyItem.rename)
+        tag_input = self.main_section.add_value("tag", self.props[1], self.gameObject.tag.tag)
         tag_input.prevent_modify = True # temporarily until i implement tag dropdowns
-        enabled_input = main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
+        enabled_input = self.main_section.add_value("enabled", pyu.ShowInInspector(bool, True, "enabled"), True)
         enabled_input.edited.connect(hierarchyItem.toggle)
-        main_section.adjustHeight()
+        self.main_section.adjustHeight()
 
         for component in self.gameObject.components:
             self.add_section(component)

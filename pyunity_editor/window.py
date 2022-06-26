@@ -53,10 +53,10 @@ class Window(QMainWindow):
             self.app.hierarchy_content.tree_widget.clearSelection()
 
     def rename(self):
-        self.app.inspector.tab_widget.setCurrentWidget(self.app.inspector)
-        box = list(self.app.inspector_content.sections[0].fields.keys())[0]
-        box.setFocus()
-        box.selectAll()
+        self.app.hierarchy.tab_widget.setCurrentWidget(self.app.hierarchy)
+        items = self.app.hierarchy_content.tree_widget.selectedItems()
+        if len(items) == 1:
+            self.app.hierarchy_content.tree_widget.editItem(items[0])
 
     def mousePressEvent(self, event):
         focused = self.focusWidget()

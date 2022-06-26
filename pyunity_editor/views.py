@@ -10,6 +10,7 @@ from .files import getPath
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
         super(HierarchyItem, self).__init__()
+        self.setFlags(self.flags() | Qt.ItemIsEditable)
         self.setText(0, gameObject.name)
         self.name = gameObject.name
         self.gameObject = gameObject
@@ -47,7 +48,7 @@ class Hierarchy(QWidget):
         self.vbox_layout.setSpacing(2)
 
         self.hbox_layout = QHBoxLayout()
-        # self.hbox_layout.setStretch(0, 1)
+        self.hbox_layout.setStretch(0, 1)
         self.title = QLabel("Untitled Scene")
         self.vbox_layout.setContentsMargins(0, 0, 0, 0)
         self.vbox_layout.setSpacing(0)
@@ -71,6 +72,7 @@ class Hierarchy(QWidget):
         self.items = []
         self.tree_widget = CustomTreeWidget(self)
         self.vbox_layout.addWidget(self.tree_widget)
+        self.tree_widget.itemChanged.connect(self.rename)
         self.tree_widget.itemSelectionChanged.connect(self.on_click)
         self.inspector = None
         self.preview = None
@@ -142,6 +144,10 @@ class Hierarchy(QWidget):
                 transform.ReparentTo(parentTransform)
                 parentTransform.children.remove(transform)
                 parentTransform.children.insert(index, transform)
+
+    def rename(self, item, column):
+        self.inspector.name_input.setText(item.text(column))
+        item.gameObject.name = item.text(column)
 
     def add_item(self, gameObject, parent=None):
         item = HierarchyItem(gameObject)
