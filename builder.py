@@ -11,6 +11,13 @@ from pathlib import Path
 import shutil
 import hashlib
 import py_compile
+from optparse import Values
+from pip._internal.index.package_finder import PackageFinder
+from pip._internal.index.collector import LinkCollector
+from pip._internal.network.session import PipSession
+from pip._internal.models.selection_prefs import SelectionPreferences
+from pip._internal.models.target_python import TargetPython
+from pip._internal.req.constructors import install_req_from_line
 
 if shutil.which("7z.exe") is None:
     raise Exception("7Zip is needed to build the PyUnity Editor.")
@@ -20,26 +27,42 @@ if "GITHUB_ACTIONS" in os.environ:
 elif shutil.which("gcc.exe") is None:
     raise Exception("MinGW-w64 is needed to build the PyUnity Editor.")
 
+class PypiLinkGetter:
+    session = PipSession()
+    collector = LinkCollector.create(session, Values(dict(
+        index_url="https://pypi.org/pypi",
+        extra_index_urls=[],
+        no_index=False,
+        find_links=[]
+    )))
+    prefs = SelectionPreferences(True, False, prefer_binary=True)
+    finders = {}
+    archmap = {"amd64": "win_amd64", "win32": "win32"}
+
+    @classmethod
+    def getLink(cls, version, platform, req):
+        print("FIND", req)
+        vertuple = tuple(version.split("."))
+        if (vertuple, platform) not in cls.finders:
+            target = TargetPython([cls.archmap[platform]], vertuple)
+            finder = PackageFinder.create(cls.collector, cls.prefs, target,
+                                          use_deprecated_html5lib=False)
+            cls.finders[vertuple, platform] = finder
+        else:
+            finder = cls.finders[vertuple, platform]
+        return finder.find_requirement(install_req_from_line(req), False).link._url
+
 MSVC_RUNTIME = False
 version = "3.10.5"
 arch = "amd64"
 zipoptions = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
-wheels = [
-    {
-        "pyopengl": "https://files.pythonhosted.org/packages/80/07/003fe74d2af04be917035b42c53c7ea9e3abe1e353753cebccfe792b4e52/PyOpenGL-3.1.6-py3-none-any.whl",
-        "pysdl2": "https://files.pythonhosted.org/packages/ea/38/9cd6726c591805f79255310232a912e7c4f57e9e6ad05b74d28dd263b29e/PySDL2-0.9.11-py3-none-any.whl",
-    },
-    {
-        "pyopengl_accelerate": "https://files.pythonhosted.org/packages/f3/a5/ce94f5df7f411b2a44a469859f3a77c8938dc428d229ecbf635fc6358a3f/PyOpenGL_accelerate-3.1.6-cp310-cp310-win_amd64.whl",
-        "pysdl2_dll": "https://files.pythonhosted.org/packages/b7/6f/37cdee2957043f0f53b4c49fe819a8c7d3f2e37e6fe452b49cfd5615c344/pysdl2_dll-2.0.20-py2.py3-none-win_amd64.whl",
-        "pillow": "https://files.pythonhosted.org/packages/0a/f8/f4a5e9c5f35fbb2e3bfd9b9596d0937e8242ae14ae4172da12dd770c7bdc/Pillow-9.1.1-cp310-cp310-win_amd64.whl",
-        "pyglm": "https://files.pythonhosted.org/packages/6f/be/1e68bda30770478e9769190ac0f803221bc55b496491aadd2fe85ea35839/PyGLM-2.5.7-cp310-cp310-win_amd64.whl",
-        "pyside6": "https://files.pythonhosted.org/packages/af/fa/233b09b5952c83896ce54987f709ec83050ba1555dd4af54b114bceb2a1f/PySide6-6.3.1-cp36-abi3-win_amd64.whl",
-        "shiboken6": "https://files.pythonhosted.org/packages/c0/23/3ce3122a30da4fa8477368627f03ac470daadbd95123b29e7dede83cbb15/shiboken6-6.3.1-cp36-abi3-win_amd64.whl",
-        "pyside6_essentials": "https://files.pythonhosted.org/packages/37/4c/dd461414d4ac9716df049f7ab56107eae16b3768049d1feedc3f51550e28/PySide6_Essentials-6.3.1-cp36-abi3-win_amd64.whl",
-        "glfw": "https://files.pythonhosted.org/packages/85/c1/42d1cad8a16bba14e2bf3240931cdfa06c3bcb456f2a81636ec7f0a40172/glfw-2.5.3-py2.py27.py3.py30.py31.py32.py33.py34.py35.py36.py37.py38-none-win_amd64.whl",
-    }
-]
+
+wheels = [{}, {}]
+for req in ["pyopengl", "pysdl2"]:
+    wheels[0][req] = PypiLinkGetter.getLink(version, arch, req)
+for req in ["pyopengl_accelerate", "pysdl2_dll", "pillow", "pyglm",
+        "pyside6", "shiboken6", "pyside6_essentials", "glfw"]:
+    wheels[1][req] = PypiLinkGetter.getLink(version, arch, req)
 
 class PyZipFile(zipfile.PyZipFile):
     """Class to create ZIP archives with Python library files and packages."""
