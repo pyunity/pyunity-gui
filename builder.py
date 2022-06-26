@@ -95,12 +95,12 @@ def stripPySide6():
         if len(os.listdir(dir)) == 0:
             os.rmdir(dir)
 
-def addPackage(zf, name, path, orig, distInfo=""):
+def addPackage(zf, name, path, orig, distInfo=False):
     print("COMPILE", name, flush=True)
     os.chdir("..\\" + name)
     paths = glob.glob(path, recursive=True)
     if distInfo:
-        paths.extend(glob.glob(distInfo + ".dist-info\\**\\*", recursive=True))
+        paths.extend(glob.glob("*.dist-info\\**\\*", recursive=True))
     for file in paths:
         if file.endswith(".py"):
             py_compile.compile(file, file + "c", file,
@@ -157,8 +157,8 @@ try:
 
     zipname = "python" + "".join(VERSION.split(".")[:2])
     with zipfile.ZipFile(zipname + ".zip", "a", **ZIP_OPTIONS) as zf:
-        addPackage(zf, "pyunity", "pyunity\\**\\*", workdir, "pyunity")
-        addPackage(zf, "editor", "pyunity_editor\\**\\*", workdir, "pyunity_editor")
+        addPackage(zf, "pyunity", "pyunity\\**\\*", workdir, True)
+        addPackage(zf, "editor", "pyunity_editor\\**\\*", workdir, True)
 
         for name, url in wheels[0].items():
             download(url, "..\\" + name + ".whl")
