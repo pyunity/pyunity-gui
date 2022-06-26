@@ -8,37 +8,14 @@ data_files = glob.glob("editor/**/*.qss", recursive=True) + \
     glob.glob("editor/**/*.png", recursive=True)
 
 setup(
-    name="pyunity-editor",
-    version="0.1.1",
-    author="Ray Chen",
-    author_email="tankimarshal2@gmail.com",
-    description="An Editor for PyUnity in the style of the UnityEditor",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/pyunity/pyunity-gui",
-    classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Natural Language :: English",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: MacOS",
-        "Operating System :: Microsoft :: Windows",
-        "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 3",
-    ],
-    install_requires=[
-        "pyunity==0.9.0",
-        "pyside6",
-        "pillow",
-    ],
-    python_requires='>=3',
     packages=["editor"] + ["editor." + package for package in find_packages(where="editor")],
     package_data={"editor": [file[7:] for file in data_files]},
     entry_points={
-        # "gui_scripts": [
-        #     "pyunity-editor=editor.cli:gui"
-        # ]
-        "console_scripts": [
-            "pyunity-editor=editor.cli:run"
-        ]
+        "gui_scripts": [
+            "pyunity-editor=editor.cli:gui"
+        ],
+        # "console_scripts": [
+        #     "pyunity-editor=editor.cli:run"
+        # ],
     }
 )

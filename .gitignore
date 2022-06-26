@@ -6,20 +6,26 @@
 # Builds
 *.egg-info
 build/
+src/
 **/.doctrees
-# Only so that we don't upload builds to github
 dist/
 
-# Coverage
+# Pytest and coverage
 .coverage
 coverage.xml
+htmlcov/
+.pytest_cache/
 
 # Replit
 .replit
-pyproject.toml
 poetry.lock
+main.sh
+
+# Mypy
+.mypy_cache/
+out/
 
 # Misc
 venv/
 .vscode/
-.mypy_cache/
+docs/en/
