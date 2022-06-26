@@ -207,6 +207,13 @@ try:
         #include <string.h>
         #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
+        #ifdef NOCONSOLE
+        #include <windows.h>
+        int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd) {
+            return main(__argc, __argv);
+        }
+        #endif
+
         int main(int argc, char **argv) {
             wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib", NULL);
             Py_SetPath(path);
@@ -224,7 +231,11 @@ try:
 
             PyObject *editor = PyImport_ImportModule("editor.cli");
             CHECK(editor)
+            #ifdef NOCONSOLE
             PyObject *func = PyObject_GetAttrString(editor, "gui");
+            #else
+            PyObject *func = PyObject_GetAttrString(editor, "run");
+            #endif
             CHECK(func)
 
             PyObject *res = PyObject_CallFunction(func, NULL);
@@ -255,7 +266,7 @@ try:
         subprocess.call([
             "cl.exe", "/nologo", "/O2", "/Wall",
             "/Tcpyunity-editor.c", "/Fo..\\pyunity-editor.obj",
-            f"/I{sys.base_prefix}\\include",
+            f"/I{sys.base_prefix}\\include", "/DNOCONSOLE",
             "/link", "..\\icons.res", "/subsystem:windows",
             f"/libpath:{sys.base_prefix}\\libs",
             "/out:pyunity-editor.exe"
@@ -269,7 +280,7 @@ try:
 
         print("COMPILE pyunity-editor.exe", flush=True)
         subprocess.call([
-            "gcc.exe", "-O2", "-Wall", "-mwindows",
+            "gcc.exe", "-O2", "-Wall", "-mwindows", "-DNOCONSOLE",
             "-o", "pyunity-editor.exe", "pyunity-editor.c", "..\\icons.o",
             "-L.", f"-l{zipname}", f"-I{sys.base_prefix}\\include",
         ], stdout=sys.stdout, stderr=sys.stderr)
