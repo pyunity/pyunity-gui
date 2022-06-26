@@ -248,7 +248,7 @@ try:
     if "GITHUB_ACTIONS" in os.environ:
         print("COMPILE icons.o")
         subprocess.call([
-            "rc.exe", "/fo", "..\\icons.res" "..\\icons.rc"
+            "rc.exe", "/fo..\\icons.res", "..\\icons.rc"
         ], stdout=sys.stdout, stderr=sys.stderr)
 
         print("COMPILE pyunity-editor.exe")
