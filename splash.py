@@ -1,5 +1,5 @@
 import sys
 sys.argv.append("Test")
 
-from editor.cli import main
+from pyunity_editor.cli import main
 main()

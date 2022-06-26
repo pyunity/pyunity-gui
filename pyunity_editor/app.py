@@ -1,12 +1,12 @@
 import os
 os.environ["PYUNITY_DEBUG_MODE"] = "1"
-from editor.files import FileTracker
 from PySide6.QtCore import QThread, QObject, Signal, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window
 from .views import Hierarchy
 from .inspector import Inspector
 from .render import OpenGLFrame, Console
+from .files import FileTracker
 from pyunity import SceneManager, Logger
 import io
 import sys

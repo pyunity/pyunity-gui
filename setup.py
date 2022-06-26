@@ -4,18 +4,18 @@ import glob
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-data_files = glob.glob("editor/**/*.qss", recursive=True) + \
-    glob.glob("editor/**/*.png", recursive=True)
+data_files = glob.glob("pyunity_editor/**/*.qss", recursive=True) + \
+    glob.glob("pyunity_editor/**/*.png", recursive=True)
 
 setup(
-    packages=["editor"] + ["editor." + package for package in find_packages(where="editor")],
-    package_data={"editor": [file[7:] for file in data_files]},
+    packages=["pyunity_editor"] + ["pyunity_editor." + package for package in find_packages(where="pyunity_editor")],
+    package_data={"pyunity_editor": [file[7:] for file in data_files]},
     entry_points={
         "gui_scripts": [
-            "pyunity-editor=editor.cli:gui"
+            "pyunity-editor=pyunity_editor.cli:gui"
         ],
         # "console_scripts": [
-        #     "pyunity-editor=editor.cli:run"
+        #     "pyunity-editor=pyunity_editor.cli:run"
         # ],
     }
 )
