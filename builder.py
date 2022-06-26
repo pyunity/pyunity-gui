@@ -215,7 +215,7 @@ try:
                 program[i] = Py_DecodeLocale(argv[i], NULL);
             }
             if (program[0] == NULL) {
-                fprintf(stderr, "Fatal error: cannot decode argv[0]\\n"), flush=True;
+                fprintf(stderr, "Fatal error: cannot decode argv[0]\\n");
                 exit(1);
             }
             Py_SetProgramName(program[0]);
@@ -224,7 +224,7 @@ try:
 
             PyObject *editor = PyImport_ImportModule("editor.cli");
             CHECK(editor)
-            PyObject *func = PyObject_GetAttrString(editor, "run");
+            PyObject *func = PyObject_GetAttrString(editor, "gui");
             CHECK(func)
 
             PyObject *res = PyObject_CallFunction(func, NULL);
@@ -256,7 +256,8 @@ try:
             "cl.exe", "/nologo", "/O2", "/Wall",
             "/Tcpyunity-editor.c", "/Fo..\\pyunity-editor.obj",
             f"/I{sys.base_prefix}\\include",
-            "/link", "..\\icons.res", f"/libpath:{sys.base_prefix}\\libs",
+            "/link", "..\\icons.res", "/subsystem:windows",
+            f"/libpath:{sys.base_prefix}\\libs",
             "/out:pyunity-editor.exe"
         ], stdout=sys.stdout, stderr=sys.stderr)
     else:
@@ -268,7 +269,7 @@ try:
 
         print("COMPILE pyunity-editor.exe", flush=True)
         subprocess.call([
-            "gcc.exe", "-O2", "-Wall",
+            "gcc.exe", "-O2", "-Wall", "-mwindows",
             "-o", "pyunity-editor.exe", "pyunity-editor.c", "..\\icons.o",
             "-L.", f"-l{zipname}", f"-I{sys.base_prefix}\\include",
         ], stdout=sys.stdout, stderr=sys.stderr)

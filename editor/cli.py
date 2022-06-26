@@ -1,22 +1,59 @@
 from .splash import start, redirect_out
 from time import strftime
 import argparse
+import sys
 import os
 import io
 
-parser = argparse.ArgumentParser(
-    prog="editor", description="Launch the PyUnity editor")
-parser.add_argument("-n", "--new",
-                    action="store_true", help="Create a new PyUnity project")
-parser.add_argument("-S", "--no-splash", action="store_false", dest="splash",
-                    help="Disable the splash image on launch")
-parser.add_argument("project", help="Path to PyUnity project")
+class Parser(argparse.ArgumentParser):
+    def __init__(self, **kwargs):
+        kwargs["prog"] = os.path.basename(sys.argv[0])
+        if kwargs["prog"] == "__main__.py":
+            kwargs["prog"] = "editor"
+        super(Parser, self).__init__(**kwargs)
+        self.add_argument("-n", "--new",
+                            action="store_true", help="Create a new PyUnity project")
+        self.add_argument("-S", "--no-splash", action="store_false", dest="splash",
+                            help="Disable the splash image on launch")
+        self.add_argument("project", help="Path to PyUnity project", nargs="?")
+        self.gui = False
+
+    def parse_args(self, args=None, namespace=None):
+        args = super(Parser, self).parse_args(args, namespace)
+        if args.project is None:
+            self.print_help()
+            self.exit(0)
+        if not args.new and not os.path.isdir(args.project):
+            if self.gui:
+                import ctypes
+                ctypes.windll.user32.MessageBoxW(0, "Project not found", "Help", 0x10)
+                self.exit(1)
+            else:
+                raise Exception("Project not found")
+        return args
+
+    def print_help(self):
+        if self.gui:
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(0, self.format_help(), "Help", 0x40)
+        else:
+            print(self.format_help())
+
+    def error(self, message):
+        msg = f"{self.prog}: error: {message}"
+        if self.gui:
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(0, msg, "Error", 0x10)
+        else:
+            self.print_usage(sys.stderr)
+            sys.stderr.write(msg + "\n")
+        self.exit(2)
+
+parser = Parser(description="Launch the PyUnity editor")
 
 def run(args=None):
     if args is None:
         args = parser.parse_args()
-        if not args.new and not os.path.isdir(args.project):
-            raise Exception("Project not found")
 
     from pyunity import SceneManager, Loader
     if args.new:
@@ -30,17 +67,14 @@ def run(args=None):
 
 def main():
     args = parser.parse_args()
-    if not args.new and not os.path.isdir(args.project):
-        raise Exception("Project not found")
     if args.splash:
         start(run, args=[args])
     else:
         run(args)
 
 def gui():
+    parser.gui = True
     args = parser.parse_args()
-    if not args.new and not os.path.isdir(args.project):
-        raise Exception("Project not found")
 
     def inner():
         temp_stream = io.StringIO()
