@@ -139,7 +139,7 @@ try:
     zipname = "python" + "".join(version.split(".")[:2])
     with PyZipFile(zipname + ".zip", "a", optimize=1, **zipoptions) as zf:
         addPackage(zf, "pyunity", "pyunity\\**\\*", workdir, "pyunity")
-        addPackage(zf, "editor", "editor\\**\\*", workdir, "pyunity_editor")
+        addPackage(zf, "editor", "pyunity_editor\\**\\*", workdir, "pyunity_editor")
 
         for name, url in wheels[0].items():
             download(url, "..\\" + name + ".whl")
