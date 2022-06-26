@@ -208,7 +208,7 @@ try:
             Py_Initialize();
             PySys_SetArgvEx(argc, program, 0);
 
-            PyObject *editor = PyImport_ImportModule("editor.cli");
+            PyObject *editor = PyImport_ImportModule("pyunity_editor.cli");
             CHECK(editor)
             #ifdef NOCONSOLE
             PyObject *func = PyObject_GetAttrString(editor, "gui");
