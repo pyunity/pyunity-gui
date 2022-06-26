@@ -95,12 +95,12 @@ def stripPySide6():
         if len(os.listdir(dir)) == 0:
             os.rmdir(dir)
 
-def addPackage(zf, name, path, orig, eggInfo=""):
+def addPackage(zf, name, path, orig, distInfo=""):
     print("COMPILE", name, flush=True)
     os.chdir("..\\" + name)
     paths = glob.glob(path, recursive=True)
-    if eggInfo:
-        paths.extend(glob.glob(eggInfo + ".egg-info\\**\\*", recursive=True))
+    if distInfo:
+        paths.extend(glob.glob(distInfo + ".dist-info\\**\\*", recursive=True))
     for file in paths:
         if file.endswith(".py"):
             py_compile.compile(file, file + "c", file,
