@@ -8,6 +8,8 @@ parser = argparse.ArgumentParser(
     prog="editor", description="Launch the PyUnity editor")
 parser.add_argument("-n", "--new",
                     action="store_true", help="Create a new PyUnity project")
+parser.add_argument("-S", "--no-splash", action="store_false", dest="splash",
+                    help="Disable the splash image on launch")
 parser.add_argument("project", help="Path to PyUnity project")
 
 def run(args=None):
@@ -30,7 +32,10 @@ def main():
     args = parser.parse_args()
     if not args.new and not os.path.isdir(args.project):
         raise Exception("Project not found")
-    start(run, [args])
+    if args.splash:
+        start(run, args=[args])
+    else:
+        run(args)
 
 def gui():
     args = parser.parse_args()
@@ -53,4 +58,7 @@ def gui():
         redirect_out(f)
         Logger.SetStream(f)
         run(args)
-    start(inner)
+    if args.splash:
+        start(inner)
+    else:
+        inner()
