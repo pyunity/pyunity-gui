@@ -29,8 +29,13 @@ if shutil.which("7z.exe") is None:
 if "GITHUB_ACTIONS" in os.environ:
     if shutil.which("cl.exe") is None:
         raise Exception("Microsoft Visual C is needed to build the PyUnity Editor.")
-elif shutil.which("gcc.exe") is None:
-    raise Exception("MinGW-w64 is needed to build the PyUnity Editor.")
+    if shutil.which("rc.exe") is None:
+        raise Exception("Cannot find 'rc.exe'")
+else:
+    if shutil.which("gcc.exe") is None:
+        raise Exception("MinGW-w64 is needed to build the PyUnity Editor.")
+    if shutil.which("windres.exe") is None:
+        raise Exception("Cannot find 'windres.exe'")
 
 class PypiLinkGetter:
     session = PipSession()
