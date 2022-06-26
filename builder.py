@@ -205,7 +205,7 @@ try:
         #define Py_LIMITED_API 0x03060000
         #include <Python.h>
         #include <string.h>
-        #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); , flush=True}
+        #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
         int main(int argc, char **argv) {
             wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib", NULL);
