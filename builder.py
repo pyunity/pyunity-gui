@@ -207,13 +207,6 @@ try:
         #include <string.h>
         #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
-        #ifdef NOCONSOLE
-        #include <windows.h>
-        int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd) {
-            return main(__argc, __argv);
-        }
-        #endif
-
         int main(int argc, char **argv) {
             wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib", NULL);
             Py_SetPath(path);
@@ -251,6 +244,14 @@ try:
             free((void*)path);
             return 0;
         }
+
+        #ifdef NOCONSOLE
+        #include <windows.h>
+        int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                char* pCmdLine, int nShowCmd) {
+            return main(__argc, __argv);
+        }
+        #endif
         """))
 
     shutil.copy(orig + "\\standalone\\icons.ico", "..")
