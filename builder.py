@@ -61,6 +61,7 @@ def download(url, dest):
     shutil.copy(path, dest)
 
 def stripPySide6():
+    print("STRIP PySide6", flush=True)
     keep = [
         "__init__.pyc", "QtCore.pyd", "QtGui.pyd", "QtOpenGL.pyd",
         "QtOpenGLWidgets.pyd", "QtWidgets.pyd", "pyside6.abi3.dll",
@@ -74,6 +75,21 @@ def stripPySide6():
                 os.remove(path)
         if len(os.listdir(dir)) == 0:
             os.rmdir(dir)
+
+def addPackage(zf, name, path, orig, eggInfo=""):
+    print("COMPILE", name, flush=True)
+    os.chdir("..\\" + name)
+    paths = glob.glob(path, recursive=True)
+    if eggInfo:
+        paths.extend(glob.glob(eggInfo + ".egg-info\\**\\*", recursive=True))
+    for file in paths:
+        if file.endswith(".py"):
+            py_compile.compile(file, file + "c", file,
+                            doraise=True, optimize=1)
+            zf.write(file + "c")
+        elif not file.endswith(".pyc"):
+            zf.write(file)
+    os.chdir(orig)
 
 tmp = tempfile.mkdtemp()
 orig = os.getcwd() + "\\"
@@ -122,59 +138,29 @@ try:
 
     zipname = "python" + "".join(version.split(".")[:2])
     with PyZipFile(zipname + ".zip", "a", optimize=1, **zipoptions) as zf:
-        print("COMPILE pyunity", flush=True)
-        os.chdir("..\\pyunity")
-        for file in glob.glob("pyunity\\**\\*", recursive=True) + \
-                glob.glob("pyunity.egg-info\\**\\*", recursive=True):
-            if file.endswith(".py"):
-                py_compile.compile(file, file + "c", file,
-                                   doraise=True, optimize=1)
-                zf.write(file + "c")
-            elif not file.endswith(".pyc"):
-                zf.write(file)
-        os.chdir(workdir)
-
-        print("COMPILE editor", flush=True)
-        os.chdir("..\\editor")
-        for file in glob.glob("editor\\**\\*", recursive=True) + \
-                glob.glob("pyunity_editor.egg-info\\**\\*", recursive=True):
-            if file.endswith(".py"):
-                py_compile.compile(file, file + "c", file,
-                                   doraise=True, optimize=1)
-                zf.write(file + "c")
-            elif not file.endswith(".pyc"):
-                zf.write(file)
-        os.chdir(workdir)
+        addPackage(zf, "pyunity", "pyunity\\**\\*", workdir, "pyunity")
+        addPackage(zf, "editor", "editor\\**\\*", workdir, "pyunity_editor")
 
         for name, url in wheels[0].items():
             download(url, "..\\" + name + ".whl")
             with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
                 print("EXTRACT " + name + ".whl", flush=True)
                 zf2.extractall("..\\" + name)
-
-            print("COMPILE", name, flush=True)
-            os.chdir("..\\" + name)
-            for file in glob.glob("**\\*", recursive=True):
-                if file.endswith(".py"):
-                    py_compile.compile(file, file + "c", file,
-                                       doraise=True, optimize=1)
-                    zf.write(file + "c")
-                elif not file.endswith(".pyc"):
-                    zf.write(file)
-            os.chdir(workdir)
+            addPackage(zf, name, "**\\*", workdir)
 
     for name, url in wheels[1].items():
         download(url, "..\\" + name + ".whl")
         print("COPY", name, flush=True)
         with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
             zf2.extractall("Lib")
+
+    print("COMPILE Lib")
     os.chdir("Lib")
     for file in glob.glob("**\\*.py", recursive=True):
         py_compile.compile(file, file + "c", optimize=1, quiet=0)
         os.remove(file)
     os.chdir(workdir)
 
-    print("STRIP PySide6", flush=True)
     stripPySide6()
 
     print("MOVE *.pyd", flush=True)
@@ -315,18 +301,10 @@ try:
     print("SFX pyunity-editor.exe", flush=True)
     with open("pyunity-editor-install.exe", "wb+") as f1:
         with open(orig + "\\standalone\\7z.sfx", "rb") as f2:
-            while True:
-                data = f2.read(65536)
-                if not data:
-                    break
-                f1.write(data)
+            shutil.copyfileobj(f2, f1)
         with open("pyunity-editor.7z", "rb") as f2:
-            while True:
-                data = f2.read(65536)
-                if not data:
-                    break
-                f1.write(data)
-    shutil.copyfile("pyunity-editor-install.exe", orig + "\\pyunity-editor-install.exe")
+            shutil.copyfileobj(f2, f1)
+    shutil.copy("pyunity-editor-install.exe", orig)
 
     if "GITHUB_ACTIONS" not in os.environ:
         input("Press Enter to continue ...")
