@@ -51,7 +51,7 @@ class PyZipFile(zipfile.PyZipFile):
         self._optimize = optimize
 
 def download(url, dest):
-    print("GET", url, "->", os.path.basename(dest))
+    print("GET", url, "->", os.path.basename(dest), flush=True)
     directory = Path.home() / ".pyunity" / ".builder"
     directory.mkdir(parents=True, exist_ok=True)
     digest = hashlib.sha256(url.encode()).hexdigest()
@@ -84,17 +84,17 @@ try:
     vername = f"pyunity-editor"
     os.makedirs(vername, exist_ok=True)
     with zipfile.ZipFile("embed.zip") as zf:
-        print("EXTRACT embed.zip")
+        print("EXTRACT embed.zip", flush=True)
         zf.extractall(vername)
 
     url = "https://github.com/pyunity/pyunity/archive/refs/heads/develop.zip"
-    print("GET", url, "-> pyunity.zip")
+    print("GET", url, "-> pyunity.zip", flush=True)
     urllib.request.urlretrieve(url, "pyunity.zip")
     with zipfile.ZipFile("pyunity.zip") as zf:
-        print("EXTRACT pyunity.zip")
+        print("EXTRACT pyunity.zip", flush=True)
         zf.extractall()
 
-    print("BUILD pyunity")
+    print("BUILD pyunity", flush=True)
     os.chdir("pyunity-develop")
     subprocess.call([sys.executable, "setup.py", "bdist_wheel"],
                     stdout=subprocess.DEVNULL, stderr=sys.stderr,
@@ -103,10 +103,10 @@ try:
     os.chdir(tmp)
 
     with zipfile.ZipFile("pyunity.whl") as zf:
-        print("EXTRACT pyunity.whl")
+        print("EXTRACT pyunity.whl", flush=True)
         zf.extractall("pyunity")
 
-    print("BUILD pyunity-editor")
+    print("BUILD pyunity-editor", flush=True)
     os.chdir(orig)
     subprocess.call([sys.executable, "setup.py", "bdist_wheel"],
                     stdout=subprocess.DEVNULL, stderr=sys.stderr)
@@ -114,7 +114,7 @@ try:
     os.chdir(tmp)
 
     with zipfile.ZipFile("pyunity-editor.whl") as zf:
-        print("EXTRACT pyunity-editor.whl")
+        print("EXTRACT pyunity-editor.whl", flush=True)
         zf.extractall("editor")
 
     workdir = tmp + "\\" + vername
@@ -122,7 +122,7 @@ try:
 
     zipname = "python" + "".join(version.split(".")[:2])
     with PyZipFile(zipname + ".zip", "a", optimize=1, **zipoptions) as zf:
-        print("COMPILE pyunity")
+        print("COMPILE pyunity", flush=True)
         os.chdir("..\\pyunity")
         for file in glob.glob("pyunity\\**\\*", recursive=True) + \
                 glob.glob("pyunity.egg-info\\**\\*", recursive=True):
@@ -134,7 +134,7 @@ try:
                 zf.write(file)
         os.chdir(workdir)
 
-        print("COMPILE editor")
+        print("COMPILE editor", flush=True)
         os.chdir("..\\editor")
         for file in glob.glob("editor\\**\\*", recursive=True) + \
                 glob.glob("pyunity_editor.egg-info\\**\\*", recursive=True):
@@ -149,10 +149,10 @@ try:
         for name, url in wheels[0].items():
             download(url, "..\\" + name + ".whl")
             with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
-                print("EXTRACT " + name + ".whl")
+                print("EXTRACT " + name + ".whl", flush=True)
                 zf2.extractall("..\\" + name)
 
-            print("COMPILE", name)
+            print("COMPILE", name, flush=True)
             os.chdir("..\\" + name)
             for file in glob.glob("**\\*", recursive=True):
                 if file.endswith(".py"):
@@ -165,7 +165,7 @@ try:
 
     for name, url in wheels[1].items():
         download(url, "..\\" + name + ".whl")
-        print("COPY", name)
+        print("COPY", name, flush=True)
         with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
             zf2.extractall("Lib")
     os.chdir("Lib")
@@ -174,10 +174,10 @@ try:
         os.remove(file)
     os.chdir(workdir)
 
-    print("STRIP PySide6")
+    print("STRIP PySide6", flush=True)
     stripPySide6()
 
-    print("MOVE *.pyd")
+    print("MOVE *.pyd", flush=True)
     for file in glob.glob("*.pyd"):
         shutil.move(file, "Lib")
 
@@ -190,22 +190,22 @@ try:
     if MSVC_RUNTIME:
         download("https://files.pythonhosted.org/packages/6d/4a/602120a9e6625169fbddbdd036fe5559af638986dc0c3c3b602d3d60f95e/msvc_runtime-14.29.30133-cp310-cp310-win_amd64.whl", "..\\msvc_runtime.whl")
         with zipfile.ZipFile("..\\msvc_runtime.whl") as zf:
-            print("EXTRACT msvc_runtime.whl")
+            print("EXTRACT msvc_runtime.whl", flush=True)
             zf.extractall("..\\msvc_runtime")
         datafolder = glob.glob("..\\msvc_runtime\\*.data\\data\\")[0]
-        print("COPY msvc_runtime")
+        print("COPY msvc_runtime", flush=True)
         for file in os.listdir(datafolder):
             if file.endswith(".dll"):
                 shutil.copy(os.path.join(datafolder, file), ".")
 
-    print("WRITE pyunity-editor.c")
+    print("WRITE pyunity-editor.c", flush=True)
     with open("pyunity-editor.c", "w+") as f:
         f.write(textwrap.dedent("""
         #define PY_SSIZE_T_CLEAN
         #define Py_LIMITED_API 0x03060000
         #include <Python.h>
         #include <string.h>
-        #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
+        #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); , flush=True}
 
         int main(int argc, char **argv) {
             wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib", NULL);
@@ -215,7 +215,7 @@ try:
                 program[i] = Py_DecodeLocale(argv[i], NULL);
             }
             if (program[0] == NULL) {
-                fprintf(stderr, "Fatal error: cannot decode argv[0]\\n");
+                fprintf(stderr, "Fatal error: cannot decode argv[0]\\n"), flush=True;
                 exit(1);
             }
             Py_SetProgramName(program[0]);
@@ -246,12 +246,12 @@ try:
     shutil.copy(orig + "\\standalone\\icons.rc", "..")
 
     if "GITHUB_ACTIONS" in os.environ:
-        print("COMPILE icons.o")
+        print("COMPILE icons.o", flush=True)
         subprocess.call([
             "rc.exe", "/fo..\\icons.res", "..\\icons.rc"
         ], stdout=sys.stdout, stderr=sys.stderr)
 
-        print("COMPILE pyunity-editor.exe")
+        print("COMPILE pyunity-editor.exe", flush=True)
         subprocess.call([
             "cl.exe", "/nologo", "/O2", "/Wall",
             "/Tcpyunity-editor.c", "/Fo..\\pyunity-editor.obj",
@@ -260,13 +260,13 @@ try:
             "/out:pyunity-editor.exe"
         ], stdout=sys.stdout, stderr=sys.stderr)
     else:
-        print("COMPILE icons.o")
+        print("COMPILE icons.o", flush=True)
         subprocess.call([
             "windres.exe", "-O", "coff",
             "..\\icons.rc", "..\\icons.o"
         ], stdout=sys.stdout, stderr=sys.stderr)
 
-        print("COMPILE pyunity-editor.exe")
+        print("COMPILE pyunity-editor.exe", flush=True)
         subprocess.call([
             "gcc.exe", "-O2", "-Wall",
             "-o", "pyunity-editor.exe", "pyunity-editor.c", "..\\icons.o",
@@ -274,7 +274,7 @@ try:
         ], stdout=sys.stdout, stderr=sys.stderr)
     os.remove("pyunity-editor.c")
 
-    print(f"ZIP pyunity-editor.zip")
+    print(f"ZIP pyunity-editor.zip", flush=True)
     os.chdir(tmp)
     subprocess.call([
         "7z.exe", "a", "-mx=9",
@@ -282,14 +282,14 @@ try:
     ], stdout=sys.stdout, stderr=sys.stderr)
     shutil.copy(f"pyunity-editor.zip", orig)
 
-    print(f"7Z pyunity-editor.7z")
+    print(f"7Z pyunity-editor.7z", flush=True)
     subprocess.call([
         "7z.exe", "a", "-mx=9",
         f"pyunity-editor.7z", vername
     ], stdout=sys.stdout, stderr=sys.stderr)
     shutil.copy(f"pyunity-editor.7z", orig)
 
-    print("SFX pyunity-editor.exe")
+    print("SFX pyunity-editor.exe", flush=True)
     with open("pyunity-editor-install.exe", "wb+") as f1:
         with open(orig + "\\standalone\\7z.sfx", "rb") as f2:
             while True:
@@ -308,9 +308,9 @@ try:
     if "GITHUB_ACTIONS" not in os.environ:
         input("Press Enter to continue ...")
 except BaseException as e:
-    print("".join(traceback.format_exception(e)))
+    print("".join(traceback.format_exception(e)), flush=True)
     raise SystemExit
 finally:
-    print("Cleaning up")
+    print("Cleaning up", flush=True)
     os.chdir(orig)
     shutil.rmtree(tmp)
