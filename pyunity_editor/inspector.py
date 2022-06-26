@@ -1,5 +1,5 @@
 from PySide6.QtCore import (
-    Signal, Qt, QParallelAnimationGroup, QPropertyAnimation, QAbstractAnimation)
+    Signal, Qt, QParallelAnimationGroup, QPropertyAnimation, QAbstractAnimation, QTimer)
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from .smoothScroll import QSmoothListWidget, QSmoothScrollArea
@@ -95,6 +95,9 @@ class Inspector(QWidget):
         self.button.setStyleSheet("QPushButton { margin: 10px; }"
                                   "QPushButton::menu-indicator{ image: none; }")
         self.finder = ComponentFinder(self.button)
+        self.finder.listWidget.itemDoubleClicked.connect(self.addComponent)
+        callback = lambda: self.addComponent(self.finder.listWidget.itemAt(0))
+        self.finder.inputBox.returnPressed.connect(callback)
         self.button.setMenu(self.finder)
 
         self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
@@ -114,6 +117,10 @@ class Inspector(QWidget):
         section.edited.connect(self.on_edit)
         self.sections.append(section)
         self.vbox_layout.addWidget(section)
+        if isinstance(component, pyu.Component):
+            for name, val in component._shown.items():
+                section.add_value(name, val, getattr(component, name))
+            section.adjustHeight()
         return section
 
     def load(self, hierarchyItem):
@@ -148,18 +155,26 @@ class Inspector(QWidget):
         main_section.adjustHeight()
 
         for component in self.gameObject.components:
-            section = self.add_section(component)
-            for name, val in component._shown.items():
-                section.add_value(name, val, getattr(component, name))
-            section.adjustHeight()
+            self.add_section(component)
 
         self.addComponentButton()
 
     def addComponentButton(self):
+        if self.button in self.vbox_layout.children():
+            self.vbox_layout.removeWidget(self.button)
         self.vbox_layout.addWidget(self.button)
 
-    def addComponent(self):
-        pass
+    def addComponent(self, item):
+        self.finder.close()
+        if item.text() == "Create a new Behaviour...":
+            pass
+        else:
+            componentType = self.finder.components[item.text()]
+            component = self.gameObject.AddComponent(componentType)
+            self.add_section(component)
+            self.addComponentButton()
+        scrollBar = self.scrollArea.verticalScrollBar()
+        QTimer.singleShot(1, lambda: scrollBar.setValue(scrollBar.maximum()))
 
     def on_edit(self, section, item, value, attr):
         if hasattr(item, "prevent_modify") or section.component is None:
