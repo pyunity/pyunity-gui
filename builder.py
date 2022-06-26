@@ -256,11 +256,16 @@ try:
 
     shutil.copy(orig + "\\standalone\\icons.ico", "..")
     shutil.copy(orig + "\\standalone\\icons.rc", "..")
+    shutil.copy(orig + "\\standalone\\version.rc", "..")
 
     if "GITHUB_ACTIONS" in os.environ:
         print("COMPILE icons.o", flush=True)
         subprocess.call([
             "rc.exe", "/fo..\\icons.res", "..\\icons.rc"
+        ], stdout=sys.stdout, stderr=sys.stderr)
+        print("COMPILE version.o", flush=True)
+        subprocess.call([
+            "rc.exe", "/fo..\\version.res", "..\\version.rc"
         ], stdout=sys.stdout, stderr=sys.stderr)
 
         print("COMPILE pyunity-editor.exe", flush=True)
@@ -268,7 +273,7 @@ try:
             "cl.exe", "/nologo", "/O2", "/Wall",
             "/Tcpyunity-editor.c", "/Fo..\\pyunity-editor.obj",
             f"/I{sys.base_prefix}\\include", "/DNOCONSOLE",
-            "/link", "..\\icons.res", "/subsystem:windows",
+            "/link", "..\\icons.res", "..\\version.res", "/subsystem:windows",
             f"/libpath:{sys.base_prefix}\\libs",
             "/out:pyunity-editor.exe"
         ], stdout=sys.stdout, stderr=sys.stderr)
@@ -278,11 +283,16 @@ try:
             "windres.exe", "-O", "coff",
             "..\\icons.rc", "..\\icons.o"
         ], stdout=sys.stdout, stderr=sys.stderr)
+        print("COMPILE version.o", flush=True)
+        subprocess.call([
+            "windres.exe", "-O", "coff",
+            "..\\version.rc", "..\\version.o"
+        ], stdout=sys.stdout, stderr=sys.stderr)
 
         print("COMPILE pyunity-editor.exe", flush=True)
         subprocess.call([
             "gcc.exe", "-O2", "-Wall", "-mwindows", "-DNOCONSOLE",
-            "-o", "pyunity-editor.exe", "pyunity-editor.c", "..\\icons.o",
+            "-o", "pyunity-editor.exe", "pyunity-editor.c", "..\\icons.o", "..\\version.o",
             "-L.", f"-l{zipname}", f"-I{sys.base_prefix}\\include",
         ], stdout=sys.stdout, stderr=sys.stderr)
     os.remove("pyunity-editor.c")

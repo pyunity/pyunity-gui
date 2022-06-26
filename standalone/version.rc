@@ -1,0 +1,21 @@
+1 VERSIONINFO
+FILEVERSION 19,0,0,0
+PRODUCTVERSION 19,0,0,0
+FILEOS 0x40004
+FILETYPE 0x1
+{
+BLOCK "StringFileInfo"
+{
+	BLOCK "040904B0"
+	{
+		VALUE "CompanyName", "The PyUnity Team"
+		VALUE "FileDescription", "PyUnity Editor"
+		VALUE "FileVersion", "19.00"
+		VALUE "InternalName", "PyUnity Editor"
+		VALUE "LegalCopyright", "Copyright (c) 2020-2022 The PyUnity Team"
+		VALUE "OriginalFilename", "pyunity-editor.exe"
+		VALUE "ProductName", "PyUnity"
+		VALUE "ProductVersion", "19.00"
+	}
+}
+}
