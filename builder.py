@@ -19,6 +19,11 @@ from pip._internal.models.selection_prefs import SelectionPreferences
 from pip._internal.models.target_python import TargetPython
 from pip._internal.req.constructors import install_req_from_line
 
+MSVC_RUNTIME = False
+VERSION = "3.10.5"
+ARCH = "amd64"
+ZIP_OPTIONS = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
+
 if shutil.which("7z.exe") is None:
     raise Exception("7Zip is needed to build the PyUnity Editor.")
 if "GITHUB_ACTIONS" in os.environ:
@@ -52,26 +57,12 @@ class PypiLinkGetter:
             finder = cls.finders[vertuple, platform]
         return finder.find_requirement(install_req_from_line(req), False).link._url
 
-MSVC_RUNTIME = False
-version = "3.10.5"
-arch = "amd64"
-zipoptions = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
-
 wheels = [{}, {}]
 for req in ["pyopengl", "pysdl2"]:
-    wheels[0][req] = PypiLinkGetter.getLink(version, arch, req)
+    wheels[0][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
 for req in ["pyopengl_accelerate", "pysdl2_dll", "pillow", "pyglm",
         "pyside6", "shiboken6", "pyside6_essentials", "glfw"]:
-    wheels[1][req] = PypiLinkGetter.getLink(version, arch, req)
-
-class PyZipFile(zipfile.PyZipFile):
-    """Class to create ZIP archives with Python library files and packages."""
-
-    def __init__(self, file, mode="r", compression=zipfile.ZIP_STORED,
-                 allowZip64=True, optimize=-1, compresslevel=None):
-        zipfile.ZipFile.__init__(self, file, mode=mode, compression=compression,
-                         allowZip64=allowZip64, compresslevel=compresslevel)
-        self._optimize = optimize
+    wheels[1][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
 
 def download(url, dest):
     print("GET", url, "->", os.path.basename(dest), flush=True)
@@ -108,7 +99,7 @@ def addPackage(zf, name, path, orig, eggInfo=""):
     for file in paths:
         if file.endswith(".py"):
             py_compile.compile(file, file + "c", file,
-                            doraise=True, optimize=1)
+                            doraise=True)
             zf.write(file + "c")
         elif not file.endswith(".pyc"):
             zf.write(file)
@@ -118,7 +109,7 @@ tmp = tempfile.mkdtemp()
 orig = os.getcwd() + "\\"
 os.chdir(tmp)
 try:
-    download(f"https://www.python.org/ftp/python/{version}/python-{version}-embed-{arch}.zip",
+    download(f"https://www.python.org/ftp/python/{VERSION}/python-{VERSION}-embed-{ARCH}.zip",
              "embed.zip")
     vername = f"pyunity-editor"
     os.makedirs(vername, exist_ok=True)
@@ -159,8 +150,8 @@ try:
     workdir = tmp + "\\" + vername
     os.chdir(workdir)
 
-    zipname = "python" + "".join(version.split(".")[:2])
-    with PyZipFile(zipname + ".zip", "a", optimize=1, **zipoptions) as zf:
+    zipname = "python" + "".join(VERSION.split(".")[:2])
+    with zipfile.ZipFile(zipname + ".zip", "a", **ZIP_OPTIONS) as zf:
         addPackage(zf, "pyunity", "pyunity\\**\\*", workdir, "pyunity")
         addPackage(zf, "editor", "pyunity_editor\\**\\*", workdir, "pyunity_editor")
 
@@ -180,7 +171,7 @@ try:
     print("COMPILE Lib")
     os.chdir("Lib")
     for file in glob.glob("**\\*.py", recursive=True):
-        py_compile.compile(file, file + "c", optimize=1, quiet=0)
+        py_compile.compile(file, file + "c", quiet=0)
         os.remove(file)
     os.chdir(workdir)
 
