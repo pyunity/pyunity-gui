@@ -134,11 +134,13 @@ class Hierarchy(QWidget):
 
     def reparent(self, items, indices, parents):
         for item, index, parent in zip(items, indices, parents):
+            item.setSelected(True)
             if parent is None:
                 item.gameObject.transform.ReparentTo(None)
                 print("Move", item.gameObject.name, "to root, index", index)
             else:
                 print("Move", item.gameObject.name, "under", parent.gameObject.name, "index", index)
+                parent.setExpanded(True)
                 transform = item.gameObject.transform
                 parentTransform = parent.gameObject.transform
                 transform.ReparentTo(parentTransform)
