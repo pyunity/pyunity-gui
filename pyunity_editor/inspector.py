@@ -518,8 +518,8 @@ class InspectorSection(QWidget):
         self.mainLayout = QGridLayout(self)
         self.mainLayout.setVerticalSpacing(0)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
-        self.mainLayout.addWidget(self.toggleButton, 0, 0, 1, 1, Qt.AlignLeft)
-        self.mainLayout.addWidget(self.contentArea, 1, 0, 1, 2, Qt.AlignLeft)
+        self.mainLayout.addWidget(self.toggleButton, 0, 0, 1, 1)
+        self.mainLayout.addWidget(self.contentArea, 1, 0, 1, 2)
         self.setLayout(self.mainLayout)
 
         self.grid_layout = QGridLayout(self.contentArea)
