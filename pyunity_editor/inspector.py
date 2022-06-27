@@ -90,16 +90,7 @@ class Inspector(QWidget):
         self.baseLayout.addWidget(self.scrollArea)
 
         self.sections = []
-
-        self.button = QPushButton("Add Component")
-        self.button.setStyleSheet("QPushButton { margin: 10px; }"
-                                  "QPushButton::menu-indicator{ image: none; }")
-        self.finder = ComponentFinder(self.button)
-        self.finder.listWidget.itemDoubleClicked.connect(self.addComponent)
-        callback = lambda: self.addComponent(self.finder.listWidget.item(0))
-        self.finder.inputBox.returnPressed.connect(callback)
-        self.button.setMenu(self.finder)
-
+        self.button = None
         self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
 
     def add_buffer(self, text):
@@ -130,10 +121,8 @@ class Inspector(QWidget):
             item = self.vbox_layout.takeAt(0)
             widget = item.widget()
             self.vbox_layout.removeItem(item)
-            if widget not in [self.button]:
-                widget.deleteLater()
-            else:
-                widget.setParent(None)
+            widget.deleteLater()
+        self.button = None
         if hierarchyItem == []:
             self.buffer = self.add_buffer("Select a single item to view its properties.")
             return
@@ -160,9 +149,16 @@ class Inspector(QWidget):
         self.addComponentButton()
 
     def addComponentButton(self):
-        if self.button in self.vbox_layout.children():
+        if self.button is not None:
             self.vbox_layout.removeWidget(self.button)
-        self.vbox_layout.addWidget(self.button)
+        self.button = QPushButton("Add Component")
+        self.button.setStyleSheet("QPushButton { margin: 10px; }"
+                                  "QPushButton::menu-indicator{ image: none; }")
+        self.finder = ComponentFinder(self.button)
+        self.finder.listWidget.itemDoubleClicked.connect(self.addComponent)
+        callback = lambda: self.addComponent(self.finder.listWidget.item(0))
+        self.finder.inputBox.returnPressed.connect(callback)
+        self.button.setMenu(self.finder)
 
     def addComponent(self, item):
         self.finder.close()
@@ -508,7 +504,7 @@ class InspectorSection(QWidget):
         self.toggleButton.clicked.connect(self.toggle)
 
         self.contentArea = QFrame(self)
-        self.contentArea.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Fixed)
+        self.contentArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.contentArea.setMaximumHeight(0)
         self.contentArea.setMinimumHeight(0)
 

@@ -132,9 +132,10 @@ class Hierarchy(QWidget):
                 self.loaded.Destroy(item.gameObject)
         self.preview.update()
 
-    def reparent(self, items, indices, parents):
-        for item, index, parent in zip(items, indices, parents):
-            item.setSelected(True)
+    def reparent(self, items):
+        for item in items:
+            index = self.tree_widget.indexFromItem(item).row()
+            parent = item.parent()
             if parent is None:
                 item.gameObject.transform.ReparentTo(None)
                 print("Move", item.gameObject.name, "to root, index", index)
@@ -217,15 +218,10 @@ class CustomTreeWidget(QSmoothTreeWidget):
 
     def dropEvent(self, event):
         items = self.selectedItems()
-        indices = []
-        parents = []
-
         super(CustomTreeWidget, self).dropEvent(event)
-
         for item in items:
-            indices.append(self.indexFromItem(item).row())
-            parents.append(item.parent())
-        self.hierarchy.reparent(items, indices, parents)
+            item.setSelected(True)
+        self.hierarchy.reparent(items)
 
     def contextMenuEvent(self, event):
         menu = QMenu()
