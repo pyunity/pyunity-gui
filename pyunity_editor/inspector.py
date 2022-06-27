@@ -96,7 +96,7 @@ class Inspector(QWidget):
                                   "QPushButton::menu-indicator{ image: none; }")
         self.finder = ComponentFinder(self.button)
         self.finder.listWidget.itemDoubleClicked.connect(self.addComponent)
-        callback = lambda: self.addComponent(self.finder.listWidget.itemAt(0))
+        callback = lambda: self.addComponent(self.finder.listWidget.item(0))
         self.finder.inputBox.returnPressed.connect(callback)
         self.button.setMenu(self.finder)
 
