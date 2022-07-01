@@ -17,8 +17,8 @@ Therefore, PyUnity Editor is also completely seperate from UnityEditor.
 
 The PyPi package does not work with the latest releases of PyUnity, and as such the best way
 to use this editor is to clone this editor and regularly run `git pull` to update. From the repo,
-running `python -m editor ProjectPath/` will work. To create a new project, run
-`python -m editor --new ProjectPath/`. Note that this editor also relies on the `develop` branch
+running `python -m pyunity_editor ProjectPath/` will work. To create a new project, run
+`python -m pyunity_editor --new ProjectPath/`. Note that this editor also relies on the `develop` branch
 of PyUnity, which can be fetched with `install.py`. Run this periodically in case of any errors.
 
 A full run would look something like this:
@@ -28,8 +28,8 @@ git clone https://github.com/pyunity/pyunity-gui/
 cd pyunity-gui/
 python install.py
 python -m pip install -r requirements.txt
-python -m editor --new ProjectPath/
-``` 
+python -m pyunity_editor --new ProjectPath/
+```
 
 ## Contributing
 
