@@ -3,7 +3,7 @@ os.environ["PYUNITY_DEBUG_MODE"] = "1"
 from PySide6.QtCore import QThread, QObject, Signal, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox
 from .window import Editor, SceneButtons, Window
-from .views import Hierarchy
+from .views import Hierarchy, HierarchyItem
 from .inspector import Inspector
 from .render import OpenGLFrame, Console
 from .files import FileTracker
@@ -43,6 +43,7 @@ class Application(QApplication):
         self.buttons.setMaximumHeight(self.buttons.sizeHint().height())
         self.window.vbox_layout.addWidget(self.buttons)
 
+        # Tabs
         self.editor = Editor(self.window)
         self.window.vbox_layout.addWidget(self.editor)
         self.scene = self.editor.add_tab("Scene", 0, 0)
@@ -56,24 +57,49 @@ class Application(QApplication):
 
         self.editor.set_stretch((3, 1, 1))
 
+        # Views
         self.inspector_content = self.inspector.set_window_type(Inspector)
 
         self.game_content = self.game.set_window_type(OpenGLFrame)
         self.game_content.set_buttons(self.buttons)
         self.game_content.file_tracker = FileTracker(self, path)
-        self.game_content.file_tracker.start(1)
-        self.game_content.original = SceneManager.GetSceneByIndex(
-            self.game_content.file_tracker.project.firstScene)
 
         self.hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
-        self.hierarchy_content.load_scene(self.game_content.original)
         self.hierarchy_content.inspector = self.inspector_content
         self.hierarchy_content.preview = self.game_content
 
         self.console_content = self.console.set_window_type(Console)
         self.game_content.console = self.console_content
 
+        self.loadScene(SceneManager.GetSceneByIndex(
+            self.game_content.file_tracker.project.firstScene))
+        self.game_content.file_tracker.start(1)
+
         self.setup_toolbar()
+
+    def loadScene(self, scene, uuids=None):
+        self.loaded = scene
+        self.game_content.original = self.loaded
+        self.hierarchy_content.load_scene(self.loaded)
+        if uuids is not None:
+            for uuid in uuids:
+                gameObject = self.game_content.file_tracker.project._idMap[uuid]
+                selected = None
+                stack = [self.hierarchy_content.tree_widget.invisibleRootItem()]
+                while stack:
+                    item = stack.pop(0)
+                    if isinstance(item, HierarchyItem) and item.gameObject is gameObject:
+                        selected = item
+                        break
+                    for i in range(item.childCount()):
+                        stack.append(item.child(i))
+                if selected is not None:
+                    current = selected
+                    while current.parent() is not None:
+                        current.parent().setExpanded(True)
+                        current = current.parent()
+                    selected.setSelected(True)
+                    self.hierarchy_content.on_click()
 
     def start(self):
         os.environ["PYUNITY_EDITOR_LOADED"] = "1"

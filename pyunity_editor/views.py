@@ -95,7 +95,6 @@ class Hierarchy(QWidget):
         self.tree_widget.clearSelection()
         item.setExpanded(True)
         newitem.setSelected(True)
-        newitem.setSelected(True)
 
     def new_sibling(self):
         sibling = self.tree_widget.currentItem()
@@ -126,8 +125,7 @@ class Hierarchy(QWidget):
             if item.parent() is not None:
                 item.parent().removeChild(item)
             else:
-                idx = self.tree_widget.indexOfTopLevelItem(item)
-                self.tree_widget.takeTopLevelItem(idx)
+                self.tree_widget.removeItemWidget(item, 0)
             if self.loaded.Has(item.gameObject):
                 self.loaded.Destroy(item.gameObject)
         self.preview.update()
@@ -171,6 +169,7 @@ class Hierarchy(QWidget):
         return item
 
     def load_scene(self, scene):
+        self.tree_widget.clear()
         self.loaded = scene
         self.title.setText(scene.name)
         items = {}

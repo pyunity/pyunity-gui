@@ -1,6 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QIcon, QFont, QAction
+from PySide6.QtGui import QIcon, QPixmap, QFont, QAction
+from PIL import Image
 import os
 from .files import getPath
 from .resources import qInitResources
@@ -34,7 +35,10 @@ class Window(QMainWindow):
         for size in [16, 24, 32, 48, 64, 128, 256]:
             filename = f"icon{size}x{size}.png"
             fullPath = os.path.join("icons", "window", filename)
-            self.icon.addFile(str(getPath(fullPath)))
+            img = Image.open(getPath(fullPath))
+            pixmap = QPixmap()
+            pixmap.loadFromData(img.tobytes())
+            self.icon.addPixmap(pixmap)
         self.setWindowIcon(self.icon)
 
     def toggle_theme(self):

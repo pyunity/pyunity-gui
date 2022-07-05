@@ -89,6 +89,7 @@ class Inspector(QWidget):
         self.scrollArea.setWidget(self.baseWidget)
         self.baseLayout.addWidget(self.scrollArea)
 
+        self.gameObject = None
         self.sections = []
         self.button = None
         self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
@@ -123,6 +124,7 @@ class Inspector(QWidget):
             self.vbox_layout.removeItem(item)
             widget.deleteLater()
         self.button = None
+        self.gameObject = None
         if hierarchyItem == []:
             self.buffer = self.add_buffer("Select a single item to view its properties.")
             return
