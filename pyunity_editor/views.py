@@ -41,7 +41,8 @@ class HierarchyItem(QTreeWidgetItem):
 
 class Hierarchy(QWidget):
     SPACER = None
-    def __init__(self, parent):
+
+    def __init__(self, parent=None):
         super(Hierarchy, self).__init__(parent)
         self.vbox_layout = QVBoxLayout(self)
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)

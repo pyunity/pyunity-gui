@@ -111,7 +111,8 @@ class QRunner(Runner):
 
 class OpenGLFrame(QOpenGLWidget):
     SPACER = None
-    def __init__(self, parent):
+
+    def __init__(self, parent=None):
         super(OpenGLFrame, self).__init__(parent)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setMouseTracking(True)
@@ -401,7 +402,8 @@ class SceneEditor:
 
 class Console(QSmoothListWidget):
     SPACER = None
-    def __init__(self, parent):
+
+    def __init__(self, parent=None):
         super(Console, self).__init__(parent)
         self.scrollRatio = 0.5
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)

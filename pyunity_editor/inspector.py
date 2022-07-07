@@ -65,11 +65,11 @@ class ComponentFinder(QMenu):
         QWidget.setTabOrder(self.inputBox, self.listWidget)
 
 class Inspector(QWidget):
-    SPACER = True
+    SPACER = None
     props = [pyu.ShowInInspector(str, "", "name"), pyu.ShowInInspector(int, "", "tag")]
     font = QFont("Segoe UI", 12)
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(Inspector, self).__init__(parent)
         self.baseLayout = QGridLayout(self)
         self.baseLayout.setContentsMargins(0, 0, 0, 0)

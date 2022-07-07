@@ -264,6 +264,7 @@ class Tab(QWidget):
 
     def set_window(self, content):
         self.content = content
+        self.content.setParent(self)
         self.vbox_layout.insertWidget(0, self.content)
         if hasattr(type(content), "SPACER"):
             self.vbox_layout.removeItem(self.spacer)
