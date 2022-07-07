@@ -188,7 +188,8 @@ class Editor(QSplitter):
             self.addWidget(columnWidget)
             self.stretch.append(1)
             self.columnWidgets.append(columnWidget)
-        columnWidget = self.columnWidgets[column]
+        else:
+            columnWidget = self.columnWidgets[column]
         return columnWidget.add_tab(name, row)
 
     def set_stretch(self, stretch):
@@ -226,7 +227,8 @@ class Column(QSplitter):
             self.stretch.append(1)
             self.tab_widgets.append(tab_widget)
             self.tabs.append([])
-        tab_widget = self.tab_widgets[row]
+        else:
+            tab_widget = self.tab_widgets[row]
         tab = Tab(tab_widget, name)
         self.tabs[row].append(tab)
         return tab
@@ -260,10 +262,10 @@ class Tab(QWidget):
         self.tab_widget.addTab(self, self.name)
         self.content = None
 
-    def set_window_type(self, window_type):
-        self.content = window_type(self)
+    def set_window(self, content):
+        self.content = content
         self.vbox_layout.insertWidget(0, self.content)
-        if hasattr(window_type, "SPACER"):
+        if hasattr(type(content), "SPACER"):
             self.vbox_layout.removeItem(self.spacer)
             del self.spacer
         return self.content

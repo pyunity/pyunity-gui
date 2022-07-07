@@ -1,7 +1,8 @@
 import os
+from pathlib import Path
 os.environ["PYUNITY_DEBUG_MODE"] = "1"
 from PySide6.QtCore import QThread, QObject, Signal, QTimer
-from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtWidgets import QApplication, QMessageBox, QFileDialog
 from .window import Editor, SceneButtons, Window
 from .views import Hierarchy, HierarchyItem
 from .inspector import Inspector
@@ -10,7 +11,6 @@ from .files import FileTracker
 from pyunity import SceneManager, Logger
 import io
 import sys
-import subprocess
 import contextlib
 
 def testing(string):
@@ -58,17 +58,17 @@ class Application(QApplication):
         self.editor.set_stretch((3, 1, 1))
 
         # Views
-        self.inspector_content = self.inspector.set_window_type(Inspector)
+        self.inspector_content = self.inspector.set_window(Inspector())
 
-        self.game_content = self.game.set_window_type(OpenGLFrame)
+        self.game_content = self.game.set_window(OpenGLFrame())
         self.game_content.set_buttons(self.buttons)
         self.game_content.file_tracker = FileTracker(self, path)
 
-        self.hierarchy_content = self.hierarchy.set_window_type(Hierarchy)
+        self.hierarchy_content = self.hierarchy.set_window(Hierarchy())
         self.hierarchy_content.inspector = self.inspector_content
         self.hierarchy_content.preview = self.game_content
 
-        self.console_content = self.console.set_window_type(Console)
+        self.console_content = self.console.set_window(Console())
         self.game_content.console = self.console_content
 
         self.loadScene(SceneManager.GetSceneByIndex(
@@ -110,9 +110,38 @@ class Application(QApplication):
 
     def open(self):
         Logger.Log("Choosing folder...")
-        # Get opened project
-        subprocess.Popen(["py", "cli.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        self.quit()
+        project = self.game_content.file_tracker.project
+        while True:
+            file, _ = QFileDialog.getOpenFileName(
+                None, "Select scene to open", str(project.path),
+                "PyUnity Scenes (*.scene)")
+            if not file:
+                return
+            fp = Path(file).resolve()
+            if not fp.is_relative_to(project.path):
+                message_box = QMessageBox(
+                    QMessageBox.Information, "Error",
+                    "Please select a scene that is in the project.")
+                message_box.exec()
+            else:
+                break
+
+        localPath = str(fp.relative_to(project.path).as_posix())
+        uuid = project.filePaths[localPath].uuid
+        scene = project._idMap[uuid]
+
+        message_box = QMessageBox(
+            QMessageBox.Information, "Quit",
+            "Are you sure you want to open a different scene?",
+            parent=self.window)
+        message_box.setInformativeText("You may lose unsaved changes.")
+        message_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        message_box.setDefaultButton(QMessageBox.Cancel)
+        ret = message_box.exec()
+        if ret == QMessageBox.Cancel:
+            return
+
+        self.loadScene(scene)
 
     def save(self):
         self.game_content.save()
@@ -120,7 +149,10 @@ class Application(QApplication):
         self.hierarchy_content.reset_bold()
 
     def quit_wrapper(self):
-        message_box = QMessageBox(QMessageBox.Information, "Quit", "Are you sure you want to quit?", parent=self.window)
+        message_box = QMessageBox(
+            QMessageBox.Information, "Quit",
+            "Are you sure you want to quit?",
+            parent=self.window)
         message_box.setInformativeText("You may lose unsaved changes.")
         message_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         message_box.setDefaultButton(QMessageBox.Cancel)
@@ -155,13 +187,11 @@ class Application(QApplication):
 
     def setup_toolbar(self):
         self.window.toolbar.add_action("New", "File", "Ctrl+N", "Create a new project", testing("new"))
-        self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open an existing project", self.open)
+        self.window.toolbar.add_action("Open", "File", "Ctrl+O", "Open another Scene", self.open)
+        self.window.toolbar.add_separator("File")
         self.window.toolbar.add_action("Save", "File", "Ctrl+S", "Save the current Scene", self.save)
         self.window.toolbar.add_action("Save As", "File", "Ctrl+Shift+S", "Save the current Scene as new file", testing("save as"))
         self.window.toolbar.add_action("Save a Copy As", "File", "Ctrl+Alt+S", "Save a copy of the current Scene", testing("save copy as"))
-        self.window.toolbar.add_separator("File")
-        self.window.toolbar.add_action("Close Scene", "File", "Ctrl+W", "Closes the current Scene", testing("close"))
-        self.window.toolbar.add_action("Close All", "File", "Ctrl+Shift+W", "Closes all opened Scene", testing("close all"))
         self.window.toolbar.add_separator("File")
         self.window.toolbar.add_action("Quit", "File", "Ctrl+Q", "Close the Editor", self.quit_wrapper)
 
