@@ -43,9 +43,9 @@ def getPath(local):
 class FileTracker:
     font = QFont("Segoe UI", 12)
     states = {
-        "modified": "modifying",
-        "deleted": "deleting",
-        "created": "creating"
+        "modified": "Modifying",
+        "deleted": "Deleting",
+        "created": "Creating"
     }
 
     def __init__(self, app, path):
