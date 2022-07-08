@@ -58,11 +58,12 @@ class Application(QApplication):
         self.editor.set_stretch((3, 1, 1))
 
         # Views
-        self.inspector_content = self.inspector.set_window(Inspector())
-
         self.game_content = self.game.set_window(OpenGLFrame())
         self.game_content.set_buttons(self.buttons)
         self.game_content.file_tracker = FileTracker(self, path)
+
+        self.inspector_content = self.inspector.set_window(Inspector())
+        self.inspector_content.project = self.game_content.file_tracker.project
 
         self.hierarchy_content = self.hierarchy.set_window(Hierarchy())
         self.hierarchy_content.inspector = self.inspector_content

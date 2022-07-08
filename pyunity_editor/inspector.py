@@ -3,6 +3,7 @@ from PySide6.QtCore import (
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from .smoothScroll import QSmoothListWidget, QSmoothScrollArea
+from pathlib import Path
 import pyunity as pyu
 import re
 
@@ -15,6 +16,8 @@ def capitalize(string):
     while "" in match:
         match.remove("")
     return " ".join(map(str.capitalize, match))
+
+cleanName = re.compile("^\d|[^a-zA-Z_0-9]")
 
 def isfloat(string):
     try:
@@ -47,17 +50,24 @@ class ComponentFinder(QMenu):
         self.listAction.setDefaultWidget(self.listWidget)
         self.addAction(self.listAction)
 
+        import PyUnityScripts
         self.components = pyu.Loader.GetComponentMap()
+        for behaviour in PyUnityScripts._lookup.values():
+            self.components[behaviour.__name__] = behaviour
         for name in sorted(self.components):
             self.listWidget.addItem(QListWidgetItem(name))
         self.listWidget.addItem(QListWidgetItem("Create a new Behaviour..."))
 
     def updateSearch(self, text):
         self.listWidget.clear()
+        addButton = True
         for name in sorted(self.components):
             if text.lower() in name.lower():
                 self.listWidget.addItem(QListWidgetItem(name))
-        self.listWidget.addItem(QListWidgetItem("Create a new Behaviour..."))
+            if text.lower() == name.lower():
+                addButton = False
+        if addButton:
+            self.listWidget.addItem(QListWidgetItem("Create a new Behaviour..."))
 
     def load(self):
         self.inputBox.clear()
@@ -93,6 +103,7 @@ class Inspector(QWidget):
         self.sections = []
         self.button = None
         self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
+        self.project = None
 
     def add_buffer(self, text):
         label = QLabel(text)
@@ -153,6 +164,7 @@ class Inspector(QWidget):
     def addComponentButton(self):
         if self.button is not None:
             self.vbox_layout.removeWidget(self.button)
+            self.button.deleteLater()
         self.button = QPushButton("Add Component")
         self.button.setStyleSheet("QPushButton { margin: 10px; }"
                                   "QPushButton::menu-indicator{ image: none; }")
@@ -161,16 +173,51 @@ class Inspector(QWidget):
         callback = lambda: self.addComponent(self.finder.listWidget.item(0))
         self.finder.inputBox.returnPressed.connect(callback)
         self.button.setMenu(self.finder)
+        self.vbox_layout.addWidget(self.button)
 
     def addComponent(self, item):
         self.finder.close()
         if item.text() == "Create a new Behaviour...":
-            pass
+            if self.finder.inputBox.text():
+                defaultName = re.sub(
+                    cleanName, "_", self.finder.inputBox.text())
+            else:
+                defaultName = ""
+            while True:
+                file, _ = QFileDialog.getSaveFileName(
+                    None, "Select path to Behaviour",
+                    str(self.project.path / defaultName),
+                    "PyUnity Behaviours (*.py)")
+                if not file:
+                    return
+                fp = Path(file).resolve()
+                if not fp.is_relative_to(self.project.path):
+                    message_box = QMessageBox(
+                        QMessageBox.Information, "Error",
+                        "Please select a path that is in the project.")
+                    message_box.exec()
+                elif re.findall(cleanName, fp.name[:-3]):
+                    message_box = QMessageBox(
+                        QMessageBox.Information, "Error",
+                        "That is not a valid Behaviour name.")
+                    message_box.exec()
+                else:
+                    break
+
+            name = fp.name[:-3]
+            with open(fp, "w+") as f:
+                f.write(pyu.Scripts.template.format(name))
+
+            componentType = pyu.Scripts.LoadScript(fp)
+            uuid = self.project.GetUuid(componentType)
+            self.project.ImportFile(fp.relative_to(self.project.path).as_posix(), uuid)
+            self.finder.components[name] = componentType
         else:
             componentType = self.finder.components[item.text()]
-            component = self.gameObject.AddComponent(componentType)
-            self.add_section(component)
-            self.addComponentButton()
+        component = self.gameObject.AddComponent(componentType)
+        print(component)
+        self.add_section(component)
+        self.addComponentButton()
         scrollBar = self.scrollArea.verticalScrollBar()
         QTimer.singleShot(1, lambda: scrollBar.setValue(scrollBar.maximum()))
 
