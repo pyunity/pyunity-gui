@@ -131,6 +131,16 @@ class OpenGLFrame(QOpenGLWidget):
         self.buttons[1].clicked.connect(self.pause)
         self.buttons[2].clicked.connect(self.stop)
 
+    def loadScene(self, scene):
+        self.original = scene
+        self.makeCurrent()
+        self.original.mainCamera.skybox.compile()
+        self.original.mainCamera.setupBuffers()
+        for renderer in self.original.FindComponents(MeshRenderer):
+            renderer.mesh.compile()
+        self.original.Render()
+        self.update()
+
     def initializeGL(self):
         Logger.LogLine(Logger.DEBUG, "Compiling objects")
         Logger.elapsed.tick()
@@ -140,12 +150,6 @@ class OpenGLFrame(QOpenGLWidget):
         Logger.LogLine(Logger.INFO, "Loading skyboxes")
         render.compileSkyboxes()
         Logger.LogSpecial(Logger.INFO, Logger.ELAPSED_TIME)
-
-        self.original.mainCamera.skybox.compile()
-        self.original.mainCamera.setupBuffers()
-        for renderer in self.original.FindComponents(MeshRenderer):
-            renderer.mesh.compile()
-        self.original.Render()
 
     def paintGL(self):
         if self.runner.opened:
@@ -160,13 +164,13 @@ class OpenGLFrame(QOpenGLWidget):
                 self.runner.next = None
                 self.runner.load()
                 self.runner.start()
-        else:
+        elif self.original is not None:
             self.original.Render()
 
     def resizeGL(self, width, height):
         if self.runner.opened:
             self.runner.scene.mainCamera.Resize(width, height)
-        else:
+        elif self.original is not None:
             self.original.mainCamera.Resize(width, height)
         self.update()
 

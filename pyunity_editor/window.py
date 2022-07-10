@@ -1,35 +1,45 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QIcon, QPixmap, QFont, QAction
+from PySide6.QtGui import QIcon, QPixmap, QAction
 from PIL import Image
+from qframelesswindow import FramelessWindow
 import os
 from .files import getPath
 from .resources import qInitResources
 qInitResources()
 
-class Window(QMainWindow):
+class Window(FramelessWindow):
     def __init__(self, app):
         super(Window, self).__init__()
+        self.setStyleSheet("Window:focus {border: none;}")
         self.setWindowTitle("PyUnity Editor")
         self.setFocusPolicy(Qt.StrongFocus)
+        self.titleBar.setObjectName("titlebar")
+
+        self.statusBar()
         self.app = app
-        self.app.setFont(QFont("Segoe UI", 10))
         self.toolbar = ToolBar(self)
-        widget = QWidget(self)
-        self.vbox_layout = QVBoxLayout(widget)
+        self.mainWidget = QWidget(self)
+        self.mainWidget.setObjectName("main-widget")
+        self.mainWidget.setStyleSheet("#main-widget:focus {border: none;}")
+        self.vbox_layout = QVBoxLayout(self.mainWidget)
         self.vbox_layout.setStretch(0, 0)
         self.vbox_layout.setStretch(1, 1)
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)
-        widget.setLayout(self.vbox_layout)
-        self.setCentralWidget(widget)
+        self.mainWidget.setLayout(self.vbox_layout)
+        self.mainWidget.resize(self.width(), self.height() - 32)
+        self.mainWidget.move(0, 32)
 
+        self.colors = {
+            "dark": "#485057",
+            "light": "#d4d7d9"
+        }
         self.styles = {}
         for style in ["dark", "light"]:
             with open(getPath(f"theme/{style}.qss")) as f:
                 self.styles[style] = f.read()
-        self.app.setStyleSheet(self.styles["dark"])
-        self.theme = "dark"
+        self.setTheme("dark")
 
         self.icon = QIcon()
         for size in [16, 24, 32, 48, 64, 128, 256]:
@@ -43,10 +53,14 @@ class Window(QMainWindow):
 
     def toggle_theme(self):
         if self.theme == "dark":
-            self.theme = "light"
+            self.setTheme("light")
         else:
-            self.theme = "dark"
+            self.setTheme("dark")
+
+    def setTheme(self, theme):
+        self.theme = theme
         self.app.setStyleSheet(self.styles[self.theme])
+        self.titleBar.setStyleSheet(f"background-color: {self.colors[self.theme]};")
 
     def closeEvent(self, event):
         self.app.quit_wrapper()
@@ -69,6 +83,9 @@ class Window(QMainWindow):
         super(Window, self).mousePressEvent(event)
 
     def resizeEvent(self, event):
+        super(Window, self).resizeEvent(event)
+        self.mainWidget.resize(self.width(), self.height() - 32)
+        self.mainWidget.move(0, 32)
         self.app.editor.readjust()
 
 class SceneButtons(QWidget):
@@ -101,8 +118,6 @@ class ToolBar:
         self.menu_bar = self.instance.menuBar()
         self.menus = {}
         self.sub_menus = {}
-
-        instance.statusBar()
 
     def add_menu(self, name):
         if name in self.menus:

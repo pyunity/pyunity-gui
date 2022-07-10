@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 os.environ["PYUNITY_DEBUG_MODE"] = "1"
+from PySide6.QtGui import QFont
 from PySide6.QtCore import QThread, QObject, Signal, QTimer
 from PySide6.QtWidgets import QApplication, QMessageBox, QFileDialog
 from .window import Editor, SceneButtons, Window
@@ -32,6 +33,7 @@ class VersionWorker(QObject):
 class Application(QApplication):
     def __init__(self, path):
         super(Application, self).__init__(sys.argv)
+        self.setFont(QFont("Segoe UI", 10))
 
         self.window = Window(self)
         self.setWindowIcon(self.window.icon)
@@ -80,7 +82,7 @@ class Application(QApplication):
 
     def loadScene(self, scene, uuids=None):
         self.loaded = scene
-        self.game_content.original = self.loaded
+        self.game_content.loadScene(self.loaded)
         self.hierarchy_content.load_scene(self.loaded)
         if uuids is not None:
             for uuid in uuids:
