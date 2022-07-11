@@ -97,8 +97,12 @@ def stripPySide6():
 
 def setupPyWin32(zf):
     os.makedirs("Lib/win32", exist_ok=True)
+    folders = ["win32/", "win32comext/"]
     for file in zf.filelist:
-        if file.filename.startswith("win32/") or ".dist-info/" in file.filename:
+        for folder in folders:
+            if file.filename.startswith(folder):
+                zf.extract(file, "Lib")
+        if ".dist-info/" in file.filename:
             zf.extract(file, "Lib")
         elif file.filename.startswith("pywin32_system32/"):
             with open("Lib/win32/" + file.filename.rsplit("/")[1], "wb+") as f:
