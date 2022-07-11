@@ -95,6 +95,16 @@ def stripPySide6():
         if len(os.listdir(dir)) == 0:
             os.rmdir(dir)
 
+def setupPyWin32(zf):
+    os.makedirs("Lib/win32", exist_ok=True)
+    for file in zf.filelist:
+        if file.filename.startswith("win32/") or ".dist-info/" in file.filename:
+            zf.extract(file, "Lib")
+        elif file.filename.startswith("pywin32_system32/"):
+            with open("Lib/win32/" + file.filename.rsplit("/")[1], "wb+") as f:
+                with zf.open(file) as f2:
+                    shutil.copyfileobj(f2, f)
+
 def addPackage(zf, name, path, orig, distInfo=False):
     print("COMPILE", name, flush=True)
     os.chdir("..\\" + name)
@@ -171,7 +181,10 @@ try:
         download(url, "..\\" + name + ".whl")
         print("COPY", name, flush=True)
         with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
-            zf2.extractall("Lib")
+            if name == "pywin32":
+                setupPyWin32(zf2)
+            else:
+                zf2.extractall("Lib")
 
     print("COMPILE Lib")
     os.chdir("Lib")
