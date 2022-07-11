@@ -97,7 +97,7 @@ def stripPySide6():
 
 def setupPyWin32(zf):
     os.makedirs("Lib/win32", exist_ok=True)
-    folders = ["win32/", "win32comext/"]
+    folders = ["win32/", "win32com/", "win32comext/"]
     for file in zf.filelist:
         for folder in folders:
             if file.filename.startswith(folder):
