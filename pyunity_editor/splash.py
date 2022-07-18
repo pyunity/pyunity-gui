@@ -17,7 +17,6 @@ def tksplash():
     from PIL import ImageTk, Image
     root = tkinter.Tk()
     root.overrideredirect(1)
-    root.attributes("-topmost", True)
 
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
@@ -89,10 +88,10 @@ def sdlsplash():
     window.close()
 
 def splash():
-    if pkgutil.find_loader("tkinter") is not None:
-        tksplash()
-    elif pkgutil.find_loader("sdl2") is not None:
+    if pkgutil.find_loader("sdl2") is not None:
         sdlsplash()
+    elif pkgutil.find_loader("tkinter") is not None:
+        tksplash()
     else:
         print("Could not find splash screen window provider")
 
