@@ -230,7 +230,7 @@ try:
         #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
 
         int main(int argc, char **argv) {
-            wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib", NULL);
+            wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib;Lib\\\\win32;Lib\\\\win32\\\\lib", NULL);
             Py_SetPath(path);
             wchar_t **program = (wchar_t**)malloc(sizeof(wchar_t**) * argc);
             for (int i = 0; i < argc; i++) {
