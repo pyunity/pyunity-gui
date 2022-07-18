@@ -233,4 +233,3 @@ class Application(QApplication):
         self.vThread = None
         self.window.toolbar.add_action("Show PyUnity information", "Window", "", "Show information about PyUnity, the PyUnity Editor and all its dependencies.", self.showVersion)
         self.window.toolbar.add_action("Toggle Theme", "Window", "Ctrl+L", "Toggle theme between light and dark", self.window.toggle_theme)
-
