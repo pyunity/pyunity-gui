@@ -4,7 +4,7 @@ from PySide6.QtGui import QIcon, QPixmap, QAction
 from PIL import Image
 from qframelesswindow import FramelessWindow
 import os
-from .files import getPath
+from .local import getPath
 from .resources import qInitResources
 qInitResources()
 

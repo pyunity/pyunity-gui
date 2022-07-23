@@ -3,7 +3,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import QFont, QIcon
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from .smoothScroll import QSmoothListWidget
-from .files import getPath
+from .local import getPath
 from pyunity import (Logger, SceneManager, KeyCode,
     MouseCode, MeshRenderer, KeyState, Loader, Window,
     WaitForUpdate, WaitForRender, WaitForFixedUpdate, PyUnityException,

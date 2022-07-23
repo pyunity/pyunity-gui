@@ -3,6 +3,7 @@ import time
 import threading
 import pkgutil
 import sys
+from .local import getPath
 
 def redirect_out(stream):
     sys.stdout = stream
@@ -26,9 +27,9 @@ def tksplash():
     root.geometry(str(size) + "x" + str(size) + "+" + str(x) + "+" + str(y))
 
     canvas = tkinter.Canvas(root, width=size, height=size,
-        bd=0, highlightthickness=0, relief='ridge')
+        bd=0, highlightthickness=0, relief="ridge")
     canvas.pack()
-    splash_img = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "splash.png")
+    splash_img = getPath("icons/splash.png")
     img = ImageTk.PhotoImage(Image.open(splash_img).resize((size, size)))
     canvas.create_image(0, 0, anchor=tkinter.NW, image=img)
     while True:
@@ -49,7 +50,7 @@ def sdlsplash():
         import sdl2
 
     sdlimage.IMG_Init(sdlimage.IMG_INIT_PNG)
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons", "splash.png")
+    path = str(getPath("icons/splash.png"))
     img = sdlimage.IMG_Load(path.encode())
 
     sdl2.ext.init()

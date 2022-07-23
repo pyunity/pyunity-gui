@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import *
 from .smoothScroll import QSmoothTreeWidget
-from .files import getPath
+from .local import getPath
 
 class HierarchyItem(QTreeWidgetItem):
     def __init__(self, gameObject):
