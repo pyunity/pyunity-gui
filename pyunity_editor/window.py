@@ -14,7 +14,6 @@ class Window(FramelessWindow):
         self.setStyleSheet("Window:focus {border: none;}")
         self.setWindowTitle("PyUnity Editor")
         self.setFocusPolicy(Qt.StrongFocus)
-        self.titleBar.setObjectName("titlebar")
 
         self.statusBar()
         self.app = app

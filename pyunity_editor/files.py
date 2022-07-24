@@ -13,8 +13,8 @@ class FileTracker:
         "created": "Creating"
     }
 
-    def __init__(self, app, path):
-        self.app = app
+    def __init__(self, path):
+        self.app = None
         self.path = os.path.normpath(path)
         self.files = set(glob.glob(os.path.join(self.path, "**/*"), recursive=True))
         self.times = {file: os.stat(file)[8] for file in self.files}

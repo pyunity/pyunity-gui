@@ -60,9 +60,9 @@ class Application(QApplication):
         self.editor.set_stretch((3, 1, 1))
 
         # Views
-        self.game_content = self.game.set_window(OpenGLFrame())
+        self.game_content = self.game.set_window(OpenGLFrame(path=path))
+        self.game_content.file_tracker.app = self
         self.game_content.set_buttons(self.buttons)
-        self.game_content.file_tracker = FileTracker(self, path)
 
         self.inspector_content = self.inspector.set_window(Inspector())
         self.inspector_content.project = self.game_content.file_tracker.project
@@ -213,7 +213,7 @@ class Application(QApplication):
         self.window.toolbar.add_action("Select None", "Edit", "Escape", "Deselects all items", self.window.select_none)
 
         self.window.toolbar.add_sub_action("Start/Stop", "View", "Game", "Ctrl+Return", "Starts and stops the game", self.buttons.buttons[0].click)
-        self.window.toolbar.add_sub_action("Pause/Unpause", "View", "Game", "Space", "Toggles the pause state", self.game_content.buttons[1].click)
+        self.window.toolbar.add_sub_action("Pause/Unpause", "View", "Game", "Space", "Toggles the pause state", self.buttons.buttons[1].click)
 
         self.window.toolbar.add_sub_action("Folder", "Assets", "Create", "", "", testing("new folder"))
         self.window.toolbar.add_sub_action("File", "Assets", "Create", "", "", testing("new file"))

@@ -3,6 +3,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import QFont, QIcon
 from PySide6.QtOpenGLWidgets import QOpenGLWidget
 from .smoothScroll import QSmoothListWidget
+from .files import FileTracker
 from .local import getPath
 from pyunity import (Logger, SceneManager, KeyCode,
     MouseCode, MeshRenderer, KeyState, Loader, Window,
@@ -112,7 +113,7 @@ class QRunner(Runner):
 class OpenGLFrame(QOpenGLWidget):
     SPACER = None
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, path=""):
         super(OpenGLFrame, self).__init__(parent)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setMouseTracking(True)
@@ -121,7 +122,7 @@ class OpenGLFrame(QOpenGLWidget):
         self.console = None
         self.original = None
         self.paused = False
-        self.file_tracker = None
+        self.file_tracker = FileTracker(path)
         self.runner = QRunner(self)
         SceneManager.runner = self.runner
 
