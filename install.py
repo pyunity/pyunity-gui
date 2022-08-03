@@ -16,11 +16,12 @@ if plat.startswith("win"):
     else:
         name += "-x86"
 elif plat.startswith("linux"):
-    workflow = "unix"
-    name = f"ubuntu-latest%20python{sys.version_info.major}.{sys.version_info.minor}"
+    workflow = "linux"
+    arch = plat.split("-", 1)[1]
+    name = f"python{sys.version_info.major}.{sys.version_info.minor}-{arch}"
 elif plat.startswith("macos"):
-    workflow = "unix"
-    name = f"macos-latest%20python{sys.version_info.major}.{sys.version_info.minor}"
+    workflow = "macos"
+    name = f"python{sys.version_info.major}.{sys.version_info.minor}"
 
 print(f"Target artifact: {name}.zip")
 
