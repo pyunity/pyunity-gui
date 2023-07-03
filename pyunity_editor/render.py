@@ -6,12 +6,9 @@ from .smoothScroll import QSmoothListWidget
 from .files import FileTracker
 from .local import getPath
 from pyunity import (Logger, SceneManager, KeyCode,
-    MouseCode, MeshRenderer, KeyState, Loader, Window,
-    WaitForUpdate, WaitForRender, WaitForFixedUpdate, PyUnityException,
-    EventLoopManager, EventLoop,
+    MouseCode, KeyState, Loader, Window, WaitForUpdate, WaitForRender,
     config, render)
 from pyunity.scenes.runner import Runner, ChangeScene
-import asyncio
 import os
 import copy
 import time
@@ -24,60 +21,6 @@ def logPatch(func):
             Logger.LogException(e, stacklevel=2)
     return inner
 
-class QEventLoopManager(EventLoopManager):
-    def start(self):
-        if EventLoopManager.current is not None:
-            raise PyUnityException("Only one EventLoopManager can be running")
-        EventLoopManager.current = self
-
-        self.waiting[self.mainWaitFor] = []
-
-        for loop in self.separateLoops:
-            loop.call_soon(loop.stop)
-            loop.run_forever() # Run until awaits are encountered
-        self.separateLoops.clear()
-
-        self.running = True
-        for thread in self.threads:
-            thread.start()
-
-        self.mainLoop = EventLoop()
-        asyncio.set_event_loop(self.mainLoop)
-
-        def inner():
-            if len(EventLoopManager.exceptions):
-                if isinstance(EventLoopManager.exceptions[0], ChangeScene):
-                    exc = EventLoopManager.exceptions.pop()
-                    EventLoopManager.exceptions.clear()
-                    raise exc
-                elif config.exitOnError:
-                    Logger.LogLine(Logger.ERROR,
-                                   f"Exception in Scene: {SceneManager.CurrentScene().name!r}")
-                    exc = EventLoopManager.exceptions.pop()
-                    EventLoopManager.exceptions.clear()
-                    raise exc
-                else:
-                    for exception in EventLoopManager.exceptions:
-                        Logger.LogLine(Logger.ERROR,
-                                    f"Exception ignored in Scene: {SceneManager.CurrentScene().name!r}")
-                        Logger.LogException(exception)
-                    EventLoopManager.exceptions.clear()
-
-            for waiter in self.waiting[self.mainWaitFor]:
-                waiter.loop.call_soon_threadsafe(waiter.event.set)
-
-            for func in self.updates:
-                func(loop)
-
-            for event in self.pending:
-                event.trigger()
-            self.pending.clear()
-
-            self.mainLoop.call_soon(self.mainLoop.stop)
-            self.mainLoop.run_forever()
-
-        return inner
-
 class QRunner(Runner):
     def __init__(self, frame):
         super(QRunner, self).__init__()
@@ -89,12 +32,7 @@ class QRunner(Runner):
         self.window = WidgetWindow("Editor")
 
     def load(self):
-        if self.scene is None:
-            raise PyUnityException("Cannot load runner before setting a scene")
-        Logger.LogLine(Logger.DEBUG, "Starting scene")
-        self.eventLoopManager = QEventLoopManager()
-        self.eventLoopManager.schedule(self.scene.updateFixed, ups=50, waitFor=WaitForFixedUpdate)
-        self.eventLoopManager.addLoop(self.scene.startScripts())
+        super(QRunner, self).load()
 
         self.eventLoopManager.schedule(
             self.scene.updateScripts, self.window.updateFunc,
@@ -108,7 +46,8 @@ class QRunner(Runner):
         self.scene.startLoop()
 
     def start(self):
-        self.updateFunc = self.eventLoopManager.start()
+        self.eventLoopManager.setup()
+        self.updateFunc = self.eventLoopManager.update
 
 class OpenGLFrame(QOpenGLWidget):
     SPACER = None
