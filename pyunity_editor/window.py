@@ -1,23 +1,27 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QIcon, QPixmap, QAction
+from PySide6.QtGui import QIcon, QPixmap, QAction, QFont
 from PIL import Image
-from qframelesswindow import FramelessWindow
+from qframelesswindow import FramelessMainWindow
 import os
 from .local import getPath
 from .resources import qInitResources
 qInitResources()
 
-class Window(FramelessWindow):
+class Window(FramelessMainWindow):
     def __init__(self, app):
         super(Window, self).__init__()
         self.setStyleSheet("Window:focus {border: none;}")
         self.setWindowTitle("PyUnity Editor")
+        self.titleBar.raise_()
         self.setFocusPolicy(Qt.StrongFocus)
 
         self.statusBar()
         self.app = app
         self.toolbar = ToolBar(self)
+        self.titleBar.layout().insertWidget(0, self.toolbar, 0, Qt.AlignLeft)
+        self.titleBar.layout().insertStretch(1, 1)
+        self.setMenuWidget(self.titleBar)
         self.mainWidget = QWidget(self)
         self.mainWidget.setObjectName("main-widget")
         self.mainWidget.setStyleSheet("#main-widget:focus {border: none;}")
@@ -26,9 +30,6 @@ class Window(FramelessWindow):
         self.vbox_layout.setStretch(1, 1)
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)
-        self.mainWidget.setLayout(self.vbox_layout)
-        self.mainWidget.resize(self.width(), self.height() - 32)
-        self.mainWidget.move(0, 32)
 
         self.colors = {
             "dark": "#485057",
@@ -83,8 +84,10 @@ class Window(FramelessWindow):
 
     def resizeEvent(self, event):
         super(Window, self).resizeEvent(event)
-        self.mainWidget.resize(self.width(), self.height() - 32)
-        self.mainWidget.move(0, 32)
+        padding = self.statusBar().height() - self.titleBar.height()
+        self.mainWidget.resize(self.width(), self.height() - padding)
+        self.mainWidget.move(0, self.titleBar.height())
+        self.titleBar.raise_()
         self.app.editor.readjust()
 
 class SceneButtons(QWidget):
@@ -111,17 +114,18 @@ class SceneButtons(QWidget):
         self.buttons.append(button)
         self.hbox_layout.insertWidget(len(self.buttons), button)
 
-class ToolBar:
+class ToolBar(QMenuBar):
     def __init__(self, instance):
+        super(ToolBar, self).__init__(instance)
+        self.setFont(QFont("Segoe UI", 12))
         self.instance = instance
-        self.menu_bar = self.instance.menuBar()
         self.menus = {}
         self.sub_menus = {}
 
     def add_menu(self, name):
         if name in self.menus:
             return
-        menu = self.menu_bar.addMenu("&" + name)
+        menu = self.addMenu("&" + name)
         self.menus[name] = menu
         self.sub_menus[name] = {}
         return menu

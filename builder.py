@@ -63,7 +63,7 @@ class PypiLinkGetter:
         return finder.find_requirement(install_req_from_line(req), False).link._url
 
 wheels = [{}, {}]
-for req in ["pyopengl", "pysdl2", "pyside6-frameless-window"]:
+for req in ["pyopengl", "pysdl2", "pysidesix-frameless-window"]:
     wheels[0][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
 for req in ["pyopengl_accelerate", "pysdl2_dll", "pillow", "pyglm",
         "pyside6", "shiboken6", "pyside6_essentials", "glfw", "pywin32"]:
