@@ -8,7 +8,6 @@ from .window import Editor, SceneButtons, Window
 from .views import Hierarchy, HierarchyItem
 from .inspector import Inspector
 from .render import OpenGLFrame, Console
-from .files import FileTracker
 from pyunity import SceneManager, Logger
 import io
 import sys
@@ -23,10 +22,10 @@ class VersionWorker(QObject):
     finished = Signal()
 
     def run(self):
-        from pyunity.__main__ import version
+        from pyunity.info import printVersion
         r = io.StringIO()
         with contextlib.redirect_stdout(r):
-            version()
+            printVersion()
         self.lines = r.getvalue().rstrip().split("\n")[3:]
         self.finished.emit()
 
@@ -106,7 +105,6 @@ class Application(QApplication):
 
     def start(self):
         os.environ["PYUNITY_EDITOR_LOADED"] = "1"
-        self.window.resize(800, 500)
         self.window.showMaximized()
         QTimer.singleShot(100, self.window.activateWindow)
         self.exec()
