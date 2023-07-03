@@ -49,13 +49,27 @@ class QRunner(Runner):
         self.eventLoopManager.setup()
         self.updateFunc = self.eventLoopManager.update
 
-class OpenGLFrame(QOpenGLWidget):
+class OpenGLFrame(QWidget):
     SPACER = None
 
     def __init__(self, parent=None, path=""):
         super(OpenGLFrame, self).__init__(parent)
-        self.setFocusPolicy(Qt.StrongFocus)
-        self.setMouseTracking(True)
+        self.vboxLayout = QVBoxLayout(self)
+        self.vboxLayout.setContentsMargins(2, 2, 2, 2)
+        self.vboxLayout.setSpacing(2)
+        self.setLayout(self.vboxLayout)
+
+        self.optionsBar = QWidget(self)
+        self.hboxLayout = QHBoxLayout(self.optionsBar)
+        self.hboxLayout.setContentsMargins(0, 0, 0, 0)
+        self.optionsBar.setLayout(self.hboxLayout)
+        self.vboxLayout.addWidget(self.optionsBar, 0)
+
+        self.frame = QOpenGLWidget(self)
+        self.frame.setFocusPolicy(Qt.StrongFocus)
+        self.frame.setMouseTracking(True)
+        self.vboxLayout.addWidget(self.frame, 1)
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.console = None
@@ -73,11 +87,8 @@ class OpenGLFrame(QOpenGLWidget):
 
     def loadScene(self, scene):
         self.original = scene
-        self.makeCurrent()
-        self.original.mainCamera.skybox.compile()
-        self.original.mainCamera.setupBuffers()
-        for renderer in self.original.FindComponents(MeshRenderer):
-            renderer.mesh.compile()
+        self.frame.makeCurrent()
+        self.original.startOpenGL()
         self.original.Render()
         self.update()
 
@@ -119,7 +130,7 @@ class OpenGLFrame(QOpenGLWidget):
         if self.runner.opened:
             self.stop()
         else:
-            self.makeCurrent()
+            self.frame.makeCurrent()
             if self.console.clear_on_run:
                 self.console.clear()
             self.buttons[2].setChecked(False)
