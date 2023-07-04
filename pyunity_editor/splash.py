@@ -14,6 +14,7 @@ def restore_out():
     sys.stderr = sys.__stderr__
 
 def tksplash():
+    print("Loading tkinter splash image")
     import tkinter
     from PIL import ImageTk, Image
     root = tkinter.Tk()
@@ -40,6 +41,7 @@ def tksplash():
     root.destroy()
 
 def sdlsplash():
+    print("Loading SDL2 splash image")
     import warnings
     import ctypes
 

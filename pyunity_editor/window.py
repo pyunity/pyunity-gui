@@ -84,7 +84,7 @@ class Window(FramelessMainWindow):
 
     def resizeEvent(self, event):
         super(Window, self).resizeEvent(event)
-        padding = self.statusBar().height() - self.titleBar.height()
+        padding = self.statusBar().height() + self.titleBar.height()
         self.mainWidget.resize(self.width(), self.height() - padding)
         self.mainWidget.move(0, self.titleBar.height())
         self.titleBar.raise_()
