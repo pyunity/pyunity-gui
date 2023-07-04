@@ -1,5 +1,4 @@
 from pyunity import *
-import math
 
 class Oscillator(Behaviour):
     a = 0
@@ -17,7 +16,8 @@ class Oscillator2(Behaviour):
     speed = ShowInInspector(int, 10)
     def Update(self, dt):
         self.a += dt * self.speed / 10
-        self.transform.localScale = Vector3.one() * (0.75 + math.sin(self.a) / 4)
+        size = Mathf.LerpUnclamped(Mathf.Cos(self.a), 0.75, 1)
+        self.transform.localScale = Vector3.one() * size
 
 class Rotator(Behaviour):
     def Update(self, dt):
