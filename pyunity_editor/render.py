@@ -45,9 +45,41 @@ class QRunner(Runner):
         self.scene.startOpenGL()
         self.scene.startLoop()
 
-    def start(self):
+    def initialize(self):
         self.eventLoopManager.setup()
         self.updateFunc = self.eventLoopManager.update
+
+class PreviewFrame(QOpenGLWidget):
+    def __init__(self, parent):
+        super(PreviewFrame, self).__init__(parent)
+        self.runner = parent.runner
+
+    def initializeGL(self):
+        Logger.LogLine(Logger.DEBUG, "Compiling objects")
+        Logger.elapsed.tick()
+        Logger.LogLine(Logger.INFO, "Compiling shaders")
+        render.compileShaders()
+        Logger.LogSpecial(Logger.INFO, Logger.ELAPSED_TIME)
+        Logger.LogLine(Logger.INFO, "Loading skyboxes")
+        render.compileSkyboxes()
+        Logger.LogSpecial(Logger.INFO, Logger.ELAPSED_TIME)
+
+    def paintGL(self):
+        if self.runner.opened:
+            try:
+                self.runner.updateFunc()
+            except ChangeScene:
+                self.runner.changeScene()
+                self.runner.initialize()
+        elif self.parent().original is not None:
+            self.parent().original.Render()
+
+    def resizeGL(self, width, height):
+        if self.runner.opened:
+            self.runner.scene.mainCamera.Resize(width, height)
+        elif self.parent().original is not None:
+            self.parent().original.mainCamera.Resize(width, height)
+        self.update()
 
 class OpenGLFrame(QWidget):
     SPACER = None
@@ -65,19 +97,21 @@ class OpenGLFrame(QWidget):
         self.optionsBar.setLayout(self.hboxLayout)
         self.vboxLayout.addWidget(self.optionsBar, 0)
 
-        self.frame = QOpenGLWidget(self)
+        self.runner = QRunner(self)
+        SceneManager.runner = self.runner
+
+        self.frame = PreviewFrame(self)
         self.frame.setFocusPolicy(Qt.StrongFocus)
         self.frame.setMouseTracking(True)
         self.vboxLayout.addWidget(self.frame, 1)
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update)
+        self.timer.timeout.connect(self.frame.update)
+
         self.console = None
         self.original = None
         self.paused = False
         self.file_tracker = FileTracker(path)
-        self.runner = QRunner(self)
-        SceneManager.runner = self.runner
 
     def set_buttons(self, buttons):
         self.buttons = buttons.buttons
@@ -90,40 +124,7 @@ class OpenGLFrame(QWidget):
         self.frame.makeCurrent()
         self.original.startOpenGL()
         self.original.Render()
-        self.update()
-
-    def initializeGL(self):
-        Logger.LogLine(Logger.DEBUG, "Compiling objects")
-        Logger.elapsed.tick()
-        Logger.LogLine(Logger.INFO, "Compiling shaders")
-        render.compileShaders()
-        Logger.LogSpecial(Logger.INFO, Logger.ELAPSED_TIME)
-        Logger.LogLine(Logger.INFO, "Loading skyboxes")
-        render.compileSkyboxes()
-        Logger.LogSpecial(Logger.INFO, Logger.ELAPSED_TIME)
-
-    def paintGL(self):
-        if self.runner.opened:
-            try:
-                self.runner.updateFunc()
-            except ChangeScene:
-                if self.runner.next is None:
-                    raise
-                self.runner.eventLoopManager.quit()
-                self.runner.scene.cleanUp()
-                self.runner.scene = self.runner.next
-                self.runner.next = None
-                self.runner.load()
-                self.runner.start()
-        elif self.original is not None:
-            self.original.Render()
-
-    def resizeGL(self, width, height):
-        if self.runner.opened:
-            self.runner.scene.mainCamera.Resize(width, height)
-        elif self.original is not None:
-            self.original.mainCamera.Resize(width, height)
-        self.update()
+        self.frame.update()
 
     @logPatch
     def start(self, on=None):
@@ -140,7 +141,7 @@ class OpenGLFrame(QWidget):
             if not self.runner.opened:
                 self.runner.open()
             self.runner.load()
-            self.runner.start()
+            self.runner.initialize()
 
             self.runner.scene.mainCamera.Resize(self.width(), self.height())
             if not self.paused:
@@ -157,7 +158,7 @@ class OpenGLFrame(QWidget):
             self.buttons[1].setChecked(False)
             self.buttons[2].setChecked(True)
             self.paused = False
-            self.update()
+            self.frame.update()
             self.file_tracker.start(5)
         else:
             self.buttons[2].setChecked(True)
@@ -174,6 +175,16 @@ class OpenGLFrame(QWidget):
                 self.timer.start(duration)
 
     def save(self):
+        if self.runner.opened:
+            message = QMessageBox()
+            message.setText("Cannot save scene while running!")
+            message.setWindowTitle(self.file_tracker.project.name)
+            message.setStandardButtons(QMessageBox.StandardButton.Ok)
+            message.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowTitleHint)
+            message.setFont(QFont("Segoe UI", 12))
+            message.exec()
+            return
+
         def callback():
             Loader.ResaveScene(self.original, self.file_tracker.project)
             message.done(0)
