@@ -17,7 +17,7 @@ def importModule(submodule):
     folder = packageSpec.submodule_search_locations[0]
     if not Path(folder).exists():
         loader = zipimport.zipimporter(folder)
-        spec = loader.find_spec(submodule)
+        spec = loader.find_spec("pyunity." + submodule)
     else:
         loader = None
         for extension in [".py", ".pyc"]:
