@@ -5,7 +5,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 data_files = glob.glob("pyunity_editor/**/*.qss", recursive=True) + \
-    glob.glob("pyunity_editor/**/*.png", recursive=True)
+    glob.glob("pyunity_editor/**/*.png", recursive=True) + \
+    ["pyunity_editor/resources.qrc"]
 
 setup(
     packages=["pyunity_editor"] + ["pyunity_editor." + package for package in find_packages(where="pyunity_editor")],
