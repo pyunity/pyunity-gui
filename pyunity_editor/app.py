@@ -22,10 +22,10 @@ class VersionWorker(QObject):
     finished = Signal()
 
     def run(self):
-        from pyunity.info import printVersion
+        from pyunity.info import printInfo
         r = io.StringIO()
         with contextlib.redirect_stdout(r):
-            printVersion()
+            printInfo()
         self.lines = r.getvalue().rstrip().split("\n")[3:]
         self.finished.emit()
 
