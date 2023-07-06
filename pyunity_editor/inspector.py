@@ -102,6 +102,7 @@ class Inspector(QWidget):
         self.gameObject = None
         self.sections = []
         self.button = None
+        self.name_input = None
         self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
         self.project = None
 
@@ -140,6 +141,7 @@ class Inspector(QWidget):
             self.buffer = self.add_buffer("Select a single item to view its properties.")
             return
         elif hierarchyItem is None:
+            self.name_input = None
             self.buffer = self.add_buffer("Select a GameObject in the Hiearchy tab to view its properties.")
             return
         self.currentItem = hierarchyItem

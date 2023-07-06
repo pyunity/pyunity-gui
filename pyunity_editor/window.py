@@ -22,6 +22,7 @@ class Window(FramelessMainWindow):
         self.titleBar.layout().insertWidget(0, self.toolbar, 0, Qt.AlignLeft)
         self.titleBar.layout().insertStretch(1, 1)
         self.setMenuWidget(self.titleBar)
+
         self.mainWidget = QWidget(self)
         self.mainWidget.setObjectName("main-widget")
         self.mainWidget.setStyleSheet("#main-widget:focus {border: none;}")
@@ -117,7 +118,8 @@ class SceneButtons(QWidget):
 class ToolBar(QMenuBar):
     def __init__(self, instance):
         super(ToolBar, self).__init__(instance)
-        self.setFont(QFont("Segoe UI", 12))
+        self.setStyleSheet("ToolBar {vertical-align: middle; padding: 4px;}")
+        self.setFont(QFont("Segoe UI", 10))
         self.instance = instance
         self.menus = {}
         self.sub_menus = {}
