@@ -1,5 +1,5 @@
 __version__ = "0.1.1"
-__copyright__ = "Copyright 2021 Ray Chen"
+__copyright__ = "Copyright (c) 2020-2023 The PyUnity Team"
 __email__ = "tankimarshal2@gmail.com"
 __license__ = "MIT License"
 __summary__ = "An Editor for PyUnity in the style of the UnityEditor"
