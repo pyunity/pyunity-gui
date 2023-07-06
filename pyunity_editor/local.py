@@ -13,17 +13,25 @@ packageSpec = importlib.util.find_spec("pyunity")
 
 def importModule(submodule):
     folder = packageSpec.submodule_search_locations[0]
-    spec = importlib.util.spec_from_file_location(
-        "pyunity." + submodule, Path(folder) / (submodule + ".py"))
-    if spec is None:
-        raise Exception("Could not load asset resolver")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    module = None
+    for suffix in [".py", ".pyc"]:
+        spec = importlib.util.spec_from_file_location(
+            "pyunity." + submodule, Path(folder) / (submodule + suffix))
+        if spec is None:
+            continue
+        module = importlib.util.module_from_spec(spec)
+        try:
+            spec.loader.exec_module(module)
+            break
+        except FileNotFoundError:
+            module = None
     return module
 
 # Import `pyunity.logger` into `pyunity.Logger` for
 # use by `pyunity.resources`
 logger = importModule("logger")
+if logger is None:
+    raise Exception("Could not load asset resolver: pyunity.logger failed to load")
 sys.modules["pyunity.logger"] = logger
 sys.modules["pyunity.Logger"] = logger
 
@@ -31,6 +39,8 @@ sys.modules["pyunity.Logger"] = logger
 pyunity = importlib.util.module_from_spec(packageSpec)
 sys.modules["pyunity"] = pyunity
 resources = importModule("resources")
+if resources is None:
+    raise Exception("Could not load asset resolver: pyunity.resources failed to load")
 sys.modules["pyunity.resources"] = resources
 loaded = False
 
