@@ -148,8 +148,9 @@ class Hierarchy(QWidget):
                 parentTransform.children.insert(index, transform)
 
     def rename(self, item, column):
-        self.inspector.name_input.setText(item.text(column))
-        item.gameObject.name = item.text(column)
+        if self.inspector.name_input is not None:
+            self.inspector.name_input.setText(item.text(column))
+            item.gameObject.name = item.text(column)
 
     def add_item(self, gameObject, parent=None):
         item = HierarchyItem(gameObject)

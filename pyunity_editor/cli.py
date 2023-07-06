@@ -1,4 +1,5 @@
 from .splash import start, redirect_out
+from .local import fixPackage
 from time import strftime
 import argparse
 import sys
@@ -55,6 +56,7 @@ def run(args=None):
     if args is None:
         args = parser.parse_args()
 
+    fixPackage()
     from pyunity import SceneManager, Loader
     if args.new:
         SceneManager.AddScene("Scene")
@@ -80,6 +82,7 @@ def gui():
         temp_stream = io.StringIO()
         redirect_out(temp_stream)
 
+        fixPackage()
         from pyunity import Logger
         directory = os.path.join(os.path.dirname(Logger.folder), "Editor", "Logs")
         os.makedirs(directory, exist_ok=True)

@@ -3,7 +3,9 @@ import time
 import threading
 import pkgutil
 import sys
-from .local import getPath
+from .local import getPath, fixPackage
+
+splashPath = getPath("icons/splash.png")
 
 def redirect_out(stream):
     sys.stdout = stream
@@ -17,6 +19,8 @@ def tksplash():
     print("Loading tkinter splash image")
     import tkinter
     from PIL import ImageTk, Image
+    img = ImageTk.PhotoImage(Image.open(splashPath).resize((size, size)))
+
     root = tkinter.Tk()
     root.overrideredirect(1)
 
@@ -30,9 +34,8 @@ def tksplash():
     canvas = tkinter.Canvas(root, width=size, height=size,
         bd=0, highlightthickness=0, relief="ridge")
     canvas.pack()
-    splash_img = getPath("icons/splash.png")
-    img = ImageTk.PhotoImage(Image.open(splash_img).resize((size, size)))
     canvas.create_image(0, 0, anchor=tkinter.NW, image=img)
+
     while True:
         if os.getenv("PYUNITY_EDITOR_LOADED") == "1":
             break
@@ -52,8 +55,7 @@ def sdlsplash():
         import sdl2
 
     sdlimage.IMG_Init(sdlimage.IMG_INIT_PNG)
-    path = str(getPath("icons/splash.png"))
-    img = sdlimage.IMG_Load(path.encode())
+    img = sdlimage.IMG_Load(splashPath.encode())
 
     sdl2.ext.init()
     dispMode = sdl2.SDL_DisplayMode()
