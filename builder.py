@@ -55,8 +55,7 @@ class PypiLinkGetter:
         vertuple = tuple(version.split("."))
         if (vertuple, platform) not in cls.finders:
             target = TargetPython([cls.archmap[platform]], vertuple)
-            finder = PackageFinder.create(cls.collector, cls.prefs, target,
-                                          use_deprecated_html5lib=False)
+            finder = PackageFinder.create(cls.collector, cls.prefs, target)
             cls.finders[vertuple, platform] = finder
         else:
             finder = cls.finders[vertuple, platform]
@@ -83,9 +82,10 @@ def stripPySide6():
     print("STRIP PySide6", flush=True)
     keep = [
         "__init__.pyc", "QtCore.pyd", "QtGui.pyd", "QtOpenGL.pyd",
-        "QtOpenGLWidgets.pyd", "QtWidgets.pyd", "pyside6.abi3.dll",
-        "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll",
-        "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "plugins\\platforms\\qwindows.dll"
+        "QtOpenGLWidgets.pyd", "QtWidgets.pyd", "QtSvg.pyd",
+        "pyside6.abi3.dll", "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll",
+        "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "Qt6Svg.dll",
+        "plugins\\platforms\\qwindows.dll"
     ]
     for dir, subdirs, files in os.walk("Lib\\PySide6\\", topdown=False):
         for name in files:
@@ -127,6 +127,7 @@ def addPackage(zf, name, path, orig, distInfo=False):
 tmp = tempfile.mkdtemp()
 orig = os.getcwd() + "\\"
 os.chdir(tmp)
+print("Working directory:", os.getcwd())
 try:
     download(f"https://www.python.org/ftp/python/{VERSION}/python-{VERSION}-embed-{ARCH}.zip",
              "embed.zip")
@@ -145,10 +146,10 @@ try:
 
     print("BUILD pyunity", flush=True)
     os.chdir("pyunity-develop")
-    subprocess.call([sys.executable, "setup.py", "bdist_wheel"],
+    subprocess.call([sys.executable, "-m", "build"],
                     stdout=subprocess.DEVNULL, stderr=sys.stderr,
                     env={**os.environ, "cython": "0"})
-    shutil.move(glob.glob("dist/*")[0], "..\\pyunity.whl")
+    shutil.move(glob.glob("dist/*.whl")[0], "..\\pyunity.whl")
     os.chdir(tmp)
 
     with zipfile.ZipFile("pyunity.whl") as zf:
@@ -157,9 +158,9 @@ try:
 
     print("BUILD pyunity-editor", flush=True)
     os.chdir(orig)
-    subprocess.call([sys.executable, "setup.py", "bdist_wheel"],
+    subprocess.call([sys.executable, "-m", "build"],
                     stdout=subprocess.DEVNULL, stderr=sys.stderr)
-    shutil.move(glob.glob("dist/*")[0], tmp + "\\pyunity-editor.whl")
+    shutil.move(glob.glob("dist/*.whl")[0], tmp + "\\pyunity-editor.whl")
     os.chdir(tmp)
 
     with zipfile.ZipFile("pyunity-editor.whl") as zf:
@@ -175,7 +176,13 @@ try:
         addPackage(zf, "editor", "pyunity_editor\\**\\*", workdir, True)
 
         for name, url in wheels[0].items():
-            download(url, "..\\" + name + ".whl")
+            if url.endswith(".tar.gz"):
+                download(url, "..\\" + name + ".tar.gz")
+                subprocess.call([sys.executable, "-m", "pip", "wheel",
+                                 "--no-deps", "..\\" + name + ".tar.gz"])
+                shutil.move(glob.glob("*.whl")[0], "..\\" + name + ".whl")
+            else:
+                download(url, "..\\" + name + ".whl")
             with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
                 print("EXTRACT " + name + ".whl", flush=True)
                 zf2.extractall("..\\" + name)
