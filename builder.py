@@ -84,7 +84,7 @@ def stripPySide6():
         "__init__.pyc", "QtCore.pyd", "QtGui.pyd", "QtOpenGL.pyd",
         "QtOpenGLWidgets.pyd", "QtWidgets.pyd", "QtSvg.pyd", "QtXml.pyd",
         "pyside6.abi3.dll", "Qt6Core.dll", "Qt6Gui.dll", "Qt6OpenGL.dll",
-        "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "Qt6Svg.dll", "Qt6Xml.pyd",
+        "Qt6OpenGLWidgets.dll", "Qt6Widgets.dll", "Qt6Svg.dll", "Qt6Xml.dll",
         "plugins\\platforms\\qwindows.dll"
     ]
     for dir, subdirs, files in os.walk("Lib\\PySide6\\", topdown=False):
