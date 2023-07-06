@@ -1,5 +1,7 @@
 from pathlib import Path
+from importlib.machinery import SourceFileLoader
 import importlib.util
+import zipimport
 import sys
 
 # Problem: Need to import `pyunity.resources` for splash
@@ -13,18 +15,24 @@ packageSpec = importlib.util.find_spec("pyunity")
 
 def importModule(submodule):
     folder = packageSpec.submodule_search_locations[0]
-    module = None
-    for suffix in [".py", ".pyc"]:
-        spec = importlib.util.spec_from_file_location(
-            "pyunity." + submodule, Path(folder) / (submodule + suffix))
-        if spec is None:
-            continue
-        module = importlib.util.module_from_spec(spec)
-        try:
-            spec.loader.exec_module(module)
-            break
-        except FileNotFoundError:
-            module = None
+    if not Path(folder).exists():
+        loader = zipimport.zipimporter(folder)
+        spec = loader.find_spec(submodule)
+    else:
+        loader = None
+        for extension in [".py", ".pyc"]:
+            path = Path(folder) / (submodule + extension)
+            if path.exists():
+                loader = SourceFileLoader("pyunity." + submodule, str(path))
+                break
+        if loader is None:
+            return None
+        spec = importlib.util.spec_from_loader("pyunity." + submodule, loader)
+    module = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(module)
+    except (FileNotFoundError, zipimport.ZipImportError):
+        return None
     return module
 
 # Import `pyunity.logger` into `pyunity.Logger` for
