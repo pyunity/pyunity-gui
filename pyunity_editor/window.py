@@ -1,7 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import *
 from PySide6.QtGui import QIcon, QPixmap, QAction, QFont
-from PIL import Image
 from qframelesswindow import FramelessMainWindow
 import os
 from .local import getPath
@@ -23,6 +22,10 @@ class Window(FramelessMainWindow):
         self.titleBar.layout().insertStretch(1, 1)
         self.setMenuWidget(self.titleBar)
 
+        self.iconLabel = QLabel(self)
+        self.iconLabel.setStyleSheet("QLabel {padding-left: 4px}")
+        self.titleBar.layout().insertWidget(0, self.iconLabel, 0, Qt.AlignLeft)
+
         self.mainWidget = QWidget(self)
         self.mainWidget.setObjectName("main-widget")
         self.mainWidget.setStyleSheet("#main-widget:focus {border: none;}")
@@ -32,25 +35,27 @@ class Window(FramelessMainWindow):
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.colors = {
+        self.titleColors = {
             "dark": "#485057",
             "light": "#d4d7d9"
         }
-        self.styles = {}
+        self.styleSheets = {}
         for style in ["dark", "light"]:
             with open(getPath(f"theme/{style}.qss")) as f:
-                self.styles[style] = f.read()
+                self.styleSheets[style] = f.read()
         self.setTheme("dark")
 
         self.icon = QIcon()
         for size in [16, 24, 32, 48, 64, 128, 256]:
             filename = f"icon{size}x{size}.png"
             fullPath = os.path.join("icons", "window", filename)
-            img = Image.open(getPath(fullPath))
-            pixmap = QPixmap()
-            pixmap.loadFromData(img.tobytes())
-            self.icon.addPixmap(pixmap)
+            self.icon.addFile(getPath(fullPath))
         self.setWindowIcon(self.icon)
+
+    def setWindowIcon(self, icon: QIcon | QPixmap) -> None:
+        super().setWindowIcon(icon)
+        self.iconLabel.setPixmap(icon.pixmap(24, 24))
+        self.titleBar.update()
 
     def toggle_theme(self):
         if self.theme == "dark":
@@ -60,8 +65,8 @@ class Window(FramelessMainWindow):
 
     def setTheme(self, theme):
         self.theme = theme
-        self.app.setStyleSheet(self.styles[self.theme])
-        self.titleBar.setStyleSheet(f"background-color: {self.colors[self.theme]};")
+        self.app.setStyleSheet(self.styleSheets[self.theme])
+        self.titleBar.setStyleSheet(f"background-color: {self.titleColors[self.theme]};")
 
     def closeEvent(self, event):
         self.app.quit_wrapper()
