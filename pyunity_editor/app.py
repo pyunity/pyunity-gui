@@ -73,10 +73,6 @@ class Application(QApplication):
         self.console_content = self.console.set_window(Console())
         self.game_content.console = self.console_content
 
-        self.loadScene(SceneManager.GetSceneByIndex(
-            self.game_content.file_tracker.project.firstScene))
-        self.game_content.file_tracker.start(1)
-
         self.setup_toolbar()
 
     def loadScene(self, scene, uuids=None):
@@ -106,6 +102,12 @@ class Application(QApplication):
     def start(self):
         os.environ["PYUNITY_EDITOR_LOADED"] = "1"
         self.window.showMaximized()
+
+        scene = SceneManager.GetSceneByIndex(
+            self.game_content.file_tracker.project.firstScene)
+        self.loadScene(scene)
+        self.game_content.file_tracker.start(1)
+
         QTimer.singleShot(100, self.window.activateWindow)
         self.exec()
 
