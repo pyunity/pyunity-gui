@@ -46,9 +46,9 @@ def SmoothScroller(cls):
         self.smoothMode = SmoothMode.COSINE
         self.acceleration = 0.5
 
-        self.smallStepModifier = Qt.SHIFT
+        self.smallStepModifier = Qt.ShiftModifier
         self.smallStepRatio = 1/5
-        self.bigStepModifier = Qt.ALT
+        self.bigStepModifier = Qt.AltModifier
         self.bigStepRatio = 5
 
         self.scrollStamps = []
@@ -69,11 +69,13 @@ def SmoothScroller(cls):
 
         self.stepsTotal = self.fps * self.duration // 1000
         multiplier = self.scrollRatio
+        delta = event.angleDelta().y()
         if QApplication.keyboardModifiers() & self.smallStepModifier:
             multiplier *= self.smallStepRatio
         if QApplication.keyboardModifiers() & self.bigStepModifier:
             multiplier *= self.bigStepRatio
-        delta = event.angleDelta().y() * multiplier
+            delta = event.angleDelta().x()
+        delta *= multiplier
         if self.acceleration > 0:
             delta += delta * self.acceleration * accelerationRatio
 
