@@ -1,5 +1,5 @@
 pyunity==0.9.0
-pyside6
+pyside6-essentials>=6.5.2
 pillow
 importlib_metadata; python_version < '3.8'
 PySideSix-Frameless-Window

@@ -1,9 +1,6 @@
 from setuptools import setup, find_packages
 import glob
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
 data_files = glob.glob("pyunity_editor/**/*.qss", recursive=True) + \
     glob.glob("pyunity_editor/**/*.png", recursive=True) + \
     ["pyunity_editor/resources.qrc"]
