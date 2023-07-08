@@ -233,7 +233,7 @@ class Inspector(QWidget):
         for section in self.sections:
             section.reset_bold()
 
-class InspectorInput(QWidget):
+class InspectorInput:
     pass
 
 class AutoSelectLineEdit(QLineEdit):
@@ -357,11 +357,11 @@ class InspectorBoolEdit(QCheckBox, InspectorInput):
         self.orig = orig
         self.value = True
         self.label = None
-        self.stateChanged.connect(self.on_edit)
         self.setChecked(True)
+        self.stateChanged.connect(self.on_edit)
 
     def on_edit(self, state):
-        value = state == Qt.Checked
+        value = state == Qt.Checked.value
         if value != self.value:
             self.modified = True
             font = self.label.font()
@@ -385,7 +385,7 @@ class InspectorBoolEdit(QCheckBox, InspectorInput):
     def get(self):
         return self.value
 
-class InspectorVector3Edit(InspectorInput):
+class InspectorVector3Edit(QWidget, InspectorInput):
     edited = Signal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorVector3Edit, self).__init__(parent)
@@ -454,7 +454,7 @@ class InspectorVector3Edit(InspectorInput):
             font.setBold(input.modified)
             input.label.setFont(font)
 
-class InspectorQuaternionEdit(InspectorInput):
+class InspectorQuaternionEdit(QWidget, InspectorInput):
     edited = Signal(object)
     def __init__(self, parent, prop, orig):
         super(InspectorQuaternionEdit, self).__init__(parent)
@@ -632,7 +632,6 @@ class InspectorSection(QWidget):
             input_box = QWidget(self)
         else:
             input_box = self.__class__.inputs[prop.type](self, prop, orig)
-        if isinstance(input_box, InspectorInput):
             input_box.label = label
             if value is not None:
                 input_box.setText(str(value))
