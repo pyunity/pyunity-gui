@@ -2,18 +2,9 @@ import os
 import time
 import threading
 import pkgutil
-import sys
-from .local import getPath, fixPackage
+from .local import getPath
 
 splashPath = getPath("icons/splash.png")
-
-def redirect_out(stream):
-    sys.stdout = stream
-    sys.stderr = stream
-
-def restore_out():
-    sys.stdout = sys.__stdout__
-    sys.stderr = sys.__stderr__
 
 def tksplash():
     print("Loading tkinter splash image")

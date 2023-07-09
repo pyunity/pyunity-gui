@@ -3,6 +3,15 @@ from importlib.machinery import SourceFileLoader
 import importlib.util
 import zipimport
 import sys
+import io
+
+def redirect_out(stream):
+    sys.stdout = stream
+    sys.stderr = stream
+
+def restore_out():
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
 
 # Problem: Need to import `pyunity.resources` for splash
 # image fetching, but that will load the entirety of
@@ -35,6 +44,9 @@ def importModule(submodule):
         return None
     return module
 
+tempStream = io.StringIO()
+redirect_out(tempStream)
+
 # Import `pyunity.logger` into `pyunity.Logger` for
 # use by `pyunity.resources`
 logger = importModule("logger")
@@ -51,6 +63,8 @@ if resources is None:
     raise Exception("Could not load asset resolver: pyunity.resources failed to load")
 sys.modules["pyunity.resources"] = resources
 loaded = False
+
+restore_out()
 
 # Code for asset resolver
 directory = Path.home() / ".pyunity" / ".editor"
@@ -76,5 +90,6 @@ def fixPackage():
     if loaded:
         return
     sys.modules.pop("pyunity.Logger")
+    print(tempStream.getvalue())
     packageSpec.loader.exec_module(sys.modules["pyunity"])
     loaded = True

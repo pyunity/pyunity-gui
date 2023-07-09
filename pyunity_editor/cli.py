@@ -1,5 +1,5 @@
-from .splash import start, redirect_out
-from .local import fixPackage
+from .splash import start
+from .local import fixPackage, redirect_out
 from time import strftime
 import argparse
 import sys
