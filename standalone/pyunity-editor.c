@@ -1,6 +1,7 @@
 #define PY_SSIZE_T_CLEAN
 #define Py_LIMITED_API 0x03060000
 #include <Python.h>
+#include <stdlib.h>
 
 #ifdef NOCONSOLE
 #include <windows.h>
@@ -8,6 +9,7 @@
 
 void showError() {
     printf("Error encountered\n");
+    setenv("PYUNITY_EDITOR_LOADED", "1", 1);
     PyObject *type, *value, *traceback;
     PyErr_Fetch(&type, &value, &traceback);
     PyErr_Print();
