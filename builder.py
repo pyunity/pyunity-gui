@@ -108,7 +108,7 @@ def setupPyWin32(zf):
         "win32/lib/win32con.py", "pywin32_system32/pywintypes310.dll"
     ]
     for file in zf.filelist:
-        if file in files:
+        if file.filename in files:
             filename = os.path.basename(file)
             with open("Lib/win32/" + filename, "wb+") as f:
                 with zf.open(file) as f2:
