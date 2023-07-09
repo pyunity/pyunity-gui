@@ -24,19 +24,6 @@ VERSION = "3.10.5"
 ARCH = "amd64"
 ZIP_OPTIONS = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
 
-if shutil.which("7z.exe") is None:
-    raise Exception("7Zip is needed to build the PyUnity Editor.")
-if "GITHUB_ACTIONS" in os.environ:
-    if shutil.which("cl.exe") is None:
-        raise Exception("Microsoft Visual C is needed to build the PyUnity Editor.")
-    if shutil.which("rc.exe") is None:
-        raise Exception("Cannot find 'rc.exe'")
-else:
-    if shutil.which("gcc.exe") is None:
-        raise Exception("MinGW-w64 is needed to build the PyUnity Editor.")
-    if shutil.which("windres.exe") is None:
-        raise Exception("Cannot find 'windres.exe'")
-
 class PypiLinkGetter:
     session = PipSession()
     collector = LinkCollector.create(session, Values(dict(
@@ -60,6 +47,20 @@ class PypiLinkGetter:
         else:
             finder = cls.finders[vertuple, platform]
         return finder.find_requirement(install_req_from_line(req), False).link._url
+
+def checkTools():
+    if shutil.which("7z.exe") is None:
+        raise Exception("7Zip is needed to build the PyUnity Editor.")
+    if "GITHUB_ACTIONS" in os.environ:
+        if shutil.which("cl.exe") is None:
+            raise Exception("Microsoft Visual C is needed to build the PyUnity Editor.")
+        if shutil.which("rc.exe") is None:
+            raise Exception("Cannot find 'rc.exe'")
+    else:
+        if shutil.which("gcc.exe") is None:
+            raise Exception("MinGW-w64 is needed to build the PyUnity Editor.")
+        if shutil.which("windres.exe") is None:
+            raise Exception("Cannot find 'windres.exe'")
 
 wheels = [{}, {}]
 for req in ["pyopengl", "pysdl2", "pysidesix-frameless-window"]:
@@ -233,19 +234,23 @@ try:
         #define PY_SSIZE_T_CLEAN
         #define Py_LIMITED_API 0x03060000
         #include <Python.h>
-        #define CHECK(n) if (n == NULL) { showError(); exit(1); }
 
         #ifdef NOCONSOLE
         #include <windows.h>
-        #define CHECK(n) if (n == NULL) { showError(); exit(1); }
+        #define CHECK_ERROR(n) if (PyErr_Occurred() != NULL) { showError(); exit(1); }
 
         void showError() {
+            printf("Error encountered\n");
             PyObject *type, *value, *traceback;
             PyErr_Fetch(&type, &value, &traceback);
+            PyErr_Print();
 
             PyObject *tracebackModule = PyImport_ImportModule("traceback");
             PyObject *formatFunc = PyObject_GetAttrString(tracebackModule, "format_exception");
             Py_DecRef(tracebackModule);
+
+            PyErr_NormalizeException(&type, &value, &traceback);
+            PyException_SetTraceback(value, traceback);
 
             PyObject *lines = PyObject_CallFunctionObjArgs(formatFunc, value, NULL);
             PyObject *sep = PyUnicode_FromString("");
@@ -260,43 +265,47 @@ try:
             PyErr_Restore(type, value, traceback);
         }
         #else
-        #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
+        #define CHECK_ERROR() if (PyErr_Occurred() != NULL) { PyErr_Print(); exit(1); }
         #endif
 
         int main(int argc, char **argv) {
-            wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib;Lib\\\\win32;Lib\\\\win32\\\\lib", NULL);
+            wchar_t *path = Py_DecodeLocale("Lib\\python.zip;Lib;Lib\\win32;Lib\\win32\\lib", NULL);
             Py_SetPath(path);
-            wchar_t **program = (wchar_t**)PyMem_RawMalloc(sizeof(wchar_t**) * argc);
+            wchar_t **program = (wchar_t**)PyMem_Malloc(sizeof(wchar_t**) * argc);
             for (int i = 0; i < argc; i++) {
                 program[i] = Py_DecodeLocale(argv[i], NULL);
             }
             if (program[0] == NULL) {
-                fprintf(stderr, "Fatal error: cannot decode argv[0]\\n");
+                fprintf(stderr, "Fatal error: cannot decode argv[0]\n");
                 exit(1);
             }
             Py_SetProgramName(program[0]);
             Py_Initialize();
             PySys_SetArgvEx(argc, program, 0);
+            CHECK_ERROR();
 
             PyObject *editor = PyImport_ImportModule("pyunity_editor.cli");
-            CHECK(editor)
+            CHECK_ERROR();
+
             #ifdef NOCONSOLE
             PyObject *func = PyObject_GetAttrString(editor, "gui");
             #else
             PyObject *func = PyObject_GetAttrString(editor, "run");
             #endif
-            CHECK(func)
+            CHECK_ERROR();
 
             PyObject *res = PyObject_CallFunction(func, NULL);
+            CHECK_ERROR();
 
             if (Py_FinalizeEx() < 0) {
                 exit(1);
             }
             for (int i = 0; i < argc; i++) {
-                PyMem_RawFree((void*)program[i]);
+                PyMem_Free((void*)program[i]);
             }
-            PyMem_RawFree((void*)program);
-            PyMem_RawFree((void*)path);
+            PyMem_Free((void*)program);
+            PyMem_Free((void*)path);
+            printf("Safely freed memory\n");
             return 0;
         }
 
