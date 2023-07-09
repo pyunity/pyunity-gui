@@ -74,7 +74,6 @@ class Application(QApplication):
         self.game_content.console = self.console_content
 
         self.setup_toolbar()
-        raise Exception("test value")
 
     def loadScene(self, scene, uuids=None):
         self.loaded = scene

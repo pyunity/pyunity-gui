@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QIcon, QPixmap, QAction, QFont
+from PySide6.QtGui import QIcon, QAction, QFont, QColor
 from qframelesswindow import FramelessMainWindow
 import os
 from .local import getPath
@@ -10,17 +10,23 @@ qInitResources()
 class Window(FramelessMainWindow):
     def __init__(self, app):
         super(Window, self).__init__()
-        self.setStyleSheet("Window:focus {border: none;}")
-        self.setWindowTitle("PyUnity Editor")
-        self.titleBar.raise_()
-        self.setFocusPolicy(Qt.StrongFocus)
 
-        self.statusBar()
+        statusBar = QStatusBar(self)
+        label = QLabel(statusBar)
+        label.setText("Hover over a button to view what it does")
+        label.setFont(QFont("Segoe UI", 9))
+        label.setStyleSheet("QLabel {padding-left: 2px;}")
+        statusBar.insertWidget(0, label)
+        self.setStatusBar(statusBar)
+
         self.app = app
         self.toolbar = ToolBar(self)
         self.titleBar.layout().insertWidget(0, self.toolbar, 0, Qt.AlignLeft)
-        self.titleBar.layout().insertStretch(1, 1)
         self.setMenuWidget(self.titleBar)
+
+        self.titleLabel = QLabel(self)
+        self.titleLabel.setFont(QFont("Segoe UI", 12))
+        self.titleBar.layout().insertWidget(1, self.titleLabel, 1, Qt.AlignRight | Qt.AlignVCenter)
 
         self.iconLabel = QLabel(self)
         self.iconLabel.setStyleSheet("QLabel {padding-left: 4px}")
@@ -35,10 +41,32 @@ class Window(FramelessMainWindow):
         self.vbox_layout.setSpacing(0)
         self.vbox_layout.setContentsMargins(2, 2, 2, 2)
 
-        self.titleColors = {
-            "dark": "#485057",
-            "light": "#d4d7d9"
+        self.setStyleSheet("Window:focus {border: none;}")
+        self.setWindowTitle("PyUnity Editor")
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.titleBar.raise_()
+
+        self.buttonColors = {
+            "dark": {
+                "normal": QColor(239, 240, 241),
+                "hover": QColor(239, 240, 241),
+                "pressed": QColor(0, 0, 0),
+                "hoverbg": QColor(255, 255, 255, 26),
+                "pressedbg": QColor(255, 255, 255, 51),
+            },
+            "light": {
+                "normal": QColor(49, 54, 59),
+                "hover": QColor(49, 54, 59),
+                "pressed": QColor(255, 255, 255),
+                "hoverbg": QColor(0, 0, 0, 26),
+                "pressedbg": QColor(0, 0, 0, 51),
+            }
         }
+
+        # self.titleColors = {
+        #     "dark": "#485057",
+        #     "light": "#d4d7d9"
+        # }
         self.styleSheets = {}
         for style in ["dark", "light"]:
             with open(getPath(f"theme/{style}.qss")) as f:
@@ -52,10 +80,14 @@ class Window(FramelessMainWindow):
             self.icon.addFile(getPath(fullPath))
         self.setWindowIcon(self.icon)
 
-    def setWindowIcon(self, icon: QIcon | QPixmap) -> None:
-        super().setWindowIcon(icon)
+    def setWindowIcon(self, icon):
+        super(Window, self).setWindowIcon(icon)
         self.iconLabel.setPixmap(icon.pixmap(24, 24))
         self.titleBar.update()
+
+    def setWindowTitle(self, title):
+        super(Window, self).setWindowTitle(title)
+        self.titleLabel.setText(title)
 
     def toggle_theme(self):
         if self.theme == "dark":
@@ -66,7 +98,15 @@ class Window(FramelessMainWindow):
     def setTheme(self, theme):
         self.theme = theme
         self.app.setStyleSheet(self.styleSheets[self.theme])
-        self.titleBar.setStyleSheet(f"background-color: {self.titleColors[self.theme]};")
+        # self.titleBar.setStyleSheet(f"background-color: {self.titleColors[self.theme]};")
+        self.titleBar.closeBtn.setNormalColor(self.buttonColors[theme]["normal"])
+        for button in [self.titleBar.minBtn, self.titleBar.maxBtn]:
+            button.setNormalColor(self.buttonColors[theme]["normal"])
+            button.setHoverColor(self.buttonColors[theme]["hover"])
+            button.setPressedColor(self.buttonColors[theme]["pressed"])
+            button.setHoverBackgroundColor(self.buttonColors[theme]["hoverbg"])
+            button.setPressedBackgroundColor(self.buttonColors[theme]["pressedbg"])
+        self.update()
 
     def closeEvent(self, event):
         self.app.quit_wrapper()
