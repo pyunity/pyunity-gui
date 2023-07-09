@@ -4,7 +4,7 @@
 
 #ifdef NOCONSOLE
 #include <windows.h>
-#define CHECK_ERROR(n) if (PyErr_Occurred() != NULL) { showError(); exit(1); }
+#define CHECK_ERROR() if (PyErr_Occurred() != NULL) { showError(); exit(1); }
 
 void showError() {
     printf("Error encountered\n");

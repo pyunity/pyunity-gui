@@ -253,7 +253,8 @@ try:
             "cl.exe", "/nologo", "/O2", "/Wall",
             "/Tc..\\pyunity-editor.c", "/Fo..\\pyunity-editor.obj",
             f"/I{sys.base_prefix}\\include", "/DNOCONSOLE",
-            "/link", "..\\icons.res", "..\\version.res", "/subsystem:windows",
+            "/link", "..\\icons.res", "..\\version.res", "user32.lib",
+            "/subsystem:windows",
             f"/libpath:{sys.base_prefix}\\libs",
             "/out:pyunity-editor.exe"
         ], stdout=sys.stdout, stderr=sys.stderr)
