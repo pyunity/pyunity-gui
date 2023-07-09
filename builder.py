@@ -217,7 +217,7 @@ try:
     shutil.move(zipname + ".zip", "Lib\\python.zip")
 
     if MSVC_RUNTIME:
-        download("https://files.pythonhosted.org/packages/6d/4a/602120a9e6625169fbddbdd036fe5559af638986dc0c3c3b602d3d60f95e/msvc_runtime-14.29.30133-cp310-cp310-win_amd64.whl", "..\\msvc_runtime.whl")
+        download(PypiLinkGetter.getLink(VERSION, ARCH, "msvc-runtime"), "..\\msvc_runtime.whl")
         with zipfile.ZipFile("..\\msvc_runtime.whl") as zf:
             print("EXTRACT msvc_runtime.whl", flush=True)
             zf.extractall("..\\msvc_runtime")
@@ -233,13 +233,40 @@ try:
         #define PY_SSIZE_T_CLEAN
         #define Py_LIMITED_API 0x03060000
         #include <Python.h>
-        #include <string.h>
+        #define CHECK(n) if (n == NULL) { showError(); exit(1); }
+
+        #ifdef NOCONSOLE
+        #include <windows.h>
+        #define CHECK(n) if (n == NULL) { showError(); exit(1); }
+
+        void showError() {
+            PyObject *type, *value, *traceback;
+            PyErr_Fetch(&type, &value, &traceback);
+
+            PyObject *tracebackModule = PyImport_ImportModule("traceback");
+            PyObject *formatFunc = PyObject_GetAttrString(tracebackModule, "format_exception");
+            Py_DecRef(tracebackModule);
+
+            PyObject *lines = PyObject_CallFunctionObjArgs(formatFunc, value, NULL);
+            PyObject *sep = PyUnicode_FromString("");
+            PyObject *joined = PyUnicode_Join(sep, lines);
+            Py_DecRef(sep);
+            Py_DecRef(lines);
+
+            wchar_t *msg = PyUnicode_AsWideCharString(joined, NULL);
+            MessageBoxW(NULL, msg, L"Error loading PyUnity Editor", 0x10L);
+            PyMem_Free(msg);
+
+            PyErr_Restore(type, value, traceback);
+        }
+        #else
         #define CHECK(n) if (n == NULL) { PyErr_Print(); exit(1); }
+        #endif
 
         int main(int argc, char **argv) {
             wchar_t *path = Py_DecodeLocale("Lib\\\\python.zip;Lib;Lib\\\\win32;Lib\\\\win32\\\\lib", NULL);
             Py_SetPath(path);
-            wchar_t **program = (wchar_t**)malloc(sizeof(wchar_t**) * argc);
+            wchar_t **program = (wchar_t**)PyMem_RawMalloc(sizeof(wchar_t**) * argc);
             for (int i = 0; i < argc; i++) {
                 program[i] = Py_DecodeLocale(argv[i], NULL);
             }
@@ -261,21 +288,19 @@ try:
             CHECK(func)
 
             PyObject *res = PyObject_CallFunction(func, NULL);
-            CHECK(res)
 
             if (Py_FinalizeEx() < 0) {
                 exit(1);
             }
             for (int i = 0; i < argc; i++) {
-                free((void*)program[i]);
+                PyMem_RawFree((void*)program[i]);
             }
-            free((void*)program);
-            free((void*)path);
+            PyMem_RawFree((void*)program);
+            PyMem_RawFree((void*)path);
             return 0;
         }
 
         #ifdef NOCONSOLE
-        #include <windows.h>
         int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                 char* pCmdLine, int nShowCmd) {
             return main(__argc, __argv);

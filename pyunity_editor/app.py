@@ -74,6 +74,7 @@ class Application(QApplication):
         self.game_content.console = self.console_content
 
         self.setup_toolbar()
+        raise Exception("test value")
 
     def loadScene(self, scene, uuids=None):
         self.loaded = scene
@@ -162,6 +163,7 @@ class Application(QApplication):
         ret = message_box.exec()
         if ret == QMessageBox.Ok:
             self.quit()
+            exit(0)
 
     def showVersion(self):
         if self.worker is not None:
