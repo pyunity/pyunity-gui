@@ -2,15 +2,19 @@ name: Build
 on: [push, workflow_dispatch]
 jobs:
   build:
-    name: Python 3.10-x64
     runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.8.17", "3.9.17", "3.10.12"]
+        architecture: ["x64", "x86"]
+    name: Python ${{ matrix.python-version }}-${{ matrix.architecture }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: "3.10"
-          architecture: x64
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.architecture }}
       - name: Install dependencies
         run: pip install wheel build
       - uses: ilammy/msvc-dev-cmd@v1
@@ -18,19 +22,21 @@ jobs:
       - name: Build application
         env:
           GITHUB_ACTIONS: 1
+          PYTHON_VERSION: ${{ matrix.python-version }}
+          PYTHON_ARCHITECTURE: ${{ matrix.architecture }}
         run: python builder.py
       - name: Upload zip artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Zip archive
+          name: Zip archive (${{ matrix.python-version }}-${{ matrix.architecture }})
           path: pyunity-editor.zip
       - name: Upload 7z artifact
         uses: actions/upload-artifact@v3
         with:
-          name: 7z archive
+          name: 7z archive (${{ matrix.python-version }}-${{ matrix.architecture }})
           path: pyunity-editor.7z
       - name: Upload self-extracting artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Self-extracting archive
+          name: Self-extracting archive (${{ matrix.python-version }}-${{ matrix.architecture }})
           path: pyunity-editor-install.exe

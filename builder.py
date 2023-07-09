@@ -1,4 +1,3 @@
-import textwrap
 import traceback
 import urllib.request
 import tempfile
@@ -19,9 +18,15 @@ from pip._internal.models.selection_prefs import SelectionPreferences
 from pip._internal.models.target_python import TargetPython
 from pip._internal.req.constructors import install_req_from_line
 
+archmapArg = {"x64": "amd64", "x86": "win32"}
+
 MSVC_RUNTIME = False
-VERSION = "3.10.5"
-ARCH = "amd64"
+VERSION = os.getenv("PYTHON_VERSION")
+if not VERSION:
+    VERSION = "3.10.12"
+ARCH = archmapArg[os.getenv("PYTHON_ARCHITECTURE")]
+if not ARCH:
+    ARCH = "amd64"
 ZIP_OPTIONS = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
 
 class PypiLinkGetter:
