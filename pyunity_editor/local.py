@@ -44,9 +44,6 @@ def importModule(submodule):
         return None
     return module
 
-tempStream = io.StringIO()
-redirect_out(tempStream)
-
 # Import `pyunity.logger` into `pyunity.Logger` for
 # use by `pyunity.resources`
 logger = importModule("logger")
@@ -54,6 +51,9 @@ if logger is None:
     raise Exception("Could not load asset resolver: pyunity.logger failed to load")
 sys.modules["pyunity.logger"] = logger
 sys.modules["pyunity.Logger"] = logger
+
+tempStream = io.StringIO()
+redirect_out(tempStream)
 
 # Get module but don't execute `pyunity`
 pyunity = importlib.util.module_from_spec(packageSpec)
@@ -63,8 +63,6 @@ if resources is None:
     raise Exception("Could not load asset resolver: pyunity.resources failed to load")
 sys.modules["pyunity.resources"] = resources
 loaded = False
-
-restore_out()
 
 # Code for asset resolver
 directory = Path.home() / ".pyunity" / ".editor"
@@ -90,6 +88,6 @@ def fixPackage():
     if loaded:
         return
     sys.modules.pop("pyunity.Logger")
-    print(tempStream.getvalue())
+    restore_out()
     packageSpec.loader.exec_module(sys.modules["pyunity"])
     loaded = True
