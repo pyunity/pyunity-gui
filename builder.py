@@ -103,17 +103,19 @@ def stripPySide6():
 
 def setupPyWin32(zf):
     os.makedirs("Lib/win32", exist_ok=True)
-    folders = ["win32/", "win32com/", "win32comext/", "pythoncom"]
+    files = [
+        "win32/win32api.pyd", "win32/win32gui.pyd", "win32/win32print.pyd",
+        "win32/lib/win32con.py", "pywin32_system32/pywintypes310.dll"
+    ]
     for file in zf.filelist:
-        for folder in folders:
-            if file.filename.startswith(folder):
-                zf.extract(file, "Lib")
-        if ".dist-info/" in file.filename:
-            zf.extract(file, "Lib")
-        elif file.filename.startswith("pywin32_system32/"):
-            with open("Lib/win32/" + file.filename.rsplit("/")[1], "wb+") as f:
+        if file in files:
+            filename = os.path.basename(file)
+            with open("Lib/win32/" + filename, "wb+") as f:
                 with zf.open(file) as f2:
                     shutil.copyfileobj(f2, f)
+            zf.extract("win32" + filename, "Lib")
+        elif ".dist-info/" in file.filename:
+            zf.extract(file, "Lib")
 
 def addPackage(zf, name, path, orig, distInfo=False):
     print("COMPILE", name, flush=True)
