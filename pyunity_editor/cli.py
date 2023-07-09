@@ -1,5 +1,5 @@
 from .splash import start
-from .local import fixPackage, redirect_out
+from .local import fixPackage, redirect_out, restore_out
 from time import strftime
 import argparse
 import sys
@@ -22,6 +22,7 @@ class Parser(argparse.ArgumentParser):
     def parse_args(self, args=None, namespace=None):
         args = super(Parser, self).parse_args(args, namespace)
         if args.project is None:
+            restore_out()
             self.print_help()
             self.exit(0)
         if not args.new and not os.path.isdir(args.project):
@@ -81,9 +82,10 @@ def gui():
     def inner():
         temp_stream = io.StringIO()
         redirect_out(temp_stream)
-
-        fixPackage()
         from pyunity import Logger
+        Logger.SetStream(temp_stream)
+        fixPackage()
+
         directory = os.path.join(os.path.dirname(Logger.folder), "Editor", "Logs")
         os.makedirs(directory, exist_ok=True)
         path = os.path.join(directory, strftime("%Y-%m-%d %H-%M-%S") + ".log")

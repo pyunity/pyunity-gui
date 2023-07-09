@@ -64,6 +64,8 @@ if resources is None:
 sys.modules["pyunity.resources"] = resources
 loaded = False
 
+restore_out()
+
 # Code for asset resolver
 directory = Path.home() / ".pyunity" / ".editor"
 if not directory.is_dir():
@@ -88,6 +90,5 @@ def fixPackage():
     if loaded:
         return
     sys.modules.pop("pyunity.Logger")
-    restore_out()
     packageSpec.loader.exec_module(sys.modules["pyunity"])
     loaded = True
