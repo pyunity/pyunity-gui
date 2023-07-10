@@ -70,7 +70,7 @@ def checkTools():
 wheels = [{}, {}]
 for req in ["pyopengl", "pysdl2", "pysidesix-frameless-window"]:
     wheels[0][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
-for req in ["pyopengl_accelerate", "pysdl2_dll", "pillow", "pyglm",
+for req in ["pyopengl_accelerate", "pysdl2_dll", "pillow", "pyglm", "numpy",
         "pyside6", "shiboken6", "pyside6_essentials", "glfw", "pywin32"]:
     wheels[1][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
 
@@ -100,6 +100,11 @@ def stripPySide6():
                 os.remove(path)
         if len(os.listdir(dir)) == 0:
             os.rmdir(dir)
+
+def stripNumpy():
+    print("STRIP numpy", flush=True)
+    for folder in glob.glob("Lib/numpy/*/tests"):
+        shutil.rmtree(folder)
 
 def setupPyWin32(zf):
     os.makedirs("Lib/win32", exist_ok=True)
@@ -212,16 +217,25 @@ try:
     os.chdir(workdir)
 
     stripPySide6()
+    stripNumpy()
 
     print("MOVE *.pyd", flush=True)
     for file in glob.glob("*.pyd"):
         shutil.move(file, "Lib")
+
+    print("CLEAN .")
 
     os.remove("python.exe")
     os.remove("python.cat")
     os.remove("pythonw.exe")
     os.remove(zipname + "._pth")
     shutil.move(zipname + ".zip", "Lib\\python.zip")
+
+    print("REMOVE *.pyi *.pxd")
+    files = glob.glob("Lib/**/*.pyi", recursive=True) + \
+        glob.glob("Lib/**/*.pxd", recursive=True)
+    for file in files:
+        os.remove(file)
 
     if MSVC_RUNTIME:
         download(PypiLinkGetter.getLink(VERSION, ARCH, "msvc-runtime"), "..\\msvc_runtime.whl")
