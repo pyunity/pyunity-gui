@@ -1,3 +1,6 @@
+# Disable window provider selection
+import os
+os.environ["PYUNITY_WINDOW_PROVIDER"] = "0"
 from .splash import start
 from .local import fixPackage, redirect_out, restore_out
 from time import strftime

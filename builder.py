@@ -71,7 +71,7 @@ wheels = [{}, {}]
 for req in ["pyopengl", "pysdl2", "pysidesix-frameless-window"]:
     wheels[0][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
 for req in ["pyopengl_accelerate", "pysdl2_dll", "pillow", "pyglm", "numpy",
-        "pyside6", "shiboken6", "pyside6_essentials", "glfw", "pywin32"]:
+        "pyside6", "shiboken6", "pyside6_essentials", "pywin32"]:
     wheels[1][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
 
 def download(url, dest):
