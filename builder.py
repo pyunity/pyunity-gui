@@ -113,7 +113,6 @@ def setupPyWin32(zf):
             with open("Lib/win32/" + filename, "wb+") as f:
                 with zf.open(file) as f2:
                     shutil.copyfileobj(f2, f)
-            zf.extract("win32/" + filename, "Lib")
         elif ".dist-info/" in file.filename:
             zf.extract(file, "Lib")
 
