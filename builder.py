@@ -109,7 +109,7 @@ def setupPyWin32(zf):
     ]
     for file in zf.filelist:
         if file.filename in files:
-            filename = os.path.basename(file)
+            filename = os.path.basename(file.filename)
             with open("Lib/win32/" + filename, "wb+") as f:
                 with zf.open(file) as f2:
                     shutil.copyfileobj(f2, f)
