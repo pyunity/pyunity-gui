@@ -69,13 +69,18 @@ def checkTools():
             raise Exception("Cannot find 'windres.exe'")
 
 wheels = [{}, {}]
-for req in ["pyopengl", "pysdl2", "pysidesix-frameless-window"]:
+compressedReqs = ["pyopengl", "pysdl2", "pysidesix-frameless-window"]
+extensionReqs = ["pyopengl-accelerate", "pysdl2-dll", "pillow", "pyglm",
+    "pyside6", "shiboken6", "pyside6-essentials", "pywin32"]
+
+if parse(VERSION) < parse("3.9"):
+    compressedReqs.append("importlib-metadata")
+if parse(VERSION) >= parse("3.9"):
+    extensionReqs.append("numpy")
+
+for req in compressedReqs:
     wheels[0][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
-for req in ["pyopengl_accelerate", "pysdl2_dll", "pillow", "pyglm", "numpy",
-        "pyside6", "shiboken6", "pyside6_essentials", "pywin32"]:
-    if req == "numpy":
-        if parse(VERSION) < parse("3.9"):
-            continue
+for req in extensionReqs:
     wheels[1][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
 
 def download(url, dest):
