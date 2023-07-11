@@ -17,7 +17,7 @@ from pip._internal.network.session import PipSession
 from pip._internal.models.selection_prefs import SelectionPreferences
 from pip._internal.models.target_python import TargetPython
 from pip._internal.req.constructors import install_req_from_line
-from pip._vendor import packaging
+from pip._vendor.packaging.version import parse
 
 archmapArg = {"x64": "amd64", "x86": "win32"}
 
@@ -74,7 +74,7 @@ for req in ["pyopengl", "pysdl2", "pysidesix-frameless-window"]:
 for req in ["pyopengl_accelerate", "pysdl2_dll", "pillow", "pyglm", "numpy",
         "pyside6", "shiboken6", "pyside6_essentials", "pywin32"]:
     if req == "numpy":
-        if packaging.version.parse(VERSION) < packaging.version.parse("3.9"):
+        if parse(VERSION) < parse("3.9"):
             continue
     wheels[1][req] = PypiLinkGetter.getLink(VERSION, ARCH, req)
 
