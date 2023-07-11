@@ -201,7 +201,13 @@ try:
             addPackage(zf, name, "**\\*", workdir)
 
     for name, url in wheels[1].items():
-        download(url, "..\\" + name + ".whl")
+        if url.endswith(".tar.gz"):
+            download(url, "..\\" + name + ".tar.gz")
+            subprocess.call([sys.executable, "-m", "pip", "wheel",
+                                "--no-deps", "..\\" + name + ".tar.gz"])
+            shutil.move(glob.glob("*.whl")[0], "..\\" + name + ".whl")
+        else:
+            download(url, "..\\" + name + ".whl")
         print("COPY", name, flush=True)
         with zipfile.ZipFile("..\\" + name + ".whl") as zf2:
             if name == "pywin32":
