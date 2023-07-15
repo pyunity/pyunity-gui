@@ -16,7 +16,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
       - name: Install dependencies
-        run: pip install wheel build
+        run: pip install -U wheel build[virtualenv] setuptools
       - uses: ilammy/msvc-dev-cmd@v1
         name: Set up MSVC
       - name: Build application
