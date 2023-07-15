@@ -120,6 +120,13 @@ def stripNumpy():
     for folder in glob.glob("Lib/numpy/*/tests"):
         shutil.rmtree(folder)
 
+def setupPillow():
+    download("https://download.lfd.uci.edu/pythonlibs/archived/libraqm-0.7.1.dll.zip", "../raqm.zip")
+    with zipfile.ZipFile("../raqm.zip") as zf:
+        zf.extractall("../raqm-dlls")
+    for file in glob.glob("../raqm-dlls/*/x64/*"):
+        shutil.move(file, "Lib")
+
 def setupPyWin32(zf):
     os.makedirs("Lib/win32", exist_ok=True)
     files = [
@@ -227,6 +234,7 @@ def setupLibraries(directory):
 
     stripPySide6()
     stripNumpy()
+    setupPillow()
 
 def cleanPackageRoot():
     print("MOVE *.pyd", flush=True)
