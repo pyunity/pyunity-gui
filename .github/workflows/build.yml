@@ -5,7 +5,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ["3.8.10", "3.9.13", "3.10.11"]
+        python-version: ["3.7.9", "3.8.10", "3.9.13", "3.10.11"]
         architecture: ["x64"] # disable x86 for now
     name: Python ${{ matrix.python-version }}-${{ matrix.architecture }}
     steps:
