@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     #endif
     CHECK_ERROR();
 
-    PyObject *res = PyObject_CallFunction(func, NULL);
+    PyObject_CallFunction(func, NULL);
     CHECK_ERROR();
 
     if (Py_FinalizeEx() < 0) {
