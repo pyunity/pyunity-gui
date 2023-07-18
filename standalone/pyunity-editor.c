@@ -37,8 +37,9 @@ void showError() {
 #endif
 
 int main(int argc, char **argv) {
-    wchar_t *path = Py_DecodeLocale("Lib\\python.zip;Lib;Lib\\win32;Lib\\win32\\lib", NULL);
+    wchar_t *path = Py_DecodeLocale("Lib\\python.zip;Lib;Lib\\win32", NULL);
     Py_SetPath(path);
+
     wchar_t **program = (wchar_t**)PyMem_Malloc(sizeof(wchar_t**) * argc);
     for (int i = 0; i < argc; i++) {
         program[i] = Py_DecodeLocale(argv[i], NULL);
@@ -55,6 +56,13 @@ int main(int argc, char **argv) {
     Py_Initialize();
     PySys_SetArgvEx(argc, program, 0);
     CHECK_ERROR();
+
+    PyObject *left = Py_BuildValue("u", program[1]);
+    PyObject *right = Py_BuildValue("s", "-E");
+    if (PyUnicode_Compare(left, right) == 0) {
+        int retcode = Py_Main(argc, program);
+        exit(retcode);
+    }
 
     PyObject *editor = PyImport_ImportModule("pyunity_editor.cli");
     CHECK_ERROR();
