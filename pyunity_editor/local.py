@@ -21,6 +21,8 @@ def restore_out():
 # then reset and execute `pyunity` correctly later.
 
 packageSpec = importlib.util.find_spec("pyunity")
+if packageSpec is None:
+    raise ModuleNotFoundError("No module named 'pyunity'")
 
 def importModule(submodule):
     folder = packageSpec.submodule_search_locations[0]
@@ -37,6 +39,8 @@ def importModule(submodule):
         if loader is None:
             return None
         spec = importlib.util.spec_from_loader("pyunity." + submodule, loader)
+    if spec is None:
+        raise ModuleNotFoundError("No module named " + repr("pyunity." + submodule))
     module = importlib.util.module_from_spec(spec)
     try:
         spec.loader.exec_module(module)
