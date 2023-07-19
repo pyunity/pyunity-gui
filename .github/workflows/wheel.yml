@@ -1,0 +1,23 @@
+name: Wheel build
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: windows-latest
+    name: Build python wheel
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.11
+          architecture: x64
+      - name: Install dependencies
+        run: pip install -U wheel build[virtualenv] setuptools
+      - name: Build pure wheel
+        run: |
+          python -m build
+      - name: Upload python wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: purepython
+          path: dist/*.whl
