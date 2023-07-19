@@ -74,7 +74,7 @@ def checkTools():
 def getPackageLinks():
     compressedReqs = ["pyopengl", "pysdl2", "pysidesix-frameless-window"]
     extensionReqs = ["pyopengl-accelerate", "pysdl2-dll", "pillow", "pyglm",
-        "pyside6", "shiboken6", "pyside6-essentials", "pywin32"]
+                     "pyside6", "shiboken6", "pyside6-essentials", "pywin32"]
 
     if parse(VERSION) < parse("3.9"):
         compressedReqs.append("importlib-metadata")
@@ -150,8 +150,7 @@ def addPackage(zf, name, path, orig, distInfo=True):
         paths.extend(glob.glob("*.dist-info\\**\\*", recursive=True))
     for file in paths:
         if file.endswith(".py"):
-            py_compile.compile(file, file + "c", file,
-                            doraise=True)
+            py_compile.compile(file, file + "c", file, doraise=True)
             zf.write(file + "c")
         elif not file.endswith(".pyc"):
             zf.write(file)
@@ -168,29 +167,29 @@ def getEmbedPackage():
 def getPyUnity():
     # Do not cache
     url = "https://github.com/pyunity/pyunity/archive/refs/heads/develop.zip"
-    print("GET", url, "-> pyunity.zip", flush=True)
-    urllib.request.urlretrieve(url, "pyunity.zip")
-    with zipfile.ZipFile("pyunity.zip") as zf:
-        print("EXTRACT pyunity.zip", flush=True)
+    print("GET", url, "-> pyunity-develop.zip", flush=True)
+    urllib.request.urlretrieve(url, "pyunity-develop.zip")
+    with zipfile.ZipFile("pyunity-develop.zip") as zf:
+        print("EXTRACT pyunity-develop.zip", flush=True)
         zf.extractall()
 
 def buildSrcPackage(name, directory, outDir):
     print("BUILD", name, flush=True)
     with open(os.path.join(originalFolder, "build.log"), "a+") as log:
-        subprocess.call([sys.executable, "-m", "build", directory],
-                         stdout=log, stderr=sys.stderr,
-                         env={**os.environ, "cython": "0"})
+        subprocess.check_call([sys.executable, "-m", "build", directory],
+                              stdout=log, stderr=sys.stderr,
+                              env={**os.environ, "cython": "0"})
     shutil.move(glob.glob(directory + "/dist/*.whl")[0], name + ".whl")
 
     with zipfile.ZipFile(name + ".whl") as zf:
-        print("EXTRACT",  name + ".whl", flush=True)
+        print("EXTRACT", name + ".whl", flush=True)
         zf.extractall(outDir)
 
 def getBinaryPackage(name, url):
     if url.endswith(".tar.gz"):
         download(url, "..\\" + name + ".tar.gz")
-        subprocess.call([sys.executable, "-m", "pip", "wheel",
-                            "--no-deps", "..\\" + name + ".tar.gz"])
+        subprocess.check_call([sys.executable, "-m", "pip", "wheel",
+                               "--no-deps", "..\\" + name + ".tar.gz"])
         shutil.move(glob.glob("*.whl")[0], "..\\" + name + ".whl")
     else:
         download(url, "..\\" + name + ".whl")
@@ -267,16 +266,16 @@ def copyExeInfoFiles():
 
 def compileMsvc():
     print("COMPILE icons.o", flush=True)
-    subprocess.call([
+    subprocess.check_call([
         "rc.exe", "/fo..\\icons.res", "..\\icons.rc"
     ], stdout=sys.stdout, stderr=sys.stderr)
     print("COMPILE version.o", flush=True)
-    subprocess.call([
+    subprocess.check_call([
         "rc.exe", "/fo..\\version.res", "..\\version.rc"
     ], stdout=sys.stdout, stderr=sys.stderr)
 
     print("COMPILE pyunity-editor.exe", flush=True)
-    subprocess.call([
+    subprocess.check_call([
         "cl.exe", "/nologo", "/O2", "/Wall",
         "/Tc..\\pyunity-editor.c", "/Fo..\\pyunity-editor.obj",
         f"/I{sys.base_prefix}\\include", "/DNOCONSOLE",
@@ -288,18 +287,18 @@ def compileMsvc():
 
 def compileMinGW():
     print("COMPILE icons.o", flush=True)
-    subprocess.call([
+    subprocess.check_call([
         "windres.exe", "-O", "coff",
         "..\\icons.rc", "..\\icons.o"
     ], stdout=sys.stdout, stderr=sys.stderr)
     print("COMPILE version.o", flush=True)
-    subprocess.call([
+    subprocess.check_call([
         "windres.exe", "-O", "coff",
         "..\\version.rc", "..\\version.o"
     ], stdout=sys.stdout, stderr=sys.stderr)
 
     print("COMPILE pyunity-editor.exe", flush=True)
-    subprocess.call([
+    subprocess.check_call([
         "gcc.exe", "-O2", "-Wall", "-mwindows", "-DNOCONSOLE",
         "-o", "pyunity-editor.exe", "..\\pyunity-editor.c", "..\\icons.o", "..\\version.o",
         "-L.", f"-l{zipName}", f"-I{sys.base_prefix}\\include",
@@ -307,14 +306,14 @@ def compileMinGW():
 
 def archiveFolder():
     print(f"ZIP pyunity-editor.zip", flush=True)
-    subprocess.call([
+    subprocess.check_call([
         "7z.exe", "a", "-mx=9",
         f"pyunity-editor.zip", mainFolder
     ], stdout=sys.stdout, stderr=sys.stderr)
     shutil.copy(f"pyunity-editor.zip", originalFolder)
 
     print(f"7Z pyunity-editor.7z", flush=True)
-    subprocess.call([
+    subprocess.check_call([
         "7z.exe", "a", "-mx=9",
         f"pyunity-editor.7z", mainFolder
     ], stdout=sys.stdout, stderr=sys.stderr)
