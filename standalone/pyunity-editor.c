@@ -58,8 +58,11 @@ int main(int argc, char **argv) {
     CHECK_ERROR();
 
     PyObject *left = Py_BuildValue("u", program[1]);
-    PyObject *right = Py_BuildValue("s", "-E");
-    if (PyUnicode_Compare(left, right) == 0) {
+    PyObject *right1 = Py_BuildValue("s", "-i");
+    PyObject *right2 = Py_BuildValue("s", "--interactive");
+    if (PyUnicode_Compare(left, right1) == 0 ||
+            PyUnicode_Compare(left, right2) == 0) {
+        program[1] = Py_DecodeLocale("-E", NULL);
         int retcode = Py_Main(argc, program);
         exit(retcode);
     }
