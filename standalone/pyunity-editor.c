@@ -66,6 +66,17 @@ int main(int argc, char **argv) {
         int retcode = Py_Main(argc, program);
         exit(retcode);
     }
+    PyObject *right3 = Py_BuildValue("s", "-U");
+    PyObject *right4 = Py_BuildValue("s", "--update");
+    if (PyUnicode_Compare(left, right3) == 0 ||
+            PyUnicode_Compare(left, right4) == 0) {
+        PyObject *updater = PyImport_ImportModule("pyunity_updater");
+        CHECK_ERROR();
+        PyObject *func = PyObject_GetAttrString(updater, "main");
+        CHECK_ERROR();
+        PyObject_CallFunction(func, NULL);
+        CHECK_ERROR();
+    }
 
     PyObject *editor = PyImport_ImportModule("pyunity_editor.cli");
     CHECK_ERROR();

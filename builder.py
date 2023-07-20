@@ -258,6 +258,12 @@ def getRuntimeDlls():
         if file.endswith(".dll"):
             shutil.copy(os.path.join(datafolder, file), ".")
 
+def installUpdater():
+    shutil.copy(originalFolder + "\\standalone\\pyunity_updater.py", "..")
+    py_compile.compile("..\\pyunity_updater.py", "..\\pyunity_updater.pyc")
+    with zipfile.ZipFile("Lib\\python.zip", "a") as zf:
+        zf.write("..\\pyunity_updater.pyc")
+
 def copyExeInfoFiles():
     shutil.copy(originalFolder + "\\standalone\\pyunity-editor.c", "..")
     shutil.copy(originalFolder + "\\standalone\\icons.ico", "..")
@@ -346,6 +352,7 @@ def main():
     if MSVC_RUNTIME:
         getRuntimeDlls()
 
+    installUpdater()
     copyExeInfoFiles()
     if "GITHUB_ACTIONS" in os.environ:
         compileMsvc()
