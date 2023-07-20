@@ -76,20 +76,20 @@ int main(int argc, char **argv) {
         CHECK_ERROR();
         PyObject_CallFunction(func, NULL);
         CHECK_ERROR();
+    } else {
+        PyObject *editor = PyImport_ImportModule("pyunity_editor.cli");
+        CHECK_ERROR();
+
+        #ifdef NOCONSOLE
+        PyObject *func = PyObject_GetAttrString(editor, "gui");
+        #else
+        PyObject *func = PyObject_GetAttrString(editor, "run");
+        #endif
+        CHECK_ERROR();
+
+        PyObject_CallFunction(func, NULL);
+        CHECK_ERROR();
     }
-
-    PyObject *editor = PyImport_ImportModule("pyunity_editor.cli");
-    CHECK_ERROR();
-
-    #ifdef NOCONSOLE
-    PyObject *func = PyObject_GetAttrString(editor, "gui");
-    #else
-    PyObject *func = PyObject_GetAttrString(editor, "run");
-    #endif
-    CHECK_ERROR();
-
-    PyObject_CallFunction(func, NULL);
-    CHECK_ERROR();
 
     if (Py_FinalizeEx() < 0) {
         exit(1);
