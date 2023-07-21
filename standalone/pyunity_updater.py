@@ -1,6 +1,6 @@
-from pathlib import Path
-import subprocess
+import traceback
 import py_compile
+import zipimport
 import tempfile
 import zipfile
 import urllib.request
@@ -29,7 +29,7 @@ class ZipFile(zipfile.ZipFile):
             )
 
         # Make sure we have an existing info object
-        if isinstance(zinfo_or_arcname, ZipInfo):
+        if isinstance(zinfo_or_arcname, zipfile.ZipInfo):
             zinfo = zinfo_or_arcname
             # make sure zinfo exists
             if zinfo not in self.filelist:
@@ -108,10 +108,49 @@ class ZipFile(zipfile.ZipFile):
 
 def errorMessage(msg):
     if sys.stderr is not None:
-        sys.stderr.write(msg)
+        sys.stderr.write(msg + "\n")
     else:
         ctypes.windll.user32.MessageBoxW(None, msg, "PyUnity Updater error", 0x10)
     exit(1)
+
+def infoMessage(msg):
+    if sys.stdout is not None:
+        sys.stdout.write(msg + "\n")
+    else:
+        ctypes.windll.user32.MessageBoxW(None, msg, "PyUnity Updater message", 0x40)
+
+def fixModulePaths():
+    # Replace all relative paths with absolute paths
+    # TODO: Use absolute paths in C script instead of setting after Python initialization
+    mainDir = os.path.abspath(".")
+    for i in range(len(sys.path)):
+        if sys.path[i].startswith("Lib\\"):
+            sys.path[i] = os.path.join(mainDir, sys.path[i])
+
+    removed = []
+    new = {}
+    for path, importer in sys.path_importer_cache.items():
+        if isinstance(importer, zipimport.zipimporter):
+            removed.append(path)
+            newPath = os.path.join(mainDir, path)
+            importer = zipimport.zipimporter(newPath)
+            new[newPath] = importer
+    for path in removed:
+        sys.path_importer_cache.pop(path)
+    for path in new:
+        sys.path_importer_cache[path] = new[path]
+    
+    for module in sys.modules.values():
+        if isinstance(module.__loader__, zipimport.zipimporter):
+            newPath = os.path.join(mainDir, module.__loader__.archive, module.__loader__.prefix)
+            loader = zipimport.zipimporter(newPath)
+            module.__loader__ = loader
+            module.__spec__.loader = loader
+            module.__spec__.origin = os.path.join(mainDir, module.__spec__.origin)
+            locations = module.__spec__.submodule_search_locations
+            if locations is not None:
+                for i in range(len(locations)):
+                    locations[i] = os.path.join(mainDir, locations[i])
 
 def getPyUnity():
     url = "https://nightly.link/pyunity/pyunity/workflows/windows/develop/purepython.zip"
@@ -126,7 +165,7 @@ def getPyUnity():
         zf.extractall("pyunity-package")
 
 def getPyUnityEditor():
-    url = "https://nightly.link/pyunity/pyunity-gui/workflows/windows/develop/purepython.zip"
+    url = "https://nightly.link/pyunity/pyunity-gui/workflows/wheel/master/purepython.zip"
     print("GET", url, "-> editor-artifact.zip", flush=True)
     urllib.request.urlretrieve(url, "editor-artifact.zip")
     with zipfile.ZipFile("editor-artifact.zip") as zf:
@@ -152,10 +191,10 @@ def addPackage(zf, name, path, orig, distInfo=True):
             zf.write(file)
     os.chdir(orig)
 
-def updatePackages():
+def updatePackages(workdir):
     getPyUnity()
     getPyUnityEditor()
-    with ZipFile(__file__, "a", **ZIP_OPTIONS) as zf:
+    with ZipFile(os.path.dirname(__file__), "a", **ZIP_OPTIONS) as zf:
         removed = set()
         for file in zf.filelist:
             for folder in ["pyunity/", "pyunity-", "pyunity_editor/", "pyunity_editor-"]:
@@ -170,16 +209,44 @@ def updatePackages():
         addPackage(zf, "editor-package", "pyunity_editor\\**\\*", workdir)
 
 def main():
-    source = os.path.abspath(__file__)
-    if not os.path.dirname(source).endswith(".zip"):
-        errorMessage("Updater source not found in zip\nZip file not locatable")
+    if not os.path.isfile("Lib\\python.zip"):
+        errorMessage("Zip file not locatable")
+
+    fixModulePaths()
 
     workdir = tempfile.mkdtemp()
     os.chdir(workdir)
     try:
-        updatePackages()
+        updatePackages(workdir)
+        infoMessage("Updated packages successfully")
     except Exception as e:
-        errorMessage(traceback.format_exception(type(e), e, e.__traceback__))
+        errorMessage("".join(traceback.format_exception(type(e), e, e.__traceback__)))
     finally:
         os.chdir(originalFolder)
         shutil.rmtree(workdir)
+
+def installIntoZip():
+    source = os.path.abspath(__file__)
+    filename = os.path.basename(__file__)
+    os.chdir(os.path.dirname(source))
+    if not os.path.isfile("Lib\\python.zip"):
+        errorMessage("Zip file not locatable")
+
+    try:
+        py_compile.compile(filename, filename + "c")
+        with zipfile.ZipFile("Lib\\python.zip", "a") as zf:
+            zf.write(filename + "c")
+    except Exception as e:
+        errorMessage("".join(traceback.format_exception(type(e), e, e.__traceback__)))
+    else:
+        infoMessage("Installed script successfully")
+    finally:
+        if os.path.isfile(filename + "c"):
+            os.remove(filename + "c")
+
+if __name__ == "__main__":
+    source = os.path.abspath(__file__)
+    if os.path.dirname(source).endswith(".zip"):
+        main()
+    else:
+        installIntoZip()

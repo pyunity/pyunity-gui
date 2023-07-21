@@ -37,7 +37,7 @@ void showError() {
 #endif
 
 int main(int argc, char **argv) {
-    wchar_t *path = Py_DecodeLocale("Lib\\python.zip;Lib;Lib\\win32", NULL);
+    wchar_t *path = Py_DecodeLocale("Lib\\python.zip;Lib\\;Lib\\win32", NULL);
     Py_SetPath(path);
 
     wchar_t **program = (wchar_t**)PyMem_Malloc(sizeof(wchar_t**) * argc);
@@ -62,6 +62,12 @@ int main(int argc, char **argv) {
     PyObject *right2 = Py_BuildValue("s", "--interactive");
     if (PyUnicode_Compare(left, right1) == 0 ||
             PyUnicode_Compare(left, right2) == 0) {
+        #ifdef NOCONSOLE
+        if (AllocConsole() == 0) {
+            MessageBoxW(NULL, L"Cannot allocate console", L"Error loading PyUnity Editor", 0x10L);
+            exit(1);
+        }
+        #endif
         program[1] = Py_DecodeLocale("-E", NULL);
         int retcode = Py_Main(argc, program);
         exit(retcode);
