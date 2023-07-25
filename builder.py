@@ -19,12 +19,12 @@ from pip._internal.models.target_python import TargetPython
 from pip._internal.req.constructors import install_req_from_line
 from pip._vendor.packaging.version import parse
 
-argArchmap = {"x64": "amd64", "x86": "win32"}
+archmap = {"x64": "win_amd64", "x86": "win32"}
 MSVC_RUNTIME = False
 VERSION = os.getenv("PYTHON_VERSION")
 if not VERSION:
     VERSION = "3.10.11"
-ARCH = argArchmap.get(os.getenv("PYTHON_ARCHITECTURE"), "")
+ARCH = archmap.get(os.getenv("PYTHON_ARCHITECTURE"), "")
 if not ARCH:
     ARCH = "amd64"
 ZIP_OPTIONS = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
@@ -43,14 +43,13 @@ class PypiLinkGetter:
     )))
     prefs = SelectionPreferences(True, False, prefer_binary=True)
     finders = {}
-    archmap = {"amd64": "win_amd64", "win32": "win32"}
 
     @classmethod
     def getLink(cls, version, platform, req):
         print("FIND", req)
         vertuple = tuple(version.split("."))
         if (vertuple, platform) not in cls.finders:
-            target = TargetPython([cls.archmap[platform]], vertuple)
+            target = TargetPython([platform], vertuple)
             finder = PackageFinder.create(cls.collector, cls.prefs, target)
             cls.finders[vertuple, platform] = finder
         else:
@@ -157,7 +156,8 @@ def addPackage(zf, name, path, orig, distInfo=True):
     os.chdir(orig)
 
 def getEmbedPackage():
-    download(f"https://www.python.org/ftp/python/{VERSION}/python-{VERSION}-embed-{ARCH}.zip",
+    architecture = "amd64" if ARCH == "win_amd64" else ARCH
+    download(f"https://www.python.org/ftp/python/{VERSION}/python-{VERSION}-embed-{architecture}.zip",
              "embed.zip")
     os.makedirs(mainFolder, exist_ok=True)
     with zipfile.ZipFile("embed.zip") as zf:
