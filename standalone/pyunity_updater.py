@@ -2,6 +2,7 @@ import traceback
 import py_compile
 import zipimport
 import tempfile
+import logging
 import zipfile
 import urllib.request
 import ctypes
@@ -9,6 +10,10 @@ import shutil
 import glob
 import sys
 import os
+
+logging.basicConfig(filename="updater.log")
+logger = logging.getLogger("pyunity_updater")
+logger.setLevel(logging.INFO)
 
 ZIP_OPTIONS = {"compression": zipfile.ZIP_DEFLATED, "compresslevel": 9}
 
@@ -122,11 +127,14 @@ def infoMessage(msg):
 def fixModulePaths():
     # Replace all relative paths with absolute paths
     # TODO: Use absolute paths in C script instead of setting after Python initialization
+    logger.info("Fixing module paths")
+    logger.info("Fixing sys.path")
     mainDir = os.path.abspath(".")
     for i in range(len(sys.path)):
         if sys.path[i].startswith("Lib\\"):
             sys.path[i] = os.path.join(mainDir, sys.path[i])
 
+    logger.info("Fixing sys.path_importer_cache")
     removed = []
     new = {}
     for path, importer in sys.path_importer_cache.items():
@@ -140,6 +148,7 @@ def fixModulePaths():
     for path in new:
         sys.path_importer_cache[path] = new[path]
     
+    logger.info("Fixing sys.modules")
     for module in sys.modules.values():
         if isinstance(module.__loader__, zipimport.zipimporter):
             newPath = os.path.join(mainDir, module.__loader__.archive, module.__loader__.prefix)
@@ -153,9 +162,11 @@ def fixModulePaths():
                     locations[i] = os.path.join(mainDir, locations[i])
 
 def getPyUnity():
+    logger.info("Fetching latest pure python pyunity wheel build")
     url = "https://nightly.link/pyunity/pyunity/workflows/windows/develop/purepython.zip"
     print("GET", url, "-> pyunity-artifact.zip", flush=True)
     urllib.request.urlretrieve(url, "pyunity-artifact.zip")
+    logger.info("Extracting pyunity wheel build")
     with zipfile.ZipFile("pyunity-artifact.zip") as zf:
         print("EXTRACT pyunity-artifact.zip", flush=True)
         zf.extractall("pyunity-artifact")
@@ -165,9 +176,11 @@ def getPyUnity():
         zf.extractall("pyunity-package")
 
 def getPyUnityEditor():
+    logger.info("Fetching latest pure python pyunity-gui wheel build")
     url = "https://nightly.link/pyunity/pyunity-gui/workflows/wheel/master/purepython.zip"
     print("GET", url, "-> editor-artifact.zip", flush=True)
     urllib.request.urlretrieve(url, "editor-artifact.zip")
+    logger.info("Extracting pyunity-editor wheel build")
     with zipfile.ZipFile("editor-artifact.zip") as zf:
         print("EXTRACT editor-artifact.zip", flush=True)
         zf.extractall("editor-artifact")
@@ -178,6 +191,7 @@ def getPyUnityEditor():
 
 # copied from builder.py
 def addPackage(zf, name, path, orig, distInfo=True):
+    logger.info("Adding " + name + " to zip file")
     print("COMPILE", name, flush=True)
     os.chdir("..\\" + name)
     paths = glob.glob(path, recursive=True)
@@ -192,9 +206,11 @@ def addPackage(zf, name, path, orig, distInfo=True):
     os.chdir(orig)
 
 def updatePackages(workdir):
+    logger.info("Fetching latest packages")
     getPyUnity()
     getPyUnityEditor()
     with ZipFile(os.path.dirname(__file__), "a", **ZIP_OPTIONS) as zf:
+        logger.info("Deleting old files")
         removed = set()
         for file in zf.filelist:
             for folder in ["pyunity/", "pyunity-", "pyunity_editor/", "pyunity_editor-"]:
@@ -203,44 +219,59 @@ def updatePackages(workdir):
                     break
         zf._remove_members(removed)
 
+        logger.info("Adding new packages")
         os.chdir(os.path.join(workdir, "pyunity-package"))
         addPackage(zf, "pyunity-package", "pyunity\\**\\*", workdir)
         os.chdir(os.path.join(workdir, "editor-package"))
         addPackage(zf, "editor-package", "pyunity_editor\\**\\*", workdir)
 
 def main():
+    logger.info("Started update script")
     if not os.path.isfile("Lib\\python.zip"):
         errorMessage("Zip file not locatable")
+
+    logger.info("Located zip file")
 
     fixModulePaths()
 
     workdir = tempfile.mkdtemp()
     os.chdir(workdir)
+    logger.info("Using directory " + workdir)
     try:
         updatePackages(workdir)
+        logger.info("Updated packages successfully")
         infoMessage("Updated packages successfully")
     except Exception as e:
         errorMessage("".join(traceback.format_exception(type(e), e, e.__traceback__)))
     finally:
+        logger.info("Cleaning up directory " + workdir)
+        print("Cleaning up")
         os.chdir(originalFolder)
         shutil.rmtree(workdir)
 
-def installIntoZip():
+def injectIntoZip():
+    logger.info("Started update script injector")
     source = os.path.abspath(__file__)
     filename = os.path.basename(__file__)
     os.chdir(os.path.dirname(source))
     if not os.path.isfile("Lib\\python.zip"):
         errorMessage("Zip file not locatable")
 
+    logger.info("Located zip file")
+
     try:
+        logger.info("Compiling updater into bytecode")
         py_compile.compile(filename, filename + "c")
+        logger.info("Adding bytecode into zip file")
         with zipfile.ZipFile("Lib\\python.zip", "a") as zf:
             zf.write(filename + "c")
     except Exception as e:
         errorMessage("".join(traceback.format_exception(type(e), e, e.__traceback__)))
     else:
-        infoMessage("Installed script successfully")
+        logger.info("Injected script successfully")
+        infoMessage("Injected script successfully")
     finally:
+        logger.info("Removing bytecode")
         if os.path.isfile(filename + "c"):
             os.remove(filename + "c")
 
@@ -249,4 +280,4 @@ if __name__ == "__main__":
     if os.path.dirname(source).endswith(".zip"):
         main()
     else:
-        installIntoZip()
+        injectIntoZip()
